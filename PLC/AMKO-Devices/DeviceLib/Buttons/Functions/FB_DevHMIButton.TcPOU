@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+  <POU Name="FB_DevHMIButton" Id="{976bfa1c-85fd-4d4c-b554-67d8ef93bfe5}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevHMIButton EXTENDS FB_DevBase // Button function for HMI 
+VAR_INPUT
+	Istatus			: BOOL	:= FALSE;// Digital sensor, Direct input status
+	tDelay			: TIME 	:= T#5S	;// Time before delayed signal becomes active 
+END_VAR
+VAR_OUTPUT
+	bFcoInputActive		: BOOL 			;// Digital sensor, Button active state
+	bFcoDelay			: BOOL			;// Button, Delayed input status (3 seconds) 
+	bFeStatus			: BOOL			;// Button, Falling edge of input signal	
+	bReStatus			: BOOL			;// Button, Rising edge of input signal
+	TetInputActive		: TIME			;// Button, Time elapsed while button is active
+	bInvisible			: BOOL 			;// Button, Button is made invisible
+	bDeactivate			: BOOL 			;// Button, Deactivate button 
+END_VAR
+VAR
+	FB_delIStatus: TON; // Timer function for delayed input status 
+	FB_feIStatus: F_TRIG; // generate falling edge pulse edge from Istatus
+	FB_reIStatus: R_TRIG; // generate falling edge pulse edge from Istatus
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Call base function
+SUPER^();
+
+// ***** Direct input when enabled *****
+IF bEnable THEN 
+	bFcoInputActive := Istatus ;
+ELSE 
+	bFcoInputActive := FALSE ;
+END_IF
+
+// ===== check if function is enabled =====
+	IF NOT bEnable THEN 
+		bInvisible 	:= TRUE ;
+		bDeactivate	:= TRUE ;
+		bFcoDelay	:= FALSE;
+		RETURN;
+	ELSE  
+		bInvisible 	:= FALSE ;
+		bDeactivate	:= FALSE ;
+	END_IF
+
+// ====== process functions if enabled ======
+	// ***** Set Delayed inputs and time elapsed ****
+		FB_delIStatus(	IN:= bFcoInputActive,
+						PT:= tDelay , 
+						Q=> bFcoDelay , 
+						ET=> TetInputActive 
+					  ); // Generate delayed input status from push button input status
+	// ***** Edge triggers *****
+		FB_feIStatus(CLK:= Istatus , Q=> bFeStatus ); // generate falling edge pulse on pushbutton input
+		FB_reIStatus (Clk := Istatus , Q => bReStatus); // Generate rising edge from push button input signal
+]]></ST>
+    </Implementation>
+    <LineIds Name="FB_DevHMIButton">
+      <LineId Id="432" Count="1" />
+      <LineId Id="430" Count="0" />
+      <LineId Id="379" Count="1" />
+      <LineId Id="384" Count="0" />
+      <LineId Id="386" Count="24" />
+      <LineId Id="10" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

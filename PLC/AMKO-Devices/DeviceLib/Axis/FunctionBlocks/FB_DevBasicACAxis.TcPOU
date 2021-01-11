@@ -1,0 +1,1002 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+  <POU Name="FB_DevBasicACAxis" Id="{399212fc-3ad5-0237-1986-954c33e143fb}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevBasicACAxis EXTENDS FB_DevBase
+VAR_INPUT
+	// ===== General Function input =====
+		fCmdAcc			: LREAL := 15000;
+		fCmdDecc		: LREAL := 15000; 
+	// Manual control reference
+		stManualCtrl	: UDT_ManualAxisCtrl ;
+END_VAR
+VAR_OUTPUT
+	bHomed			: BOOL 	:= FALSE; 
+	bMoving		: BOOL ; // Axis is moving
+	bInPosition : BOOL ; // Axis is in position 
+END_VAR
+VAR
+		AxisRef	: AXIS_REF ; // reference to AC axis
+	// ===== HW Config Bits =====
+		bIcfCmdVelocityRpm	: BOOL ; // input speeds in Rpm
+		bIcfEnableForward 	: BOOL ; // Enable forward motion
+ 		bIcfEnablereverse	: BOOL ; // Enable reverse motion
+		bIcfAlwaysEnable	: BOOL ; // 1 = Axis always enabled, 0 = Axis disabled at Idle 
+		bIcfSimulationMode	: BOOL := FALSE ; // Simulation mode is active [default set to False] 
+	// ===== Internal motion values ======
+		fHomePosition		: LREAL := 0 ; // set position at homing
+	// ====== Axis Settings ======
+		fMaxVelo		: LREAL := 0 ; // Axis Maximum velocity
+		fMaxAcc			: LREAL := 0 ; // Axis Maximum cceleration
+		fMaxDec			: LREAL := 0 ; // axis Maxium deceleration 
+		
+		fSafeVeloLimit	: LREAL	:= 200; // Safe velocity limit 
+		tEnableDelay	: TIME 	:= T#150MS	;
+		tDisableDelay	: TIME 	:= T#500MS  ;
+		
+	// ====== Axis enable =====	
+		bCmdEnableAxis 		: BOOL 	:= FALSE; // Command to enable the axis (External)
+		bInternalEnable		: BOOL 	:= FALSE; // internal enable command (turns off after set time, and on at new motion command
+		bDelayedEnable		: BOOL 	:= false; // Delayed enable signal for motion commands
+		TonMotionEnable		: TON 			; // Timer on for motion command enable
+		TofIntAxisEnable	: TOF  			; // Timer off for internal axis enable 
+	// ===== Safe commands =====
+		bCmdSafeStop	: BOOL ;
+	// Motion commands 
+		fbMcPower 			: MC_Power		;		// FB for enable and override
+		fbMcReset 			: MC_Reset		;		// FB to reset axis
+		fbSoeReset			: FB_SoEReset	; 		// FB to reset axis hardware
+		fbMcHome			: MC_Home		;		// Fb to home Axis
+		fbMcStop 			: MC_Stop		;		// FB to stop axis
+		fbMcHalt			: MC_Halt		;		// FB to halt axis
+		fbMcJog				: MC_Jog		;		// FB to Jog axis
+		fbMcMoveVelocity	: MC_MoveVelocity;		// FB to move with specified velocity until Next command is given
+	(* PtoP Motion move commands are in arrays so multiple commands can be stacked *) 
+		fbMCMoveRelative	: ARRAY [0..1] OF MC_MoveRelative	;		// FB to move relative
+		fbMcMoveAbsolute	: ARRAY [0..1] OF MC_MoveAbsolute	;		// FB to move axis (velocity movement)
+		
+	// Parameters 
+		stMParMaxAcc : Udt_Parameter := (fMaximum := 999999, fMinimum := 0, fValue := 0)	; // Parameter for maximum acceleration
+		stMParMaxDec : Udt_Parameter := (fMaximum := 999999, fMinimum := 0, fValue := 0)	; // Parameter for maximum Deceleration
+		stMparMaxVelo: Udt_Parameter := (fMaximum := 999999, fMinimum := 0, fValue := 0)	; // Parameter for maximum velocity
+		
+	// Device feedback
+		nActVelocity AT%I* : INT ; // actual speed of the motor
+		nActPosition AT%I* : UDINT ; // Actual position of the motor
+
+	// ===== Function execute triggers =====
+		bExec_Reset			: BOOL := FALSE; // Execute reset
+		bExec_Halt			: BOOL := FALSE; // Execute hold
+		bExec_Home			: BOOL := FALSE; // Execute Home
+		bExec_JogPositive	: BOOL := FALSE; // Execute Jog in positive direction
+		bExec_JogNegative	: BOOL := FALSE; // Execute Jog in negative direction
+		bExec_MoveVelocity	: BOOL := FALSE; // Execute move velocity
+		arExec_MoveRelative	: ARRAY [0..1] OF BOOL ; // Execute move relative
+		arExec_MoveAbs		: ARRAY [0..1] OF BOOL ; // Execute move absolute reverse
+		
+
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Call base function
+SUPER^(refFbFault := refFbFault);
+
+// ==== Check if axis is initiated =====
+IF NOT bInitOk THEN 
+	RETURN ; 
+END_IF
+
+// ===== Execute safe functions =====
+	ExecSafeFunctions(); 
+
+// ==== Execute organizational functions =====
+	ExecEnable();
+
+// ==== execute motion functions =====
+	CallMotionFunctions();
+]]></ST>
+    </Implementation>
+    <Folder Name="Commands" Id="{e09297dc-c0aa-084c-2068-146d286afe03}" />
+    <Folder Name="Private" Id="{eedcaa3e-644e-09d2-2c97-9667d8fb0b6d}">
+      <Folder Name="Motion" Id="{c83b6963-b999-0671-1f0a-c1203bae4a7b}" />
+    </Folder>
+    <Method Name="CallMotionFunctions" Id="{df6778e1-9f18-0c6d-097d-55e6d2427ff8}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PRIVATE CallMotionFunctions : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ===== Check if safe to move =====
+	IF bCmdSafeStop OR NOT bDelayedEnable THEN 
+		RETURN ;
+	END_IF
+
+// ===== Homing functions =====
+	ExecHome		(); 
+
+// ===== Motion standstil commands =====
+	ExecHalt		();
+
+// ===== Motion move functions
+	ExecJog			(); 
+	ExecMoveAbsolute();
+	ExecMoveRelative();
+	ExecMoveVelocity();
+	
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdHalt" Id="{5fb82a80-5ffd-4f72-a47d-3a79f4d895b6}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdHalt : BOOL
+VAR_INPUT
+	fDeceleration 	: LREAL := 0 ; // command deceleration
+	mcBuffermode	: MC_BufferMode ; // Buffermode defines how the previous command is executed.
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Set command to true 
+bExec_Halt 		:= TRUE ;
+bInternalEnable	:= TRUE ;
+
+// coppy parameters
+fbMcHalt.Deceleration	:= fDeceleration;
+fbMcHalt.BufferMode		:= mcBuffermode	;
+
+// Set feedback output 
+CmdHalt := fbMchalt.Active ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdHome" Id="{3e65844c-78e5-091f-07c7-94c1b81b1a5a}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdHome : BOOL // start axis homing procedure
+VAR_INPUT
+	fPosition 		: LREAL := 0 ; // Homing position
+	mcBufferMode	: MC_BufferMode := MC_BufferMode.MC_Aborting		; // Buffermode
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// set command to true 
+bExec_Home 		:= TRUE	; 
+bInternalEnable	:= TRUE ;
+
+// coppy parameters
+fbMcHome.Position 	:= fPosition 	;
+fbMcHome.BufferMode	:= mcBufferMode ;
+
+// Set feedback output
+CmdHome := fbMcHome.Done ;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdJog" Id="{98cb74ae-0596-0a13-381d-d275b1843d1b}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdJog : BOOL // Jog axis with variable speed. jog stops as soon as the command is false
+VAR_INPUT
+	fVelocity		: LREAL 	; // jog velocity can be adjusted as long as the command is active
+	fPos			: LREAL 	; // Jog position or step size (if aplicable)
+	bJogNegative 	: BOOL 		:= FALSE ; // jog in negative direction
+	eJogmode		: E_JogMode := E_JogMode.MC_JOGMODE_CONTINOUS ; // jogmode [default MC_JOGMODE_CONTINOUS] 
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Velocity conversion from RPM to deg/sec
+	IF bIcfCmdVelocityRpm THEN 
+		fVelocity := Rpm_To_DegS(fVelocity);
+	END_IF
+
+// Set command to true
+	IF fbMcJog.Velocity = fVelocity THEN // If command velocity changes, then set exec to false for one cycle to trigger new velocity so the jog follows the set velocity
+		bExec_JogPositive	:= NOT bJogNegative ;
+		bExec_JogNegative 	:= bJogNegative ;
+	END_IF
+	bInternalEnable			:= TRUE ;
+
+// coppy parameters
+	fbMcJog.Velocity	:= fVelocity 	;
+	fbmcjog.Mode		:= eJogmode		;
+	fbMcJog.Position	:= fPos			;
+
+// Set feedback output 
+	CmdJog := fbMcJog.Active ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdManual" Id="{3ce40203-b4d2-0a5e-34ee-d827b0a8f117}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdManual : BOOL
+VAR
+	eJogmode		: E_JogMode := E_JogMode.MC_JOGMODE_CONTINOUS ; // jogging mode 
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Enable axis for manual control
+bCmdManual := TRUE ;
+
+// set jog mode 
+IF stManualCtrl.bCmdInching THEN 
+	eJogmode := E_JogMode.MC_JOGMODE_INCHING ;
+END_IF
+
+// execute motion commands
+IF stManualCtrl.bCmdJogForward OR stManualCtrl.bCmdJogReverse THEN 
+	CmdJog (fVelocity := stManualCtrl.fVelocity, 
+			fPos := stManualCtrl.fDistance, 
+			bJogNegative := stManualCtrl.bCmdJogReverse, 
+			eJogmode := eJogmode);
+ELSIF stManualCtrl.bCmdToPos THEN 
+	CmdMoveAbs( fPosition := stManualCtrl.fPosition, 
+				fVelocity := stManualCtrl.fVelocity, 
+				mcBuffermode := MC_BufferMode.MC_Aborting);
+ELSIF stManualCtrl.bCmdHome THEN 
+	CmdHome( fPosition := 0, mcBufferMode := MC_Aborting);
+ELSE 
+	CmdHalt( 	fDeceleration := fMaxDec * 0.9, 
+				mcBuffermode := MC_BufferMode.MC_Aborting) ; 
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdMoveAbs" Id="{c8a2c223-ab9e-00a2-1b56-623ff0fdbb39}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdMoveAbs : BOOL // Move absolute command
+VAR_INPUT
+	fPosition	:	LREAL 	; // target position
+	fVelocity	: 	LREAL 	; // Maximum velocity [units/sec]
+	mcBuffermode: 	MC_BufferMode ; // Buffermode defines how the previous command is executed.
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Velocity conversion from RPM to deg/sec
+	IF bIcfCmdVelocityRpm THEN 
+		fVelocity := Rpm_To_DegS(fVelocity);
+	END_IF
+
+// Determine function for command stacking
+	IF fbMcMoveAbsolute[0].Active THEN 
+		arExec_MoveAbs[1] 				:= (fPosition <> fbMcMoveAbsolute[0].Position OR fVelocity <> fbMcMoveAbsolute[0].Velocity) ;
+		fbMcMoveAbsolute[1].Position 	:= fPosition ;
+		fbMcMoveAbsolute[1].Velocity 	:= fVelocity ; 
+		fbMcMoveAbsolute[1].BufferMode 	:= mcBuffermode ;
+	ELSE
+		arExec_MoveAbs[0] 				:= (fPosition <> fbMcMoveAbsolute[1].Position OR fVelocity <> fbMcMoveAbsolute[1].Velocity) ;
+		fbMcMoveAbsolute[0].Position 	:= fPosition ;
+		fbMcMoveAbsolute[0].Velocity 	:= fVelocity ; 
+		fbMcMoveAbsolute[0].BufferMode 	:= mcBuffermode ;
+	END_IF
+
+bInternalEnable	:= TRUE ;
+// set feedback
+IF arExec_MoveAbs[1] OR fbMcMoveAbsolute[1].Busy THEN 
+	CmdMoveAbs :=	fbMcMoveAbsolute[1].Active ;
+ELSE 
+	CmdMoveAbs :=	fbMcMoveAbsolute[0].Active ;
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdMoveRelative" Id="{1795bbb4-c9d8-0ad1-361b-9df2709687fb}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD CmdMoveRelative : BOOL // move relative command 
+VAR_INPUT
+	fDistance	:	LREAL 	; // target position
+	fVelocity	: 	LREAL 	; // Maximum velocity [units/sec]
+	mcBuffermode: 	MC_BufferMode ; // Buffermode defines how the previous command is executed.
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Velocity conversion from RPM to deg/sec
+	IF bIcfCmdVelocityRpm THEN 
+		fVelocity := Rpm_To_DegS(fVelocity);
+	END_IF
+
+// Determine function for command stacking
+	IF fbMCMoveRelative[0].Active THEN 
+		arExec_MoveRelative[1] := (fDistance <> fbMCMoveRelative[0].Distance OR fVelocity <> fbMCMoveRelative[0].Velocity) ;
+		fbMCMoveRelative[1].Velocity	:= fVelocity 	;
+		fbMCMoveRelative[1].Distance	:= fDistance	;
+		fbMCMoveRelative[1].BufferMode	:= mcBuffermode	;
+	ELSE 
+		arExec_MoveRelative[0] := (fDistance <> fbMCMoveRelative[1].Distance OR fVelocity <> fbMCMoveRelative[1].Velocity) ;
+		fbMCMoveRelative[0].Velocity	:= fVelocity 	;
+		fbMCMoveRelative[0].Distance	:= fDistance	;
+		fbMCMoveRelative[0].BufferMode	:= mcBuffermode	;
+	END_IF
+
+bInternalEnable	:= TRUE ;
+
+// set feedback
+IF arExec_MoveRelative[1] OR fbMCMoveRelative[1].Busy THEN 
+	CmdMoveRelative :=	fbMCMoveRelative[1].Active ;
+ELSE
+	CmdMoveRelative :=	fbMCMoveRelative[0].Active ;
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdMoveVelocity" Id="{da29b8c2-802c-0e9d-24ac-ab6110610414}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdMoveVelocity : BOOL // Move with set velocity until stopped
+VAR_INPUT
+	fVelocity	: 	LREAL 	; // Maximum velocity [units/sec]
+	mcDirection : 	MC_Direction := MC_Direction.MC_Positive_Direction ; // Direction of movement mc_direction [ deafult mc_positive_direction]
+	mcBuffermode: 	MC_BufferMode ; // Buffermode defines how the previous command is executed.
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Velocity conversion from RPM to deg/sec
+	IF bIcfCmdVelocityRpm THEN 
+		fVelocity := Rpm_To_DegS(fVelocity);
+	END_IF
+
+// Set command to true 
+	bExec_MoveVelocity 	:= TRUE ;
+	bInternalEnable		:= TRUE ;
+
+// coppy parameters
+	fbMcMoveVelocity.Velocity	:= fVelocity 	;
+	fbMcMoveVelocity.Direction 	:= mcDirection	;
+	fbMcMoveVelocity.BufferMode	:= mcBuffermode	;
+
+// Set feedback output 
+	CmdMoveVelocity := fbMcMoveVelocity.Active ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdReset" Id="{ba035b82-611e-08e7-27b1-b4a38a3b499d}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdReset : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Set reset axis to true 				
+	bExec_Reset 	:= TRUE ; 
+	bInternalEnable	:= TRUE ;
+	
+// Set feedback output 
+	CmdReset := fbMcReset.Done ; ]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdSafeStop" Id="{1272661a-b4ca-456b-a28d-d7b759e2f06a}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdSafeStop : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Set safestop command
+bCmdSafeStop := TRUE ; 
+
+// Set feedback output 
+CmdSafeStop := bDevIsSafe OR NOT bInitOk;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecEnable" Id="{090a0249-1749-0de7-24c6-e8a259604e68}" FolderPath="Private\Motion\">
+      <Declaration><![CDATA[METHOD PRIVATE ExecEnable : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ===== Set axis enable ======
+IF NOT bEnable AND NOT bCmdManual AND nActVelocity <> 0 THEN
+	CmdHalt(fDeceleration := fCmdDecc, mcBuffermode := MC_BufferMode.MC_Aborting);
+ELSE 
+	bCmdEnableAxis	:= bEnable OR bCmdManual ;
+	bCmdManual := FALSE ;
+END_IF
+
+// ===== Check if axis is bussy with a command =====
+	bInternalEnable	S= bIcfAlwaysEnable ; // always enable axis if configured
+	
+// ===== Axis disable timer after last command =====
+	TofIntAxisEnable (	IN:= bInternalEnable, PT := tDisableDelay);
+
+// ===== Enable drive =====
+	fbMcPower(	Axis			:= AxisRef , 
+				Enable			:= bCmdEnableAxis AND TofIntAxisEnable.Q, 
+				Enable_Positive	:= bIcfEnableForward, 
+				Enable_Negative	:= bIcfEnablereverse, 
+				Override		:= 100 );  
+				
+// ===== Reset internal enable signal =====
+	bInternalEnable := FALSE ; 	
+
+// ===== Delayed enable function =====	
+	TonMotionEnable(IN := fbMcPower.Active, PT := tEnableDelay);
+	bDelayedEnable := TonMotionEnable.Q ;	
+
+
+IF fbMcPower.Error THEN 
+	bErrorActive			:= TRUE							;
+	stFault.Active 			:= TRUE 						;
+	stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+	stFault.Discription		:= CONCAT('Enable Fault ', UDINT_TO_STRING(fbMcPower.ErrorID));				;
+	stFault.FaultType		:= E_FaultTypes.FF				;
+	refFbFault.CmdAddFault( stFault );
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecHalt" Id="{1dacf53f-a12f-0750-236b-ec8fbb2b7997}" FolderPath="Private\Motion\">
+      <Declaration><![CDATA[METHOD PRIVATE ExecHalt : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ==== Execute halt function ===== 
+fbMcHalt (	Axis 		:= AxisRef,
+			Execute 	:= bExec_Halt );
+
+// ===== reset command =====
+	bExec_Halt := FALSE ;
+	bInternalEnable := fbMcHalt.Busy ;			
+	
+// Halt fault handling 
+	IF fbMcHalt.Error THEN 
+		bErrorActive			:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Halt Fault ', UDINT_TO_STRING(fbMcHalt.ErrorID));				;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+		refFbFault.CmdAddFault( stFault );
+	END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecHome" Id="{b92b1e44-987c-021c-13a3-ad0cde1da971}" FolderPath="Private\Motion\">
+      <Declaration><![CDATA[METHOD PRIVATE ExecHome : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ==== execute homing function =====
+	fbMcHome(	Axis			:= AxisRef,
+				Execute			:= bExec_Home,
+				HomingMode		:= MC_DefaultHoming ); 
+			
+// Reset exec command 
+	bExec_Home 	:= FALSE ;
+	bHomed		S= fbMcHome.Done ;	
+	bInternalEnable := fbMcHome.Busy ;			
+				
+// fault handling 
+	IF fbMcHome.Error THEN 
+		bErrorActive			:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Homing Fault ', UDINT_TO_STRING(fbMcHome.ErrorID));				;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+		refFbFault.CmdAddFault( stFault );
+	END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecJog" Id="{29ca9d00-0145-0213-0626-7b8b0955b474}" FolderPath="Private\Motion\">
+      <Declaration><![CDATA[METHOD PRIVATE ExecJog : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ===== Execute Jog function =====
+	// function call
+	fbMcJog (	Axis 		:= AxisRef,
+				JogForward	:= bExec_JogPositive,
+				JogBackwards:= bExec_JogNegative,
+				Acceleration:= fCmdAcc,
+				Deceleration:= fCmdDecc );
+
+// ===== reset command =====
+	bExec_JogPositive 	:= FALSE  ;
+	bExec_JogNegative	:= FALSE  ;
+	bInternalEnable		:= fbMcJog.Busy; 
+
+// Jog fault handling 
+	IF fbMcJog.Error THEN 
+		bErrorActive			:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Jog Fault ', UDINT_TO_STRING(fbMcJog.ErrorID));				;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+		refFbFault.CmdAddFault( stFault );
+	END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecMoveAbsolute" Id="{cbfacbc8-a3df-0e23-027d-0daf2a93e334}" FolderPath="Private\Motion\">
+      <Declaration><![CDATA[METHOD PRIVATE ExecMoveAbsolute : BOOL
+VAR_INPUT
+END_VAR
+VAR
+	i : UDINT := 0 ;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ==== execute move absolute function =====
+FOR i := 0 TO 1 DO 
+	// function call
+	fbMcMoveAbsolute[i](	Axis 		:= AxisRef,
+							Execute 	:= arExec_MoveAbs[i],
+							Acceleration:= fCmdAcc,
+							Deceleration:= fCmdDecc );  
+	// reset Exec command 
+	arExec_MoveAbs[i] := FALSE ; 
+	bInternalEnable := fbMcMoveAbsolute[i].Busy ;			
+
+	// If function is done then reset command values
+	IF fbMcMoveAbsolute[i].Done THEN 
+		fbMcMoveAbsolute[i].Velocity	:= 0 ;
+		fbMcMoveAbsolute[i].Position	:= 0 ; 
+	END_IF
+	
+	// fault handling 
+	IF fbMcMoveAbsolute[i].Error THEN 
+		bErrorActive			:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Move absolute Fault ', UDINT_TO_STRING(fbMcMoveAbsolute[i].ErrorID));				;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+		refFbFault.CmdAddFault( stFault );
+	END_IF
+END_FOR 
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecMoveRelative" Id="{dd527bc6-4687-0467-3966-04400a33b2aa}" FolderPath="Private\Motion\">
+      <Declaration><![CDATA[METHOD PRIVATE ExecMoveRelative : BOOL
+VAR_INPUT
+END_VAR
+VAR
+	i : UDINT := 0 ;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ===== Execute move relative function ======
+FOR i := 0 TO 1 DO 
+	// function call
+	fbMCMoveRelative[i](	Axis 		:= AxisRef,
+							Execute		:= arExec_MoveRelative[i],
+							Acceleration:= fCmdAcc,
+							Deceleration:= fCmdDecc );
+	// reset Exec command 
+	arExec_MoveRelative[i] := FALSE ; 
+	bInternalEnable := fbMCMoveRelative[i].Busy ;			
+
+	// If function is done then reset command values
+	IF fbMCMoveRelative[i].Done THEN 
+		fbMCMoveRelative[i].Velocity	:= 0 ;
+		fbMCMoveRelative[i].Distance	:= 0 ; 
+	END_IF
+	
+	// fault handling 
+	IF fbMCMoveRelative[i].Error THEN 
+		bErrorActive			:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Move relative Fault ', UDINT_TO_STRING(fbMCMoveRelative[i].ErrorID));				;
+		stFault.FaultType		:= E_FaultTypes.FF			;
+		refFbFault.CmdAddFault( stFault );
+	END_IF
+END_FOR]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecMoveVelocity" Id="{00275b2c-af05-0c37-1b38-b1989240cb13}" FolderPath="Private\Motion\">
+      <Declaration><![CDATA[METHOD PRIVATE ExecMoveVelocity : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ===== Execute move velocity function =====
+// function call
+fbMcMoveVelocity (	Axis 		:= AxisRef,
+					Execute		:= bExec_MoveVelocity,
+					Acceleration:= fCmdAcc,
+					Deceleration:= fCmdDecc );
+
+// ===== reset command =====
+bExec_MoveVelocity := FALSE ;
+bInternalEnable		:= fbMcMoveVelocity.Busy;
+	
+// Halt fault handling 
+IF fbMcHalt.Error THEN 
+	bErrorActive			:= TRUE							;
+	stFault.Active 			:= TRUE 						;
+	stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+	stFault.Discription		:= CONCAT('Move velocity Fault ', UDINT_TO_STRING(fbMcMoveVelocity.ErrorID));				;
+	stFault.FaultType		:= E_FaultTypes.FF				;
+	refFbFault.CmdAddFault( stFault );
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecReset" Id="{2fec5393-4f47-011f-1ff8-817d4f397ca7}" FolderPath="Private\Motion\">
+      <Declaration><![CDATA[METHOD PRIVATE ExecReset : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF  nActVelocity <> 0 AND bExec_Reset THEN // If the axis is still moving execute safe stop first
+	CmdSafeStop();
+	RETURN;
+END_IF
+
+// perform reset 
+	fbMcReset	( 	Execute	:= bexec_reset AND NOT fbSoeReset.Busy,
+					Axis	:= AxisRef ); 
+					
+// ===== reset command =====
+	bExec_Reset := FALSE ;
+	
+// ===== reset internal fault bits and stop bits =====
+	bErrorActive 			:= FALSE ; 
+	
+// ===== reset safe commands ======
+	bCmdSafeStop	:= FALSE ; 
+	
+// Reset fault handling 
+	IF fbSoeReset.Error OR fbMcReset.Error THEN 
+		bErrorActive			:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Reset Fault ', UDINT_TO_STRING(fbMcReset.ErrorID))			;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+		refFbFault.CmdAddFault( stFault );
+	END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecSafeFunctions" Id="{73a129ec-3a9f-0fc1-0be4-220de2bfc911}" FolderPath="Private\Motion\">
+      <Declaration><![CDATA[METHOD PRIVATE ExecSafeFunctions : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ==== Stop when safety is not ok =====
+	bCmdSafeStop := NOT bSafetyOk ;
+
+// ==== Safe operation functions (overrule all other motion functions) =====
+	fbMcStop( 	Axis 			:= AxisRef		,
+				Execute 		:= bCmdSafeStop	,
+				Deceleration	:= fMaxDec		);
+	
+	// Reset axis command			
+	bCmdSafeStop 	R= fbMcStop.Done ;
+	
+// Safestop fault handling 
+	IF fbMcStop.Error THEN 
+		bErrorActive			:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Safe stop axis fault ', UDINT_TO_STRING(fbMcStop.ErrorID));				;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+		refFbFault.CmdAddFault( stFault );
+	END_IF
+
+// ===== Dev is safe feedback =====
+bDevIsSafe := NOT bCmdEnableAxis  ;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Init" Id="{d9ee605e-1b43-0849-35b2-d86a67775109}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
+VAR_INPUT
+	// Axis message Data 
+	nDevNumber	: UDINT		:= 0	; // Axis number 
+	// Config Bits
+	bIcfCmdVelocityRpm	: BOOL := FALSE ; // input speeds in Rpm
+	bIcfEnableForward 	: BOOL := TRUE 	; // Enable forward motion
+	bIcfEnablereverse	: BOOL := TRUE 	; // Enable reverse motion
+	bIcfAlwaysEnable	: BOOL := FALSE ; // 1 = Axis always enabled, 0 = Axis disabled at Idle 
+	bIcfSimulationMode	: BOOL := FALSE ; // Simulation mode is active [default set to False] Used for testing without hardware present 
+	
+	fHomePosition		: LREAL := 0 	; // set position at homing
+	fSafeVeloLimit		: LREAL	:= 360 	; // safe velocity limit [deg/sec]
+	nEncTurnoverVal 	: LREAL := 360	; // encoder turnover value 
+	tEnableDelay		: time 	:= T#0MS; // Time between axis enable command and motion command execution (0 := no delay active)	
+	tDisabledelay		: TIME 	:= T#100MS; // Axis idle time before axis is disabled 
+END_VAR
+VAR 
+	bActParamValid 		: BOOL ; // Parameter read is valid 
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Calculate device number
+	THIS^.nDevNumber := nDevNumber ;
+	SUPER^.CalcDeviceId();
+
+// ===== Message data set =====
+	stFault.ComponentType		:= E_ComponentTypes.Axis ;
+	
+// ===== Write parameters =====
+	stMParMaxAcc.nNumber		:= nDevId + 1;
+	stMParMaxAcc.sDiscription 	:= CONCAT(STR1 := sDevName, STR2:= ' hardware maximum accaleration (0 = HWMaximum)'); 
+	stMParMaxAcc.sName			:= CONCAT(STR1 := sDevName, STR2:= 'HardMaxAceleration');
+	stMParMaxAcc.sType			:= 'MPar';
+	stMParMaxAcc.sUnit			:= 'Units/Sec^2';
+	
+	stMParMaxDec.nNumber		:= nDevId + 2;
+	stMParMaxDec.sDiscription 	:= CONCAT(STR1 := sDevName, STR2:= ' hardware maximum deceleration(0 = HWMaximum)'); 
+	stMParMaxDec.sName			:= CONCAT(STR1 := sDevName, STR2:= 'HardMaxDeceleration');
+	stMParMaxDec.sType			:= 'MPar';
+	stMParMaxDec.sUnit			:= 'Units/Sec^2';
+	
+	stMparMaxVelo.nNumber		:= nDevId + 3;
+	stMparMaxVelo.sDiscription 	:= CONCAT(STR1 := sDevName, STR2:= ' hardware maximum velocity'); 
+	stMparMaxVelo.sName			:= CONCAT(STR1 := sDevName, STR2:= 'HardMaxVelocity');
+	stMparMaxVelo.sType			:= 'MPar';
+	stMparMaxVelo.sUnit			:= 'Units/Sec';
+
+	refFbParHandler.CmdAddParameter(refParameter := stMParMaxAcc);
+	refFbParHandler.CmdAddParameter(refParameter := stMParMaxDec);
+	refFbParHandler.CmdAddParameter(refParameter := stMparMaxVelo);
+
+// ===== set axis configuration =====	
+	fMaxAcc	:= stMParMaxAcc.fValue;
+	fMaxDec	:= stMParMaxDec.fValue;	
+	fMaxVelo:= stMparMaxVelo.fValue;
+
+	fCmdAcc 		:= fMaxAcc;
+	fCmdDecc		:= fMaxDec;
+// ===== Configure Axis =====
+	// ***** Config Bits *****
+		THIS^.bIcfCmdVelocityRpm	:= bIcfCmdVelocityRpm	; // Enable speed inputs in Rpm
+		THIS^.bIcfEnableForward 	:= bIcfEnableForward 	; // Enable forward motion
+		THIS^.bIcfEnablereverse		:= bIcfEnablereverse	; // Enable reverse motion
+		THIS^.bIcfAlwaysEnable		:= bIcfAlwaysEnable		; // Always enable motor and brake if safety is ok
+		THIS^.bIcfSimulationMode	:= bIcfSimulationMode 	; // Simulation mode is active [default set to False] 
+
+	// ***** config homing Mode ***** 
+ 		THIS^.fHomePosition			:= fHomePosition;
+	// ***** Velocity settings *****
+		THIS^.fSafeVeloLimit 		:= fSafeVeloLimit ; // set maximum safe velocity	
+	// ***** Time delay enable off *****
+		THIS^.tEnableDelay		:= tEnableDelay	;
+		THIS^.tDisableDelay 	:= tDisabledelay ;		
+
+// ===== Set device type for manual control =====
+	eDevType := E_Devices.Axis ;
+		
+// ===== reset axis state indicators ======
+	bErrorActive 	:= FALSE;
+
+// ====== Set init to done =======
+	bInitOk	:= TRUE ; 
+	]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_DevBasicACAxis">
+      <LineId Id="38" Count="15" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevBasicACAxis.CallMotionFunctions">
+      <LineId Id="6" Count="14" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="33" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevBasicACAxis.CmdHalt">
+      <LineId Id="9" Count="1" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="11" Count="2" />
+      <LineId Id="15" Count="2" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevBasicACAxis.CmdHome">
+      <LineId Id="5" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="24" Count="1" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="14" Count="0" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="8" Count="0" />
+      <LineId Id="6" Count="0" />
+      <LineId Id="9" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_DevBasicACAxis.CmdJog">
+      <LineId Id="34" Count="3" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="38" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="11" Count="2" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="16" Count="1" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevBasicACAxis.CmdManual">
+      <LineId Id="21" Count="1" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="40" Count="2" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="61" Count="2" />
+      <LineId Id="43" Count="1" />
+      <LineId Id="64" Count="1" />
+      <LineId Id="70" Count="1" />
+      <LineId Id="45" Count="1" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="48" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevBasicACAxis.CmdMoveAbs">
+      <LineId Id="96" Count="0" />
+      <LineId Id="93" Count="2" />
+      <LineId Id="92" Count="0" />
+      <LineId Id="137" Count="11" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="107" Count="1" />
+      <LineId Id="110" Count="0" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="109" Count="0" />
+      <LineId Id="25" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevBasicACAxis.CmdMoveRelative">
+      <LineId Id="53" Count="0" />
+      <LineId Id="49" Count="2" />
+      <LineId Id="79" Count="0" />
+      <LineId Id="6" Count="0" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="8" Count="0" />
+      <LineId Id="32" Count="2" />
+      <LineId Id="9" Count="1" />
+      <LineId Id="36" Count="2" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="45" Count="1" />
+      <LineId Id="103" Count="0" />
+      <LineId Id="64" Count="5" />
+      <LineId Id="16" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevBasicACAxis.CmdMoveVelocity">
+      <LineId Id="27" Count="3" />
+      <LineId Id="26" Count="0" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="13" Count="2" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="18" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevBasicACAxis.CmdReset">
+      <LineId Id="16" Count="1" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="18" Count="1" />
+      <LineId Id="12" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevBasicACAxis.CmdSafeStop">
+      <LineId Id="5" Count="1" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="8" Count="0" />
+      <LineId Id="7" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevBasicACAxis.ExecEnable">
+      <LineId Id="44" Count="0" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="70" Count="0" />
+      <LineId Id="8" Count="0" />
+      <LineId Id="10" Count="12" />
+      <LineId Id="62" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="63" Count="0" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="25" Count="4" />
+      <LineId Id="38" Count="1" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevBasicACAxis.ExecHalt">
+      <LineId Id="6" Count="5" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="12" Count="6" />
+      <LineId Id="32" Count="1" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevBasicACAxis.ExecHome">
+      <LineId Id="6" Count="3" />
+      <LineId Id="11" Count="3" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="15" Count="6" />
+      <LineId Id="35" Count="1" />
+      <LineId Id="26" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevBasicACAxis.ExecJog">
+      <LineId Id="6" Count="0" />
+      <LineId Id="11" Count="9" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="21" Count="6" />
+      <LineId Id="47" Count="1" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevBasicACAxis.ExecMoveAbsolute">
+      <LineId Id="6" Count="1" />
+      <LineId Id="12" Count="6" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="43" Count="4" />
+      <LineId Id="42" Count="0" />
+      <LineId Id="20" Count="5" />
+      <LineId Id="59" Count="1" />
+      <LineId Id="30" Count="1" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevBasicACAxis.ExecMoveRelative">
+      <LineId Id="6" Count="1" />
+      <LineId Id="12" Count="6" />
+      <LineId Id="62" Count="0" />
+      <LineId Id="41" Count="5" />
+      <LineId Id="19" Count="7" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevBasicACAxis.ExecMoveVelocity">
+      <LineId Id="6" Count="0" />
+      <LineId Id="11" Count="7" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="45" Count="6" />
+      <LineId Id="53" Count="1" />
+      <LineId Id="20" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevBasicACAxis.ExecReset">
+      <LineId Id="58" Count="0" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="68" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="11" Count="7" />
+      <LineId Id="37" Count="1" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="22" Count="6" />
+      <LineId Id="52" Count="1" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevBasicACAxis.ExecSafeFunctions">
+      <LineId Id="54" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="6" Count="6" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="17" Count="6" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="47" Count="2" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevBasicACAxis.Init">
+      <LineId Id="156" Count="2" />
+      <LineId Id="155" Count="0" />
+      <LineId Id="27" Count="1" />
+      <LineId Id="102" Count="1" />
+      <LineId Id="120" Count="0" />
+      <LineId Id="104" Count="4" />
+      <LineId Id="121" Count="0" />
+      <LineId Id="109" Count="3" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="122" Count="0" />
+      <LineId Id="115" Count="3" />
+      <LineId Id="123" Count="0" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="124" Count="1" />
+      <LineId Id="133" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="127" Count="1" />
+      <LineId Id="126" Count="0" />
+      <LineId Id="132" Count="0" />
+      <LineId Id="63" Count="1" />
+      <LineId Id="73" Count="9" />
+      <LineId Id="84" Count="1" />
+      <LineId Id="88" Count="10" />
+      <LineId Id="100" Count="0" />
+      <LineId Id="26" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

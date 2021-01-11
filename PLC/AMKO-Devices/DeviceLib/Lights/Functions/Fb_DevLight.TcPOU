@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+  <POU Name="Fb_DevLight" Id="{96f8b868-5c9a-4b69-bf1f-8b217a5e80f7}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC Fb_DevLight EXTENDS FB_DevBase ;
+VAR
+	bCmdBlinkSlow	: BOOL := FALSE ; // Command light blink slow
+	bCmdBlinkFast 	: BOOL := FALSE ; // Command light blink fast
+	bCmdOn			: BOOL := FALSE ; // Command turn light on	 
+	qLight AT %Q* 	: BOOL := FALSE ; // light output
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// set device type
+IF eDevType = E_Devices.Undefined THEN 
+	eDevType := E_Devices.DigitalOut ;
+END_IF
+
+// ===== check if light is enabled ======
+	IF NOT bEnable AND NOT bCmdManual THEN 
+		qLight := FALSE ;
+		RETURN; 
+	END_IF
+	
+// ===== set light output ======
+	ExecSetOutput();
+]]></ST>
+    </Implementation>
+    <Folder Name="Private" Id="{be6c59b2-59c1-4585-9000-82ba6ae1b260}" />
+    <Method Name="CmdBlinkFast" Id="{acb8df89-fd99-0baa-3cb7-2c2a71aef735}">
+      <Declaration><![CDATA[METHOD PUBLIC CmdBlinkFast : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bCmdBlinkFast S= TRUE ;
+
+CmdBlinkFast := bCmdBlinkFast ;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdBlinkSlow" Id="{bb5ef78e-7650-0a31-2835-c6403d984f29}">
+      <Declaration><![CDATA[METHOD PUBLIC CmdBlinkSlow : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bCmdBlinkSlow S= TRUE ;
+
+CmdBlinkSlow	:= bCmdBlinkSlow ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdOn" Id="{63c5b315-4701-080d-211e-df55cc4f2251}">
+      <Declaration><![CDATA[METHOD PUBLIC CmdOn : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bCmdOn S= TRUE ;
+
+CmdOn := qLight ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecSetOutput" Id="{0db5f750-be18-466c-844c-4f5f9e5d1aac}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PRIVATE ExecSetOutput : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ===== set light output state =====
+IF bCmdOn THEN 
+	qLight S= TRUE ;
+ELSIF bCmdBlinkFast THEN 
+	qLight := Sys_Variables.BlinkFast 	;
+ELSIF bCmdBlinkSlow THEN 
+	qLight := Sys_Variables.BlinkSlow	;
+ELSE
+	qLight := FALSE ;
+END_IF
+
+// reset all commands 
+bCmdOn			:= FALSE ;
+bCmdBlinkFast 	:= FALSE ;
+bCmdBlinkSlow 	:= FALSE ;
+]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="Fb_DevLight">
+      <LineId Id="56" Count="3" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="39" Count="7" />
+      <LineId Id="20" Count="0" />
+    </LineIds>
+    <LineIds Name="Fb_DevLight.CmdBlinkFast">
+      <LineId Id="5" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="6" Count="0" />
+      <LineId Id="8" Count="0" />
+    </LineIds>
+    <LineIds Name="Fb_DevLight.CmdBlinkSlow">
+      <LineId Id="5" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="6" Count="0" />
+    </LineIds>
+    <LineIds Name="Fb_DevLight.CmdOn">
+      <LineId Id="5" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="6" Count="0" />
+    </LineIds>
+    <LineIds Name="Fb_DevLight.ExecSetOutput">
+      <LineId Id="5" Count="0" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="25" Count="6" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="8" Count="0" />
+      <LineId Id="40" Count="2" />
+      <LineId Id="36" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

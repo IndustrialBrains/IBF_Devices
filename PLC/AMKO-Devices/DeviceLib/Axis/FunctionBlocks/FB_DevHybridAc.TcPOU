@@ -1,0 +1,258 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+  <POU Name="FB_DevHybridAc" Id="{2835e4c9-b10f-0483-2c3e-9715ab7ba1da}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevHybridAc EXTENDS Fb_DevAxis
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	// Parameters 
+		stMParMaxAcc : Udt_Parameter := (fMaximum := 999999, fMinimum := 0, fValue := 0)	; // Parameter for maximum acceleration
+		stMParMaxDec : Udt_Parameter := (fMaximum := 999999, fMinimum := 0, fValue := 0)	; // Parameter for maximum Deceleration
+		stMparMaxVelo: Udt_Parameter := (fMaximum := 999999, fMinimum := 0, fValue := 0)	; // Parameter for maximum velocity
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[SUPER^();]]></ST>
+    </Implementation>
+    <Folder Name="Motion" Id="{ce0670ae-bc3b-0910-186c-bb23f73a0e83}" />
+    <Folder Name="Organization" Id="{71d33061-2c0e-0a3b-33da-fee0e5c1bffd}" />
+    <Method Name="ExecHalt" Id="{5e4de309-b238-0426-3f48-e80df496989c}" FolderPath="Motion\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecHalt : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// The hybrid axis is equiped with it's own safety stop system therefore mc halt is no longer needed with an Estop
+IF bSafetyOk THEN 
+	// ==== Execute halt function ===== 
+	fbMcHalt (	Axis 		:= AxisRef,
+				Execute 	:= bExec_Halt );
+END_IF
+// ===== reset command =====
+	bExec_Halt := FALSE ;
+	
+// Halt fault handling 
+	IF fbMcHalt.Error THEN 
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Halt Fault ', UDINT_TO_STRING(fbMcHalt.ErrorID));				;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+		refFbFault.CmdAddFault( stFault );
+	END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecReadStatus" Id="{cb425895-4050-0540-1918-1968d66043ba}" FolderPath="Organization\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecReadStatus : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Read axis status from drive
+AxisRef.ReadStatus();						
+// convert velocity to RPM for output if aplicable
+IF bIcfCmdVelocityRpm THEN 
+	fVelocity := AxisRef.NcToPlc.ActVelo / 6 ;
+ELSE 
+	fVelocity := AxisRef.NcToPlc.ActVelo ;
+END_IF
+
+// write position output
+fActPosition := AxisRef.NcToPlc.ActPos ;
+						
+// set status bits 
+bIdle := NOT AxisRef.Status.HasJob ;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecReset" Id="{aa4207d9-0234-07ad-35d1-339c2d64cd26}">
+      <Declaration><![CDATA[METHOD INTERNAL ExecReset : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF  AxisRef.Status.Moving AND bExec_Reset THEN // If the axis is still moving execute safe stop first
+	CmdSafeStop();
+	RETURN;
+END_IF
+
+	fbMcReset	( 	Execute	:= bexec_reset,
+					Axis	:= AxisRef ); 
+					
+// ===== reset command =====
+	bExec_Reset := FALSE ;
+	
+// ===== reset internal fault bits and stop bits =====
+	bError 			:= FALSE ; 
+	
+// ===== reset safe commands ======
+	bCmdSafeStop	:= FALSE ; 
+	bCmdSafeSpeed 	:= FALSE ;
+	
+// Reset fault handling 
+	IF fbMcReset.Error THEN 
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Reset Fault ', UDINT_TO_STRING(fbMcReset.ErrorID))			;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+		refFbFault.CmdAddFault( stFault );
+	END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Init" Id="{5eda7617-832b-0f15-3c03-c729ea3fb129}">
+      <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
+VAR_INPUT
+	// Axis message Data 
+	nDevNumber	: UDINT		:= 0	; // Axis number 
+	// Config Bits
+	bIcfCmdVelocityRpm	: BOOL := FALSE ; // input speeds in Rpm
+	bIcfEnableForward 	: BOOL := TRUE 	; // Enable forward motion
+	bIcfEnablereverse	: BOOL := TRUE 	; // Enable reverse motion
+	bIcfAlwaysEnable	: BOOL := FALSE ; // 1 = Axis always enabled, 0 = Axis disabled at Idle 
+	bIcfSimulationMode	: BOOL := FALSE ; // Simulation mode is active [default set to False] Used for testing without hardware present 
+	
+	// Config Values 
+	mcHomingMode 		: MC_HomingMode := MC_HomingMode.MC_DefaultHoming; 
+	fHomePosition		: LREAL := 0 	; // set position at homing
+	fSafeVeloLimit		: LREAL	:= 360 	; // safe velocity limit [deg/sec]
+	nEncTurnoverVal 	: LREAL := 360	; // encoder turnover value 
+	tEnableDelay		: time 	:= T#0MS; // Time between axis enable command and motion command execution (0 := no delay active)	
+	tDisabledelay		: TIME 	:= T#100MS; // Axis idle time before axis is disabled 
+END_VAR
+VAR 
+	bActVeloReadValid 	: BOOL ; // velocity parameter read is valid 
+	bActAccReadValid 	: BOOL ; // Acceleration parameter read is valid 
+	bActDecReadValid 	: BOOL ; // Deceleration parameter read is valid 
+	bActParamValid 		: BOOL ; // Parameter read is valid 
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Calculate device number
+	THIS^.nDevNumber := nDevNumber ;
+	SUPER^.CalcDeviceId();
+
+// ===== Message data set =====
+	stFault.ComponentType		:= E_ComponentTypes.Axis ;
+	
+// ===== Write parameters =====
+	stMParMaxAcc.nNumber		:= nDevId + 1;
+	stMParMaxAcc.sDiscription 	:= CONCAT(STR1 := sDevName, STR2:= ' hardware maximum accaleration (0 = HWMaximum)'); 
+	stMParMaxAcc.sName			:= CONCAT(STR1 := sDevName, STR2:= 'HardMaxAceleration');
+	stMParMaxAcc.sType			:= 'MPar';
+	stMParMaxAcc.sUnit			:= 'Units/Sec^2';
+	
+	stMParMaxDec.nNumber		:= nDevId + 2;
+	stMParMaxDec.sDiscription 	:= CONCAT(STR1 := sDevName, STR2:= ' hardware maximum deceleration(0 = HWMaximum)'); 
+	stMParMaxDec.sName			:= CONCAT(STR1 := sDevName, STR2:= 'HardMaxDeceleration');
+	stMParMaxDec.sType			:= 'MPar';
+	stMParMaxDec.sUnit			:= 'Units/Sec^2';
+	
+	stMparMaxVelo.nNumber		:= nDevId + 3;
+	stMparMaxVelo.sDiscription 	:= CONCAT(STR1 := sDevName, STR2:= ' hardware maximum velocity'); 
+	stMparMaxVelo.sName			:= CONCAT(STR1 := sDevName, STR2:= 'HardMaxVelocity');
+	stMparMaxVelo.sType			:= 'MPar';
+	stMparMaxVelo.sUnit			:= 'Units/Sec';
+
+	refFbParHandler.CmdAddParameter(refParameter := stMParMaxAcc);
+	refFbParHandler.CmdAddParameter(refParameter := stMParMaxDec);
+	refFbParHandler.CmdAddParameter(refParameter := stMparMaxVelo);
+
+// ===== set axis configuration =====	
+	fMaxAcc	:= stMParMaxAcc.fValue;
+	fMaxDec	:= stMParMaxDec.fValue;	
+	fMaxVelo:= stMparMaxVelo.fValue;
+
+	fCmdAcc 		:= fMaxAcc;
+	fCmdDecc		:= fMaxDec;
+// ===== Configure Axis =====
+	// ***** Config Bits *****
+		THIS^.bIcfCmdVelocityRpm	:= bIcfCmdVelocityRpm	; // Enable speed inputs in Rpm
+		THIS^.bIcfEnableForward 	:= bIcfEnableForward 	; // Enable forward motion
+		THIS^.bIcfEnablereverse		:= bIcfEnablereverse	; // Enable reverse motion
+		THIS^.bIcfAlwaysEnable		:= bIcfAlwaysEnable		; // Always enable motor and brake if safety is ok
+		THIS^.bIcfSimulationMode	:= bIcfSimulationMode 	; // Simulation mode is active [default set to False] 
+
+	// ***** config homing Mode ***** 
+ 		THIS^.mcHomingMode 			:= mcHomingMode ; // set homing mode
+ 		THIS^.fHomePosition			:= fHomePosition;
+	// ***** Velocity settings *****
+		THIS^.fSafeVeloLimit 		:= fSafeVeloLimit ; // set maximum safe velocity	
+	// ***** Time delay enable off *****
+		THIS^.tEnableDelay		:= tEnableDelay	;
+		THIS^.tDisableDelay 	:= tDisabledelay ;		
+
+// ===== Set device type for manual control =====
+	eDevType := E_Devices.Axis ;
+		
+// ===== reset axis state indicators ======
+	bErrorActive 	:= FALSE;
+
+// ====== Set init to done =======
+	bInitOk	:= TRUE ; 
+	]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_DevHybridAc">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevHybridAc.ExecHalt">
+      <LineId Id="23" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="7" Count="15" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevHybridAc.ExecReadStatus">
+      <LineId Id="53" Count="0" />
+      <LineId Id="56" Count="12" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevHybridAc.ExecReset">
+      <LineId Id="58" Count="0" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="10" Count="8" />
+      <LineId Id="37" Count="1" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="22" Count="6" />
+      <LineId Id="52" Count="1" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevHybridAc.Init">
+      <LineId Id="156" Count="2" />
+      <LineId Id="155" Count="0" />
+      <LineId Id="27" Count="1" />
+      <LineId Id="102" Count="1" />
+      <LineId Id="120" Count="0" />
+      <LineId Id="104" Count="3" />
+      <LineId Id="229" Count="0" />
+      <LineId Id="121" Count="0" />
+      <LineId Id="109" Count="3" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="122" Count="0" />
+      <LineId Id="115" Count="3" />
+      <LineId Id="123" Count="0" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="124" Count="1" />
+      <LineId Id="133" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="127" Count="1" />
+      <LineId Id="126" Count="0" />
+      <LineId Id="132" Count="0" />
+      <LineId Id="63" Count="1" />
+      <LineId Id="73" Count="8" />
+      <LineId Id="202" Count="0" />
+      <LineId Id="82" Count="0" />
+      <LineId Id="84" Count="1" />
+      <LineId Id="88" Count="10" />
+      <LineId Id="100" Count="0" />
+      <LineId Id="26" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

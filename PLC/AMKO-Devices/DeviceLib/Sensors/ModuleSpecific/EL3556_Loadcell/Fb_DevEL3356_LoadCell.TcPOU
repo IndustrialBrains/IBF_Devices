@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+  <POU Name="Fb_DevEL3356_LoadCell" Id="{b084cc69-e884-0910-3e44-7ef41c6638c3}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC Fb_DevEL3356_LoadCell EXTENDS FB_DevHDAnalogInAutoCalibrate
+VAR_INPUT
+	tCalibrationDelay	: TIME := T#2S ; // Time for which the load neads to before calibration is done (default T#2s) 
+END_VAR
+VAR_OUTPUT
+	bMeasurementError	: BOOL 		; // Measurement or component error is active
+	sErroDiscription 	: STRING 	; // 
+END_VAR
+VAR
+	ibOverrange				AT%I*	: BOOL ; // overrange status indication
+	ibDataInvalid			AT%I*	: BOOL ; // Data is invalid
+	ibError					AT%I*	: BOOL ; // Module is in error state
+	ibCalibrationinProgress	AT%I*	: BOOL ; // automatic calibration is in progress
+	ibSteadyState			AT%I*	: BOOL ; // Module is in steady state
+	ibSyncError				AT%I*	: BOOL ; // Module sync error
+	
+	tonSteadyState	: TON ; // steady state delay for calibration
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Action Name="CheckELSignalState" Id="{52b03bc8-9b4b-0702-3e0c-626bdd2aebb4}">
+      <Implementation>
+        <ST><![CDATA[// Set error device measurement error bit
+bMeasurementError := FALSE ;
+
+IF ibOverrange THEN 
+	bMeasurementError 	S= TRUE;
+ 	sErroDiscription	:= 'Load exceeds maximum range ';
+ELSIF ibDataInvalid THEN
+	bMeasurementError 	S= TRUE;
+	sErroDiscription	:= 'Incorrect date from device';
+ELSIF ibError THEN
+	bMeasurementError 	S= TRUE;
+	sErroDiscription	:= 'Module general error';
+ELSIF ibCalibrationinProgress THEN
+	bMeasurementError 	S= TRUE;
+	sErroDiscription	:= 'Calibration session in progress';
+ELSIF ibSyncError THEN
+	bMeasurementError 	S= TRUE;
+	sErroDiscription	:= 'Module ethercat sync error';	
+END_IF]]></ST>
+      </Implementation>
+    </Action>
+    <Method Name="CmdCalibrateNull" Id="{91783cee-fae7-0317-0528-43594f2ed0f4}">
+      <Declaration><![CDATA[METHOD PUBLIC CmdCalibrateNull : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[tonSteadyState(IN := ibSteadyState, PT := tCalibrationDelay);
+
+// set offset to calibrate to null
+IF tonSteadyState.Q THEN 
+	nOfset := - inHwInput ;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdCalilbrateValue" Id="{b1ec4dc6-b296-0c25-159f-c3293459e006}">
+      <Declaration><![CDATA[METHOD PUBLIC CmdCalilbrateValue : BOOL // calibrate gain factor to actual value (warning calibrate to null before calibrating to value)
+VAR_INPUT
+	fCalibrationValue	: LREAL ; // Active input value to sensor [N]
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[tonSteadyState(IN := ibSteadyState, PT := tCalibrationDelay);
+
+// set gain from current value
+IF tonSteadyState.Q THEN 
+	fGainFactor := DINT_TO_LREAL(inHwInput + nOfset) / fCalibrationValue ; 
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="Fb_DevEL3356_LoadCell">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="Fb_DevEL3356_LoadCell.CheckELSignalState">
+      <LineId Id="1" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="4" Count="0" />
+      <LineId Id="3" Count="0" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="14" Count="0" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="26" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="6" Count="0" />
+    </LineIds>
+    <LineIds Name="Fb_DevEL3356_LoadCell.CmdCalibrateNull">
+      <LineId Id="10" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="6" Count="1" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="8" Count="0" />
+    </LineIds>
+    <LineIds Name="Fb_DevEL3356_LoadCell.CmdCalilbrateValue">
+      <LineId Id="12" Count="1" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="6" Count="0" />
+      <LineId Id="10" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

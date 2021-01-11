@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.3">
+  <POU Name="FB_EncoderInput" Id="{0f518a76-74dc-4426-927f-5208a6bc0566}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_EncoderInput EXTENDS FB_EncoderBase
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	iEncoderSignal AT%I*: UDINT ;
+	
+	nScaledValue		: LREAL ; // Only scaled value for internal use
+	nValueWithOffset	: LREAL ; // scaled value with added offset
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// ====== Scale Output value ======
+	nScaledValue := UDINT_TO_LREAL(iEncoderSignal) * nCfgUnitsPerPulse ;
+
+// ====== Invert ======
+	IF bIcfInverted THEN 
+		nScaledValue := nScaledValue * -1;
+	END_IF
+	
+// ====== Add offset ======= 
+	nValueWithOffset := nScaledValue + nCfgOffset ;
+
+// ====== Set Outputs =======
+	nOutPosition 	:= nValueWithOffset ;
+	nOutRaw			:= iEncoderSignal	; 	
+]]></ST>
+    </Implementation>
+    <Method Name="FastTask" Id="{2447dce7-4abc-4c3e-b487-bf649a6d099a}">
+      <Declaration><![CDATA[METHOD PUBLIC FastTask : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_EncoderInput">
+      <LineId Id="9" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="36" Count="2" />
+      <LineId Id="25" Count="2" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="33" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_EncoderInput.FastTask">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

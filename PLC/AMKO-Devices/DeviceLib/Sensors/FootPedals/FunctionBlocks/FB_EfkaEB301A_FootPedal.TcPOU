@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.3">
+  <POU Name="FB_EfkaEB301A_FootPedal" Id="{1fe54914-84ab-46dd-bab5-0e826b7e2e25}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_EfkaEB301A_FootPedal
+VAR_INPUT
+	bEnable : BOOL := TRUE ;
+END_VAR
+VAR_OUTPUT
+	ePedalInputStep		: E_FootpedalPos	:= 0 ;
+	bRTrigtoReverse1 	: BOOL := FALSE ; // rising edge trigger when pedal moves from 0 to -1 or Idle to reverse 1 
+	bRTrigtoReverse2 	: BOOL := FALSE ; // rising edge trigger when pedal moves from 1 to -2 or reverse 1 to reverse 2 
+	bRTrigtoForward1 	: BOOL := FALSE ; // rising edge trigger when pedal moves from 0 to 1 or idle to forward 1 
+	bRTrigtoForward2 	: BOOL := FALSE ; // rising edge trigger when pedal moves from 0 to 1 or forward to forward 2 
+END_VAR
+VAR
+	// ===== greycode switches from footpedal =====
+	I_GreyCodeA AT%I* : BOOL	; // Greycode input a from foot pedal 
+	I_GreyCodeB AT%I* : BOOL	; // Greycode input a from foot pedal 
+	I_GreyCodeC AT%I* : BOOL	; // Greycode input a from foot pedal 
+	I_GreyCodeD AT%I* : BOOL	; // Greycode input a from foot pedal 
+	nGreyCodetotal	: BYTE ; // all greycode switches combined
+	// ==== decimal value =====
+	ePreviousPedalInput	: E_FootpedalPos	:= 0 ;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// ===== Read input from pedal =====
+ACT_ConvertGreycode();
+
+// ===== Create edge flanks for functions =====
+ACT_CreateEdges();]]></ST>
+    </Implementation>
+    <Action Name="ACT_ConvertGreycode" Id="{4dc4fe5b-1b07-40bb-ac34-b0c414962263}">
+      <Implementation>
+        <ST><![CDATA[// ===== Combine greycode sensors =====
+nGreyCodetotal.0 := I_GreyCodeA ;
+nGreyCodetotal.1 := I_GreyCodeB ;
+nGreyCodetotal.2 := I_GreyCodeB ;
+nGreyCodetotal.3 := I_GreyCodeC ;
+
+// ==== Convert greycode decimal to speed steps =====
+// this only makes sense in EFKA world but anyway let's convert it to our own sense
+CASE nGreyCodetotal OF 
+	12: ePedalInputStep := E_FootpedalPos.eReverse1	;
+	14: ePedalInputStep := E_FootpedalPos.eReverse2	;
+	15: ePedalInputStep := E_FootpedalPos.eIdle		;
+	13: ePedalInputStep := E_FootpedalPos.eForward1	;
+	09: ePedalInputStep := E_FootpedalPos.eForward2	;
+ 	08: ePedalInputStep := E_FootpedalPos.eForward3	;
+	10: ePedalInputStep := E_FootpedalPos.eForward4	;
+	11: ePedalInputStep := E_FootpedalPos.eForward5	;
+	03:	ePedalInputStep := E_FootpedalPos.eForward6	;
+	02:	ePedalInputStep := E_FootpedalPos.eForward7	;
+	00: ePedalInputStep := E_FootpedalPos.eForward8	;
+	01: ePedalInputStep := E_FootpedalPos.eForward9	;
+	05: ePedalInputStep := E_FootpedalPos.eForward10	;
+	04: ePedalInputStep := E_FootpedalPos.eForward11	;
+	06: ePedalInputStep := E_FootpedalPos.eForward12 	;
+	07: ePedalInputStep := E_FootpedalPos.eForward13	;
+	ELSE
+		ePedalInputStep := E_FootpedalPos.eFalse 		;
+END_CASE]]></ST>
+      </Implementation>
+    </Action>
+    <Action Name="ACT_CreateEdges" Id="{7ec27deb-0d28-4e72-b3b3-e348e7c9dad1}">
+      <Implementation>
+        <ST><![CDATA[// ===== create edges on which functions can be triggerd =====
+CASE ePedalInputStep OF
+	E_FootpedalPos.eReverse2:
+		bRTrigtoReverse2 := ePreviousPedalInput = E_FootpedalPos.eReverse1 ;
+	E_FootpedalPos.eReverse1:
+		bRTrigtoReverse1 := ePreviousPedalInput = E_FootpedalPos.eIdle ;
+	E_FootpedalPos.eForward1:
+		bRTrigtoForward1 := ePreviousPedalInput = E_FootpedalPos.eIdle ;
+	E_FootpedalPos.eForward2: 
+		bRTrigtoForward2 := ePreviousPedalInput = E_FootpedalPos.eForward1 ; 
+END_CASE 
+
+// write previous pedal input 
+ePreviousPedalInput := ePedalInputStep ;]]></ST>
+      </Implementation>
+    </Action>
+    <LineIds Name="FB_EfkaEB301A_FootPedal">
+      <LineId Id="9" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="26" Count="0" />
+      <LineId Id="73" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_EfkaEB301A_FootPedal.ACT_ConvertGreycode">
+      <LineId Id="14" Count="0" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="16" Count="2" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="33" Count="9" />
+      <LineId Id="44" Count="1" />
+      <LineId Id="26" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_EfkaEB301A_FootPedal.ACT_CreateEdges">
+      <LineId Id="1" Count="0" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="27" Count="1" />
+      <LineId Id="19" Count="2" />
+      <LineId Id="23" Count="3" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="8" Count="0" />
+      <LineId Id="30" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

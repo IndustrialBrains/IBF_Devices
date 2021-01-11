@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+  <DUT Name="UDT_DeviceID" Id="{800eb206-ac70-08a2-32f3-3fe27bd96f6d}">
+    <Declaration><![CDATA[TYPE UDT_DeviceID :
+STRUCT
+	sName			: STRING	; // device name
+	sType			: STRING	; // Type of device [string for visu]
+	pFunction		: POINTER TO FB_DevBase ; // Pointer to the device
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

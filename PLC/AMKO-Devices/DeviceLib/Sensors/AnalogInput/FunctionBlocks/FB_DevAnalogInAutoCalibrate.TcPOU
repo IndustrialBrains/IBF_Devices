@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+  <POU Name="FB_DevAnalogInAutoCalibrate" Id="{52f8b1c3-b2bf-0db6-00eb-320245a39b92}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevAnalogInAutoCalibrate EXTENDS FB_DevAnalogInputScaled
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[SUPER^();]]></ST>
+    </Implementation>
+    <Method Name="CmdCalibrateNull" Id="{dc1e7d0d-643f-0785-3788-917d8619bf0a}">
+      <Declaration><![CDATA[METHOD PUBLIC CmdCalibrateNull : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// set offset to calibrate to null
+nOfset := - inHwInput ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdCalilbrateValue" Id="{a5144a45-d837-0a3b-1129-ae07bd4b6a95}">
+      <Declaration><![CDATA[METHOD PUBLIC CmdCalilbrateValue : BOOL // calibrate gain factor to actual value (warning calibrate to null before calibrating to value)
+VAR_INPUT
+	fCalibrationValue	: LREAL ; // Active input value to sensor (calibration setpoint)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// set gain from current value
+fGainFactor := INT_TO_LREAL(inHwInput + nOfset) / fCalibrationValue ; ]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_DevAnalogInAutoCalibrate">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevAnalogInAutoCalibrate.CmdCalibrateNull">
+      <LineId Id="5" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_DevAnalogInAutoCalibrate.CmdCalilbrateValue">
+      <LineId Id="5" Count="0" />
+      <LineId Id="11" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

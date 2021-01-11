@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+  <POU Name="FB_DevAnalogOutput" Id="{c04f47fb-753a-07c6-1304-4d37cf041c4c}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevAnalogOutput EXTENDS FB_DevBase 
+VAR_INPUT
+	fCmdValue		: LREAL := 0 ;
+END_VAR
+VAR_OUTPUT
+	fOutputValue	: LREAL := 0 ;
+END_VAR
+VAR
+	nLimitMin		: INT := -32767 ;
+	nLimitMax 		: INT := 32767 ;
+	qnHwOut	AT%Q*	: INT := 0 ;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// set device type
+IF eDevType = E_Devices.Undefined THEN 
+	eDevType := E_Devices.AnalogOut ;
+END_IF
+
+// Call base function
+SUPER^();
+
+// Call private functions
+ExecSetOutput();
+ExecSetFeedback();]]></ST>
+    </Implementation>
+    <Folder Name="Private" Id="{81264718-d2cd-06cb-14d3-b5473936a556}" />
+    <Method Name="ExecSetFeedback" Id="{18d9da84-4902-013f-1733-290381c8418e}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecSetFeedback : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Set feedback 
+fOutputValue := INT_TO_LREAL(qnHwOut) ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecSetOutput" Id="{72b429d8-82f0-0371-2b55-cc7f874d4b35}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecSetOutput : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Set Output to physical device
+IF bEnable OR bCmdManual THEN 
+	qnHwOut := LREAL_TO_INT(fCmdValue) ; 
+	qnHwOut := LIMIT(nLimitMin, qnHwOut, nLimitMax) ; 
+ELSE 
+	fCmdValue := 0 ; 
+END_IF
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_DevAnalogOutput">
+      <LineId Id="95" Count="3" />
+      <LineId Id="80" Count="0" />
+      <LineId Id="13" Count="4" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevAnalogOutput.ExecSetFeedback">
+      <LineId Id="7" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevAnalogOutput.ExecSetOutput">
+      <LineId Id="12" Count="2" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="15" Count="3" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

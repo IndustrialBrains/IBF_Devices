@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+  <POU Name="FB_DevPushbuttonLight" Id="{07fab308-52dd-4cfa-88cc-f84e729aee41}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevPushbuttonLight EXTENDS Fb_DevDigitalInputFunctions
+VAR_OUTPUT
+END_VAR
+VAR
+	fbLight : Fb_DevLight ; // light control 
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Set device type
+IF eDevType = E_Devices.Undefined THEN 
+	eDevType := E_Devices.PushButtonLight ;
+END_IF
+
+SUPER^();
+
+// Light commands
+	
+fbLight(bEnable := bEnable);]]></ST>
+    </Implementation>
+    <Method Name="CmdBlinkFast" Id="{833ab54e-998c-06b2-361a-88ca4c5012fa}">
+      <Declaration><![CDATA[METHOD PUBLIC CmdBlinkFast : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CmdBlinkFast := fbLight.CmdBlinkFast();
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdBlinkSlow" Id="{a3998136-c2d9-0929-2ed9-df7052e83a4f}">
+      <Declaration><![CDATA[METHOD PUBLIC CmdBlinkSlow : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CmdBlinkSlow	:= fbLight.CmdBlinkSlow();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdOn" Id="{70490632-31ec-0540-1e03-ae338bee4da0}">
+      <Declaration><![CDATA[METHOD PUBLIC CmdOn : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CmdOn := fbLight.CmdOn() ;]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_DevPushbuttonLight">
+      <LineId Id="46" Count="3" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="36" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevPushbuttonLight.CmdBlinkFast">
+      <LineId Id="11" Count="0" />
+      <LineId Id="8" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevPushbuttonLight.CmdBlinkSlow">
+      <LineId Id="6" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevPushbuttonLight.CmdOn">
+      <LineId Id="6" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

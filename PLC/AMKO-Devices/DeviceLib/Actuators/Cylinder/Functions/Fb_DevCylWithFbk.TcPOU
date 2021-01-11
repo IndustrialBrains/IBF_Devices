@@ -1,0 +1,513 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+  <POU Name="Fb_DevCylWithFbk" Id="{4d944a84-dab5-48bc-b450-758ff0ff83b4}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC Fb_DevCylWithFbk EXTENDS FB_DevValve
+VAR_INPUT
+	bIcfFbkOpenPresent 	: BOOL := FALSE ; // Feedback for cylinder open is present 
+	bIcfFbkClosedPresent: BOOL := FALSE ; // Feedback for Cylinder closed is present
+	bIcfTimeChecked		: BOOL := TRUE 	; // Cylinder timing is checked = default true
+	nMargin				: LREAL:= 10	; // % of tollerance in move speed 
+END_VAR
+VAR_OUTPUT
+	// ===== Teach function =======
+	bCmdCopyTimeParam 	: BOOL	:= FALSE 	;// Cylinder, Command to higher level copy toucht time to parameters
+	bFeClosed			: BOOL 	:= FALSE	; // closed sensor falling edge
+	bReClosed			: BOOL 	:= FALSE	; // closed sensor rising edge
+	bFeOpen				: BOOL 	:= FALSE 	; // Open sensor falling edge
+	bReOpen				: BOOL 	:= false 	; // open sensor rising edge 
+END_VAR
+VAR	
+	bFcoCalcDone	: BOOL := FALSE ; // Calculate timers done 
+	
+	stTimesClose	: Udt_TimerBandwith ; // Timer bandwith for cylinder close
+	stTimesOpen		: Udt_TimerBandwith	; // Timer bandwitch for cylinder open 
+	
+	fbSensorClosed	: Fb_DevDigitalInputFunctions ; // Digital sensor function closed detection
+	fbSensorOpen	: Fb_DevDigitalInputFunctions ; // Digital sensor function open detection
+	
+	fbTimerOpen		: TON ; // Timer for cylinder to open
+	fbTimerClose 	: TON ; // Timer for cylinder to close
+	fbTimerTeach	: TON ; // timer for teachin cylinder 
+
+	rtCmdWriteParam	: R_TRIG ; // Write parameter rising edge trigger 
+	// Simulation
+	fbTimerSimOpen 	: TON 	; 
+	fbTimerSimClose	: TON 	; 
+	
+	// Time Cylinder valid 
+	bTriggerTimeClose	: BOOL ;
+	bTriggerTimeOpen	: BOOL ;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// set device type
+	IF eDevType = E_Devices.Undefined THEN 
+		eDevType := E_Devices.Cylinder ;
+	END_IF
+
+// call base function 
+	SUPER^();
+
+// check for device init
+	IF NOT bInitOk THEN
+		RETURN;
+	END_IF 
+
+// ====== Check direction of movement =======
+	ExecDirection();
+	
+// ====== Check movement speed =======
+	ExecTimeout();
+	
+// ====== Calculate timers =======
+	CalcTimers();
+
+]]></ST>
+    </Implementation>
+    <Folder Name="Private" Id="{a3827919-0a79-428f-9a70-8c1e3fcbad7b}" />
+    <Method Name="CalcTimers" Id="{d777a46f-a2e6-426c-b6f6-e27ce1214e62}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PRIVATE CalcTimers : BOOL
+VAR
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF stParTimeToClose.fValue = stTimesClose.Nominal AND stParTimeToOpen.fValue = stTimesOpen.Nominal AND bFcoCalcDone THEN 
+	RETURN ;
+ELSE
+	bFcoCalcDone := FALSE ;
+END_IF
+ 
+// ====== Calculate close times ======
+	stTimesClose.Nominal 	:= stParTimeToClose.fValue ;
+	stTimesClose.Maximum 	:= stParTimeToClose.fValue * (1 + (nMargin / 100));
+	stTimesClose.Minimal 	:= stParTimeToClose.fValue * (1 - (nMargin / 100));
+
+// ====== Calculate open times ======
+	stTimesOpen.Nominal 	:= stParTimeToOpen.fValue ;
+	stTimesOpen.Maximum 	:= stParTimeToOpen.fValue * (1 + (nMargin / 100));
+	stTimesOpen.Minimal 	:= stParTimeToOpen.fValue * (1 - (nMargin / 100));
+	
+// ====== Set feedback =======
+	bFcoCalcDone := TRUE ;
+
+// ===== send write parameters command ======	
+	rtCmdWriteParam(CLK := bFcoCalcDone);
+	bCmdCopyTimeParam := rtCmdWriteParam.Q	;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdSimulate" Id="{6e22c863-00b6-4acc-b064-897ffbaba65f}">
+      <Declaration><![CDATA[METHOD PUBLIC CmdSimulate : BOOL
+VAR_INPUT
+	bFbkReverse		: BOOL := FALSE ; 
+	tTimeSimOpen	: TIME := T#1S 	;
+	tTimeSimClose	: TIME := T#1S 	;  
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Run timers when cylinder is active 
+	fbTimerSimOpen	(IN := q_Open	, PT := tTimeSimOpen);
+	fbTimerSimClose	(IN := q_Close	, PT := tTimeSimClose);
+
+// set feedback sensors to simulate
+	fbSensorOpen.bCmdSimulate 	:= TRUE ;
+	fbSensorClosed.bCmdSimulate := TRUE ;
+
+// set simulated feedback state 
+	IF bFbkReverse THEN 
+		fbSensorClosed.bSimState:= fbTimerSimOpen.Q 	;
+		fbSensorOpen.bSimState	:= fbTimerSimClose.Q 	; 	
+	ELSE 
+		fbSensorClosed.bSimState:= fbTimerSimClose.Q 	;
+		fbSensorOpen.bSimState	:= fbTimerSimOpen.Q 	; 	
+	END_IF	
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdTeach" Id="{91bc0cb5-62eb-4ee0-9533-355dbae1c792}">
+      <Declaration><![CDATA[METHOD PUBLIC CmdTeach : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ====== turn off time check function until new calculation cycle =======
+	bFcoCalcDone := false ;
+
+// ====== teach cylinder from hardware inputs ======
+	fbTimerTeach	(PT:= T#60S);
+	fbTimerSwitchDir(PT:= T#1S); 
+// ====== time cylinder cycles ======
+	// ===== Start test loop =====
+	IF bFco_Closed AND fbTimerSwitchDir.Q THEN
+		bCmdClose 			:= FALSE;
+		bCmdOpen 			:= TRUE ;
+		fbTimerSwitchDir.IN	:= FALSE; 
+		fbTimerTeach.IN 	:= TRUE ;
+	ELSIF bFco_Open AND fbTimerSwitchDir.Q THEN
+		bCmdClose 			:= TRUE ;
+		bCmdOpen 			:= FALSE;
+		fbTimerSwitchDir.IN	:= FALSE; 
+		fbTimerTeach.IN 	:= TRUE ;
+	ELSIF NOT bCmdClose AND NOT bCmdOpen THEN 
+		bCmdClose 			:= TRUE ;
+		bCmdOpen 			:= FALSE;
+		fbTimerTeach.IN 	:= TRUE ;
+	END_IF
+
+// ====== start timing ========
+	IF bCmdClose AND bFco_Closed THEN 
+		IF fbTimerTeach.IN THEN
+			stParTimeToClose.fValue 	:= TIME_TO_LREAL(fbTimerTeach.ET);
+		END_IF
+		fbTimerSwitchDir.IN := TRUE 		;
+		fbTimerTeach.IN 	:= FALSE 		;
+	ELSIF bCmdOpen AND bFco_Open THEN 
+		IF fbTimerTeach.IN THEN
+			stParTimeToOpen.fValue		:= TIME_TO_LREAL(fbTimerTeach.ET);
+		END_IF
+		fbTimerSwitchDir.IN := TRUE 		;
+		fbTimerTeach.IN 	:= FALSE 		;
+	END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecDirection" Id="{7b6b02f6-752b-46a5-bdce-1b0af61f0130}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PRIVATE ExecDirection : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ===== Check direction commands =====
+ 	IF q_Close AND fbSensorOpen.bReStatus AND NOT q_Open THEN
+		stFault.Active			:= TRUE ;
+		stFault.MessageNumber	:= E_MessageNumbers.CF_WrongDirection 	;
+		stFault.Discription		:= CONCAT( sDevName,'Cylinder Opening instead of closing');
+		stFault.FaultType		:= E_FaultTypes.CF 					;
+		bErrorActive			:= TRUE 								;
+		refFbFault.CmdAddFault( stFault );
+	ELSIF q_Open AND fbSensorClosed.bReStatus AND NOT q_close THEN
+		stFault.Active			:= TRUE ;
+		stFault.MessageNumber	:= E_MessageNumbers.CF_WrongDirection 	;
+		stFault.Discription		:= CONCAT( sDevName,'Cylinder closing instead of opening');
+		stFault.FaultType		:= E_FaultTypes.CF 					;
+		bErrorActive			:= TRUE 								;
+	END_IF
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecSetFeedback" Id="{1ffe37d7-2aa6-4e39-bf13-5b9a981a51d6}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PROTECTED ExecSetFeedback : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ====== Call sensor Open function =======
+	IF bIcfFbkClosedPresent THEN 
+		fbSensorClosed();
+		bFco_Closed := fbSensorClosed.bFcoInputActive ;
+		bFeClosed 	:= fbSensorClosed.bFeStatus ;
+		bReClosed 	:= fbSensorClosed.bReStatus ;
+	ELSE 
+		fbTOnClose	(IN 	:= q_Close, PT 	:= LREAL_TO_TIME(stParTimeToClose.fValue))	;
+		bFco_Closed := fbTOnClose.Q ;
+	END_IF
+
+// ====== Call sensor Close function =======
+	IF bIcfFbkOpenPresent THEN 
+		fbSensorOpen() 	;
+		bFco_open 	:= fbSensorOpen.bFcoInputActive ;
+		bFeOpen		:= fbSensorOpen.bFeStatus;
+		bReOpen		:= fbSensorOpen.bReStatus;
+	ELSE 
+		FbTOnOpen	(IN 	:= q_Open, PT 	:= LREAL_TO_TIME(stParTimeToOpen.fValue))	;
+		bFco_Open := FbTOnOpen.Q ;
+	END_IF
+
+// ====== set outputs =======
+	bReady		:= bFco_Closed OR bFco_Open ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecTimeout" Id="{4c13fd3f-2cd5-4918-a271-53ad554a49b6}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PRIVATE ExecTimeout : BOOL
+VAR_INPUT
+END_VAR
+VAR
+	nTimePassedMs : LREAL ;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF bFcoCalcDone AND bIcfTimeChecked AND bEnable THEN 
+// ====== Set triggers ======
+	IF q_Close  AND bFco_Open THEN 
+		bTriggerTimeClose := TRUE ;
+	ELSIF q_Open OR bFco_Closed  THEN 
+		bTriggerTimeClose := FALSE ;
+	END_IF
+
+	IF q_Open  AND bFco_Closed THEN 
+		bTriggerTimeOpen := TRUE ;
+	ELSIF q_Close OR bFco_Open THEN
+		bTriggerTimeOpen := FALSE ;
+	END_IF
+ELSE
+	bTriggerTimeClose 	:= FALSE ;
+	bTriggerTimeOpen	:= FALSE ;
+END_IF
+
+
+//======= run timers =======
+	IF bIcfFbkClosedPresent THEN 
+		fbTimerClose(IN := q_Close AND bEnable, PT := T#1M);
+	END_IF	
+	
+	IF bIcfFbkOpenPresent THEN 
+		fbTimerOpen	(IN := q_Open AND bEnable , PT := T#1M);
+	END_IF
+
+//====== Run timeout checks for cylinder close =======
+	nTimePassedMs:= TIME_TO_LREAL(fbTimerClose.ET);
+	
+	IF bIcfFbkClosedPresent THEN 
+		IF bTriggerTimeClose THEN 
+			IF fbSensorClosed.bReStatus THEN 
+				IF nTimePassedMs < stTimesClose.Minimal THEN 
+					// send message to HMI 
+					stFault.Active			:= TRUE 							;
+					stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToFast 	;
+					stFault.Discription		:= CONCAT( sDevName, 'Cylinder closing to fast' )	;
+					stFault.FaultType		:= E_FaultTypes.CF 					;
+					bErrorActive			:= TRUE 							;
+				END_IF
+			ELSIF	nTimePassedMs > stTimesClose.Maximum  THEN
+				// send message to HMI 
+				stFault.Active			:= TRUE ;
+				stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToSlow 	;
+				stFault.Discription		:= CONCAT( sDevName,'Cylinder closing to Slow')	;
+				stFault.FaultType		:= E_FaultTypes.CF 				;
+				bErrorActive			:= TRUE 							;
+			END_IF
+		END_IF
+	END_IF	
+
+//====== Run timeout checks for cylinder Open =======
+	nTimePassedMs:= TIME_TO_REAL(fbTimerOpen.ET);
+
+	IF bIcfFbkOpenPresent THEN 
+		IF bTriggerTimeOpen THEN 
+			IF fbSensorOpen.bReStatus THEN 
+				IF nTimePassedMs < stTimesOpen.Minimal THEN 
+					// send message to HMI 
+					stFault.Active			:= TRUE ;
+					stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToFast 	;
+					stFault.Discription		:= CONCAT( sDevName,'Cylinder Opening to fast')		;
+					stFault.FaultType		:= E_FaultTypes.CF 				;
+					bErrorActive			:= TRUE 							;
+				END_IF
+			ELSIF	nTimePassedMs > stTimesOpen.Maximum  THEN
+				// send message to HMI 
+				stFault.Active			:= TRUE ;
+				stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToSlow 	;
+				stFault.Discription		:= CONCAT( sDevName,'Cylinder Opening to Slow')		;
+				stFault.FaultType		:= E_FaultTypes.CF 				;
+				bErrorActive			:= TRUE 							;
+			END_IF
+		END_IF
+	END_IF	
+
+// Handle faults 
+IF stFault.Active THEN 
+	refFbFault.CmdAddFault( stFault );
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Init" Id="{db3610d9-73cc-44d4-8df3-a5e2149be4ab}">
+      <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
+VAR_INPUT
+	// Valve data
+	nDevNumber	: UDINT				:= 0		; // Cylinder identification number
+	// Command state
+	eResetState		: E_ValveResetState := 0		; // Cylinder reset state variable (default is idle) 
+	eSafeState		: E_ValveResetState	:= 0		; // Valve safe state
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bFcoCalcDone := FALSE;
+
+// Enable sensor feedback
+fbSensorClosed.bEnable	:= TRUE ;
+fbSensorOpen.bEnable	:= TRUE ;
+
+// Call feedback sensors 
+ExecSetFeedback(); 
+
+SUPER^.Init(nDevNumber, eResetState, eSafeState);
+
+// ===== Set device type for manual control =====
+eDevType := E_Devices.Cylinder ;
+
+
+Init := bInitOk ;]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="Fb_DevCylWithFbk">
+      <LineId Id="924" Count="16" />
+      <LineId Id="942" Count="0" />
+      <LineId Id="944" Count="1" />
+      <LineId Id="948" Count="0" />
+      <LineId Id="954" Count="0" />
+      <LineId Id="834" Count="0" />
+    </LineIds>
+    <LineIds Name="Fb_DevCylWithFbk.CalcTimers">
+      <LineId Id="36" Count="1" />
+      <LineId Id="39" Count="1" />
+      <LineId Id="38" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="5" Count="2" />
+      <LineId Id="11" Count="1" />
+      <LineId Id="8" Count="0" />
+      <LineId Id="14" Count="0" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="46" Count="2" />
+      <LineId Id="20" Count="0" />
+    </LineIds>
+    <LineIds Name="Fb_DevCylWithFbk.CmdSimulate">
+      <LineId Id="11" Count="0" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="30" Count="1" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="35" Count="1" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="37" Count="0" />
+    </LineIds>
+    <LineIds Name="Fb_DevCylWithFbk.CmdTeach">
+      <LineId Id="112" Count="0" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="5" Count="3" />
+      <LineId Id="10" Count="3" />
+      <LineId Id="62" Count="0" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="14" Count="2" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="93" Count="0" />
+      <LineId Id="95" Count="1" />
+      <LineId Id="102" Count="0" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="103" Count="0" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="104" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="67" Count="0" />
+      <LineId Id="106" Count="0" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="108" Count="0" />
+      <LineId Id="72" Count="1" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="66" Count="0" />
+    </LineIds>
+    <LineIds Name="Fb_DevCylWithFbk.ExecDirection">
+      <LineId Id="42" Count="1" />
+      <LineId Id="74" Count="0" />
+      <LineId Id="45" Count="3" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="54" Count="3" />
+      <LineId Id="61" Count="1" />
+      <LineId Id="73" Count="0" />
+    </LineIds>
+    <LineIds Name="Fb_DevCylWithFbk.ExecSetFeedback">
+      <LineId Id="141" Count="6" />
+      <LineId Id="152" Count="10" />
+      <LineId Id="167" Count="4" />
+      <LineId Id="27" Count="0" />
+    </LineIds>
+    <LineIds Name="Fb_DevCylWithFbk.ExecTimeout">
+      <LineId Id="180" Count="0" />
+      <LineId Id="208" Count="11" />
+      <LineId Id="183" Count="1" />
+      <LineId Id="229" Count="0" />
+      <LineId Id="182" Count="0" />
+      <LineId Id="179" Count="0" />
+      <LineId Id="139" Count="0" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="6" Count="0" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="7" Count="1" />
+      <LineId Id="125" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="123" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="199" Count="0" />
+      <LineId Id="24" Count="2" />
+      <LineId Id="173" Count="0" />
+      <LineId Id="205" Count="0" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="236" Count="0" />
+      <LineId Id="51" Count="3" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="70" Count="1" />
+      <LineId Id="114" Count="1" />
+      <LineId Id="72" Count="4" />
+      <LineId Id="190" Count="0" />
+      <LineId Id="78" Count="1" />
+      <LineId Id="167" Count="1" />
+      <LineId Id="206" Count="0" />
+      <LineId Id="84" Count="1" />
+      <LineId Id="197" Count="0" />
+      <LineId Id="87" Count="1" />
+      <LineId Id="170" Count="1" />
+      <LineId Id="94" Count="1" />
+      <LineId Id="97" Count="0" />
+      <LineId Id="191" Count="0" />
+      <LineId Id="67" Count="0" />
+      <LineId Id="192" Count="2" />
+    </LineIds>
+    <LineIds Name="Fb_DevCylWithFbk.Init">
+      <LineId Id="52" Count="0" />
+      <LineId Id="68" Count="0" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="70" Count="0" />
+      <LineId Id="72" Count="0" />
+      <LineId Id="62" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="92" Count="1" />
+      <LineId Id="91" Count="0" />
+      <LineId Id="81" Count="0" />
+      <LineId Id="50" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+  <POU Name="FB_ELModuleDiag" Id="{7c3b6cf0-4cbb-0cc9-1d0a-bf4eda696d1d}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_ELModuleDiag
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+	bError 	:	BOOL ; // Module is in error
+	sErrorDiscription : STRING ; // module error discription 
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <LineIds Name="FB_ELModuleDiag">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

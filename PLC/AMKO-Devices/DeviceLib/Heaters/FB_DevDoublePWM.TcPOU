@@ -1,0 +1,383 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+  <POU Name="FB_DevDoublePWM" Id="{597d6264-d5f7-07b8-20b6-bf7abd467b88}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevDoublePWM EXTENDS FB_DevBase // PWM control for 2 outputs that cannot be switchid on simultaniously
+VAR_INPUT
+	bCmdPWMOn			: BOOL := FALSE ; // PWM controller on 
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	bCmdChanelAOn		: BOOL := FALSE ; // command switch chanel A on permanently
+	bCmdChanelBOn		: BOOL := FALSE ; // Commandswitch chanel B on permanently 
+	bCmdOverrulePWM		: BOOL := FALSE ; // Command to overrule PWM
+	bCmdHold			: BOOL := false ; // Command hold PWM on signals (collision avoidance)
+
+	tPeriodLength		: TIME  ; // desired PWM cycle time length [ms] 
+	tDutyCycle 			: TIME	; // percentage of power [%]
+	tIdleTime			: TIME	; // Time both outputs are idle during PWM
+	
+	tonOutputA 			: TON ; // Timer on PWM output A
+	tonOutputB 			: TON ; // Timer on PWM output B
+	tonIdle				: TON ; // Timer On PWM Idle time (both outputs off)
+
+	tofOutputA 			: TOF ; // Timer off PWM output A Off (For overlap prevention)
+	tofOutputB 			: TOF ; // Timer off PWM output B Off ( for overlap prevention)
+
+	stParPeriodLength	: Udt_Parameter := (fValue := 2000); // desired PWM cycle time length [ms] Parameter
+	stParDutyCycle 		: Udt_Parameter	:= ( fValue := 0); // percentage of power [%] Parameter
+	stParSwitchOverTime	: Udt_Parameter	; // Time between switching A off and B on (and vice versa) Parameter
+	stMaxTimeOn			: Udt_Parameter := (fValue := 1000);// Maximum time a heater can be on without burning through
+	
+	qbOutputMain AT %Q* 	: BOOL 	; // physical output to main relais
+	qbOutputA	 AT %Q* 	: BOOL 	; // physical output to output A
+	qbOutputB	 AT %Q* 	: BOOL 	; // physical output to output B
+	
+	nPWMStep	: INT ; // PWM stepper
+
+	tonBurnTimeA	: TON ; // burn timer for coil A
+	tonBurnTimeB	: TON ; // burn timer for coil B 
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// set device type
+IF eDevType = E_Devices.Undefined THEN 
+	eDevType := E_Devices.DoublePWMController ;
+END_IF
+
+// Call base function
+SUPER^();
+
+// ===== hold all actions if not initialized ======
+IF NOT bInitOk THEN
+	RETURN;
+END_IF 
+
+// call Functions 
+CalcCycleTimes();
+IF tDutyCycle > T#0S AND tPeriodLength > T#0S THEN // switch PWM controller up when cycle timer is null
+	ExecPWMCycle(); // 
+END_IF 
+
+SetOutputs();]]></ST>
+    </Implementation>
+    <Folder Name="Private" Id="{8f1901c9-6ed3-0e55-22ef-5b4692e73382}" />
+    <Method Name="CalcCycleTimes" Id="{c560b553-2e91-0b3f-2513-3eb8c1b8590a}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD INTERNAL CalcCycleTimes : BOOL // calculate cycle timers
+VAR_INPUT
+END_VAR
+VAR 
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Calculate Cycle timers
+tPeriodLength	:= LREAL_TO_TIME( stParPeriodLength.fValue );
+tDutyCycle		:= LREAL_TO_TIME(stParPeriodLength.fValue * (stParDutyCycle.fValue / 100));
+tIdleTime		:= LREAL_TO_TIME(stParPeriodLength.fValue) - (tDutyCycle * 2) ;
+
+tofOutputA.PT := LREAL_TO_TIME(stParSwitchOverTime.fValue);
+tofOutputB.PT := LREAL_TO_TIME(stParSwitchOverTime.fValue);]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdHold" Id="{2aa262df-5d2b-0f65-1301-f8607be7ccf8}">
+      <Declaration><![CDATA[METHOD PUBLIC CmdHold : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bCmdHold := TRUE ;
+
+CmdHold := NOT qbOutputMain ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdOutputAOn" Id="{285facb1-80c0-01b3-3adb-d410c68724cd}">
+      <Declaration><![CDATA[METHOD PUBLIC CmdOutputAOn : BOOL // Turn on chanel A permanently 
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bCmdOverrulePWM S= TRUE ;
+bCmdChanelAOn S= TRUE ;
+
+CmdOutputAOn := qbOutputA AND qbOutputMain ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdOutputBOn" Id="{ade5c8ae-04d5-0f56-3c6a-987947f25504}">
+      <Declaration><![CDATA[METHOD PUBLIC CmdOutputBOn : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bCmdOverrulePWM S= TRUE ;
+bCmdChanelBOn S= TRUE ;
+
+CmdOutputBOn := qbOutputB AND qbOutputMain ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdSafeStop" Id="{191eddc8-da09-0edf-033c-fd42f3b0ec5d}">
+      <Declaration><![CDATA[METHOD PUBLIC CmdSafeStop : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bCmdOverrulePWM S= TRUE ;
+bCmdChanelAOn 		:= FALSE ;
+bCmdChanelBOn		:= FALSE ;
+qbOutputMain 		:= FALSE ;
+
+bDevIsSafe := NOT (qbOutputA OR qbOutputB OR qbOutputMain);]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecPWMCycle" Id="{7a1c56a1-834a-0185-2358-6154f346b7a0}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecPWMCycle : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF bCmdPWMOn THEN 
+	IF bCmdOverrulePWM OR bCmdHold THEN 
+		IF bCmdChanelAOn THEN 
+			nPWMStep := 1 ;
+		ELSE 
+			nPWMStep := 0 ;
+		END_IF
+		bCmdOverrulePWM := FALSE ;
+		RETURN;
+	END_IF
+ELSE 
+	RETURN;
+END_IF
+
+// PWM stepper 
+CASE nPWMStep OF 
+	0: // Switch on chanel A
+		bCmdChanelAOn := TRUE ;
+		IF tonOutputA.Q THEN
+			nPWMStep := 1 ;
+		END_IF
+	1: // Switch on chanel B
+		bCmdChanelBOn := TRUE;
+		IF tonOutputB.Q THEN
+			nPWMStep := 2 ;
+		END_IF
+	2: // Idle Time 
+		IF tonIdle.Q THEN 
+			nPWMStep := 0;
+		END_IF
+	ELSE
+		;
+END_CASE
+
+// call timers 
+tonOutputA	(IN := bCmdChanelAOn, PT := tDutyCycle);
+tonOutputB	(IN := bCmdChanelBOn, PT := tDutyCycle);
+tonIdle 	(IN := nPWMStep = 2	, PT := tIdleTime);]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Init" Id="{398f5054-4030-04cb-100b-1777db0e2325}">
+      <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
+VAR_INPUT
+	nDevNumber		: UDINT	:= 0	; // Cylinder identification number
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ====== Calculate device id =====
+	THIS^.nDevNumber := nDevNumber ;
+	SUPER^.CalcDeviceId();
+// ====== Set message information =======
+	stFault.ComponentType	:= E_ComponentTypes.Heaters	;
+
+// ======= Reset Error bit ======
+	bErrorActive 	:= FALSE;
+	bBussy			:= FALSE;
+	
+// ===== configure parameters =====
+	stParPeriodLength.fMinimum 		:= 0 		;
+	stParPeriodLength.fMaximum		:= 60000 	;
+	stParPeriodLength.nNumber 		:= nDevId + 1;
+	stParPeriodLength.sDiscription  := CONCAT( STR1 := sDevName, STR2 := 'Period length of the cycle in miliseconds');
+	stParPeriodLength.sName			:= CONCAT( STR1 := sDevName, STR2 := 'Period Length');
+	stParPeriodLength.sType			:= 'MPar';
+	stParPeriodLength.sUnit			:= 'ms';
+	stParPeriodLength.fValue		:= 5000;
+
+	stParDutyCycle.fMinimum 		:= 0 		;
+	stParDutyCycle.fMaximum			:= 50 		;
+	stParDutyCycle.nNumber 			:= nDevId + 2;
+	stParDutyCycle.sDiscription  	:= CONCAT( STR1 := sDevName, STR2 := 'Percentage of period length in which an output is active');
+	stParDutyCycle.sName			:= CONCAT( STR1 := sDevName, STR2 := 'Duty Cyle');
+	stParDutyCycle.sType			:= 'MPar';
+	stParDutyCycle.sUnit			:= '%';
+	stParPeriodLength.fValue		:= 10;
+
+	
+	stParSwitchOverTime.fMinimum 	:= 0 		;
+	stParSwitchOverTime.fMaximum	:= 500 		;
+	stParSwitchOverTime.nNumber 	:= nDevId + 3;
+	stParSwitchOverTime.sDiscription:= CONCAT( STR1 := sDevName, STR2 := 'Idle time between output chanel switchover in miliseconds');
+	stParSwitchOverTime.sName		:= CONCAT( STR1 := sDevName, STR2 := 'Switch Time');
+	stParSwitchOverTime.sType		:= 'CPar';
+	stParSwitchOverTime.sUnit		:= 'ms';
+
+	stMaxTimeOn.fMinimum 	:= 0 		;
+	stMaxTimeOn.fMaximum	:= 5000 	;
+	stMaxTimeOn.nNumber 	:= nDevId + 4;
+	stMaxTimeOn.sDiscription:= CONCAT( STR1 := sDevName, STR2 := 'Maximum time a heater can be fully on without burning through');
+	stMaxTimeOn.sName		:= CONCAT( STR1 := sDevName, STR2 := 'Max heating time');
+	stMaxTimeOn.sType		:= 'MPar';
+	stMaxTimeOn.sUnit		:= 'ms';
+	
+	
+	// add parameters to handler 
+	refFbParHandler.CmdAddParameter( refParameter := stParPeriodLength );
+	refFbParHandler.CmdAddParameter( refParameter := stParDutyCycle );
+	refFbParHandler.CmdAddParameter( refParameter := stParSwitchOverTime );
+	
+// ====== Set init status bit =======
+	bInitOk := TRUE ;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SetOutputs" Id="{a756e636-5c44-0f4e-25a7-67cef032dabc}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PRIVATE SetOutputs : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+// Set main output
+qbOutputMain := (bEnable OR bManual) AND bSafetyOk AND NOT bCmdHold ;
+
+// Set outputs
+qbOutputA := bCmdChanelAOn AND NOT tofOutputB.Q AND NOT tonBurnTimeA.Q;
+qbOutputB := bCmdChanelBOn AND NOT tofOutputA.Q AND NOT tonBurnTimeB.Q;
+
+// Call timers for overlap prevention
+tofOutputA(IN := qbOutputA);
+tofOutputB(IN := qbOutputB);
+
+// reset commands
+bCmdChanelAOn := FALSE ;
+bCmdChanelBOn := FALSE ;
+
+tonBurnTimeA ( IN := bCmdChanelAOn, PT := LREAL_TO_TIME( stMaxTimeOn.fValue));
+tonBurnTimeB ( IN := bCmdChanelBOn, PT := LREAL_TO_TIME( stMaxTimeOn.fValue));
+
+IF tonBurnTimeA.Q THEN 
+	stFault.Active 			:= TRUE ;
+	stFault.Discription 	:= 'Heater A burn timeout';
+	stFault.MessageNumber 	:= E_MessageNumbers.CF_MoveToSlow ;
+	stFault.FaultType		:= E_FaultTypes.CF;
+	qbOutputA 				:= FALSE ;
+ELSIF tonBurnTimeB.Q THEN 
+	stFault.Active 			:= TRUE ;
+	stFault.Discription 	:= 'Heater B burn timeout';
+	stFault.MessageNumber 	:= E_MessageNumbers.CF_MoveToSlow ;
+	stFault.FaultType		:= E_FaultTypes.CF;
+	qbOutputB 				:= FALSE ;
+END_IF
+
+bCmdHold := FALSE ;]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_DevDoublePWM">
+      <LineId Id="201" Count="11" />
+      <LineId Id="200" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="124" Count="0" />
+      <LineId Id="161" Count="0" />
+      <LineId Id="125" Count="0" />
+      <LineId Id="162" Count="1" />
+      <LineId Id="126" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevDoublePWM.CalcCycleTimes">
+      <LineId Id="5" Count="0" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="6" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="13" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevDoublePWM.CmdHold">
+      <LineId Id="5" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevDoublePWM.CmdOutputAOn">
+      <LineId Id="11" Count="0" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevDoublePWM.CmdOutputBOn">
+      <LineId Id="9" Count="0" />
+      <LineId Id="6" Count="1" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevDoublePWM.CmdSafeStop">
+      <LineId Id="11" Count="0" />
+      <LineId Id="5" Count="2" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="8" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevDoublePWM.ExecPWMCycle">
+      <LineId Id="51" Count="0" />
+      <LineId Id="56" Count="1" />
+      <LineId Id="59" Count="3" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="63" Count="0" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="64" Count="1" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="21" Count="2" />
+      <LineId Id="25" Count="1" />
+      <LineId Id="28" Count="1" />
+      <LineId Id="31" Count="6" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="38" Count="2" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="41" Count="2" />
+    </LineIds>
+    <LineIds Name="FB_DevDoublePWM.Init">
+      <LineId Id="13" Count="8" />
+      <LineId Id="25" Count="8" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="34" Count="7" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="59" Count="0" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="51" Count="6" />
+      <LineId Id="67" Count="7" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="42" Count="3" />
+      <LineId Id="61" Count="1" />
+      <LineId Id="47" Count="1" />
+      <LineId Id="12" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevDoublePWM.SetOutputs">
+      <LineId Id="13" Count="0" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="14" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="8" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="24" Count="1" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="26" Count="0" />
+      <LineId Id="28" Count="1" />
+      <LineId Id="34" Count="3" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="40" Count="5" />
+      <LineId Id="47" Count="4" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="55" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

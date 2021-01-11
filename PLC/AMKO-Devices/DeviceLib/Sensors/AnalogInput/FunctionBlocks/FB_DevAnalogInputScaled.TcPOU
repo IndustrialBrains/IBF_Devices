@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+  <POU Name="FB_DevAnalogInputScaled" Id="{43638945-f4e4-0cff-025b-6c03ae4b4de9}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevAnalogInputScaled EXTENDS FB_DevAnalogInput
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	fGainFactor 	: LREAL	:= 1	;
+	nOfset			: INT	:= 0	;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[SUPER^();]]></ST>
+    </Implementation>
+    <Method Name="ExecSetFeedback" Id="{6b8ba436-87f3-0e59-2933-34440dde902f}">
+      <Declaration><![CDATA[METHOD ExecSetFeedback : BOOL
+VAR
+	nCalibValue	: INT ; 
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Offset 
+IF bCmdSimulate THEN 
+	nCalibValue := fSimValue + nOfset ;
+ELSE
+	nCalibValue := inHwInput + nOfset ;
+END_IF
+
+fValue := INT_TO_LREAL(nCalibValue) / fGainFactor;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SetScaling" Id="{ac76234a-a867-0b26-0f7d-98f1a69590d3}">
+      <Declaration><![CDATA[METHOD PUBLIC SetScaling : BOOL 
+VAR_INPUT
+	fMaxValue	: LREAL ; 	// Maximum input value after scaling, e.g. 100%, 0 = no scaling (gain = hardware limit / fMaxValue)  
+	fOfset		: LREAL ;	// offset value (fvalue = (gain * hwvalue) + fOfset)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// calculate gain 
+IF fMaxValue =0 THEN 
+	fGainFactor := 1 ;
+ELSE 
+	fGainFactor := nLimitMax / fMaxValue ;
+END_IF
+
+nOfset := LREAL_TO_INT(fOfset * fGainFactor) ;
+]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_DevAnalogInputScaled">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevAnalogInputScaled.ExecSetFeedback">
+      <LineId Id="17" Count="7" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevAnalogInputScaled.SetScaling">
+      <LineId Id="56" Count="0" />
+      <LineId Id="67" Count="1" />
+      <LineId Id="70" Count="0" />
+      <LineId Id="72" Count="0" />
+      <LineId Id="69" Count="0" />
+      <LineId Id="73" Count="0" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="11" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

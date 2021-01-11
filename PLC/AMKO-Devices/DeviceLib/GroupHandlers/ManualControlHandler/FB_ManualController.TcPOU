@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+  <POU Name="FB_ManualController" Id="{791f33e7-9b25-0d7d-213d-2739874fa7e2}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ManualController
+VAR_INPUT
+	bReset 			: BOOL 		:= FALSE ; // (auto linked) reset selected device 
+END_VAR
+VAR_OUTPUT
+	eDevType		: INT		:= E_Devices.Undefined	; // Selected device type
+	bManual			: BOOL 		:= FALSE ; // selected device is in manual state
+	bErroractive	: BOOL 		:= FALSE ; // Device error is active
+	sDeviceState	: STRING	:= '' 	; // Dselected device fault message
+END_VAR
+VAR
+	nNumberOfDevices	: UDINT := 0 	; // number of devices in manual array 
+	
+	bManualActive		: BOOL 	:= FALSE ; // Manual control mode is activated
+	bDisableManualInputs: BOOL 	:= TRUE 	; // disable device manual inputs
+	
+	pDevValve			: POINTER TO FB_DevValve				; // Device pointer to valve
+	pDevCylinder		: POINTER TO Fb_DevCylWithFbk 			; // Device pointer to cylinder with manual 
+	pDevAxis			: POINTER TO Fb_DevAxis 				; // device pointer to Axis 
+	pDevPBL				: POINTER TO FB_DevPushbuttonLight		; // Device pointer to puschbutton light
+	pDevDigitalInput	: POINTER TO Fb_DevDigitalInputFunctions; // device pointer to digital input
+	pDevAnalogInput		: POINTER TO FB_DevAnalogInput			; // Device pointer to analog input
+	pDevAnalogOut		: POINTER TO FB_DevAnalogOutput			; // Device pointer to analog output
+	pDevDigitalOut		: POINTER TO FB_DevDigitalOutput		; // Device pointer to digital output
+	pDevPWMController	: POINTER TO FB_DevPWMGenerator			; // Device pointer to PWM controller
+	pDevDoublePWM		: POINTER TO FB_DevDoublePWM			; // Device pointer to Double PWM controller
+	
+	fbNodevice			: FB_DevBase ;
+	stNoDevice			: UDT_DeviceID := (sName := 'No device', sType := TO_STRING(E_Devices.Undefined), pFunction := ADR(fbNodevice)); 
+	arDeviceArray		: ARRAY [0..GVL_DevManual.nMAXDEVCOUNT] OF UDT_DeviceID := [stNoDevice]	; // Array of Devices for manual control
+	nCmdLookupindex		: UDINT := 0; // Index number in array
+	i					: UDINT := 0; // Index pointer to array
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[GVL_DevManual.bManualModeActive := bManualActive ;
+IF bManualActive THEN 
+	// insert a device 
+	ExecSelectDevice();
+END_IF]]></ST>
+    </Implementation>
+    <Folder Name="Private" Id="{aa1be144-3e85-00ba-24ed-50747e4a9031}" />
+    <Method Name="CmdAddDevice" Id="{0bc99b03-d325-0236-3e6c-84d8051938b0}">
+      <Declaration><![CDATA[METHOD PUBLIC CmdAddDevice : BOOL
+VAR_INPUT
+	refToDevice	: REFERENCE TO FB_DevBase ;
+END_VAR
+VAR
+	bDevAdded	: BOOL ;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Check if device is not already in the array 
+FOR i:= 0 TO nNumberOfDevices DO 
+	IF arDeviceArray[i].sName = refToDevice.sDevName THEN 
+		bDevAdded := TRUE ;
+	END_IF 
+END_FOR
+
+// If device is not found add device to the list
+IF NOT bDevAdded THEN 
+	nNumberOfDevices := LIMIT(0, nNumberOfDevices + 1 ,GVL_DevManual.nMAXDEVCOUNT)	;
+	arDeviceArray[nNumberOfDevices].sType 		:= TO_STRING(refToDevice.eDevType)	;
+	arDeviceArray[nNumberOfDevices].sName		:= refToDevice.sDevName	;
+	arDeviceArray[nNumberOfDevices].pFunction 	:= ADR(refToDevice)		;	
+	bDevAdded := TRUE ;
+END_IF
+
+CmdAddDevice := bDevAdded ; ]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecSelectDevice" Id="{f2221552-ec82-0ac1-22a7-ed85ccee3236}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PRIVATE ExecSelectDevice : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Select active manual device
+bDisableManualInputs := NOT arDeviceArray[nCmdLookupindex].pFunction^.bManual ; 
+IF bManualActive THEN 
+	arDeviceArray[nCmdLookupindex].pFunction^.CmdManual(); 
+END_IF
+
+CASE arDeviceArray[nCmdLookupindex].pFunction^.eDevType OF
+	E_Devices.Valve			:
+		pDevValve 			:= arDeviceArray[nCmdLookupindex].pFunction ;
+	E_Devices.Cylinder		:
+		pDevCylinder		:= arDeviceArray[nCmdLookupindex].pFunction ;
+	E_Devices.Axis 			:
+		pDevAxis			:= arDeviceArray[nCmdLookupindex].pFunction ;
+	E_Devices.PushButtonLight :
+		pDevPBL				:= arDeviceArray[nCmdLookupindex].pFunction ;
+	E_Devices.DigitalSensor :
+		pDevDigitalInput	:= arDeviceArray[nCmdLookupindex].pFunction ;
+	E_Devices.AnalogSensor 	:
+		pDevAnalogInput 	:= arDeviceArray[nCmdLookupindex].pFunction ;
+	E_Devices.DigitalOut	:
+	 	pDevDigitalOut		:= arDeviceArray[nCmdLookupindex].pFunction ;
+	E_Devices.AnalogOut		:
+		pDevAnalogOut		:= arDeviceArray[nCmdLookupindex].pFunction ;
+	E_Devices.PWMController	:
+		pDevPWMController	:= arDeviceArray[nCmdLookupindex].pFunction ;
+	E_Devices.DoublePWMController :
+		pDevDoublePWM		:= arDeviceArray[nCmdLookupindex].pFunction ;
+	ELSE
+		;
+END_CASE
+
+// Set device command 
+arDeviceArray[nCmdLookupindex].pFunction^.bReset := bReset ;
+
+// Set device state feedback
+bManual 		:= arDeviceArray[nCmdLookupindex].pFunction^.bManual ;
+bErroractive	:= arDeviceArray[nCmdLookupindex].pFunction^.bErrorActive ;
+sDeviceState	:= arDeviceArray[nCmdLookupindex].pFunction^.sDevActiveState ;
+
+// Set device screen control 
+eDevType := arDeviceArray[nCmdLookupindex].pFunction^.eDevType ; 
+]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_ManualController">
+      <LineId Id="138" Count="0" />
+      <LineId Id="133" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="134" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ManualController.CmdAddDevice">
+      <LineId Id="72" Count="15" />
+      <LineId Id="26" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ManualController.ExecSelectDevice">
+      <LineId Id="5" Count="0" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="22" Count="1" />
+      <LineId Id="25" Count="1" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="31" Count="1" />
+      <LineId Id="54" Count="1" />
+      <LineId Id="51" Count="1" />
+      <LineId Id="56" Count="2" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="59" Count="3" />
+      <LineId Id="81" Count="1" />
+      <LineId Id="29" Count="1" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="71" Count="2" />
+      <LineId Id="67" Count="0" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="68" Count="2" />
+      <LineId Id="75" Count="0" />
+      <LineId Id="74" Count="0" />
+      <LineId Id="77" Count="0" />
+      <LineId Id="76" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

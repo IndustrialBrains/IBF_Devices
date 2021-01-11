@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.16">
+  <DUT Name="UDT_AxVal" Id="{57896813-04dc-42ad-bf4d-fd0988279439}">
+    <Declaration><![CDATA[TYPE UDT_AxVal :
+STRUCT
+	// ***** Velocity settings *****
+		HardMax		: LREAL 	; // Hardware maximum set absolute maximum
+		ManMax 		: LREAL		; // Manual maximum percentage of hardware max
+		AutoMax		: LREAL		; // Automatic maximum percentage of hardware max
+		HomeMax		: LREAL 	; // Homing maximum percentage of hardware max
+		CmdVal		: LREAL 	; // Commanded value
+		SafeVal		: LREAL		; // Command value after safety check
+		PrevVal		: LREAL		; // previous command value 
+		ActVal		: LREAL		; // Actual value
+		ActModulo	: LREAL		; // [deg] Modulo position
+		RefVal		: LREAL 	; // referance value (basic setting or home) 
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

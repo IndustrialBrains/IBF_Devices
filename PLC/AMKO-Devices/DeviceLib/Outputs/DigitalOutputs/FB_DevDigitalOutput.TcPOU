@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+  <POU Name="FB_DevDigitalOutput" Id="{88d6c6d5-b226-0e14-13a4-cf37841a6f20}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevDigitalOutput EXTENDS FB_DevBase
+VAR_INPUT
+	bCmdOn			: BOOL ; // command output status
+END_VAR
+VAR_OUTPUT
+	bOutputState	: BOOL := FALSE ; // State of physical output
+END_VAR
+VAR
+	qbOutput AT%Q* : BOOL ; // Output to physical device
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Call base function
+SUPER^();
+
+// Call private functions
+ExecSetOutput();
+ExecSetFeedback();]]></ST>
+    </Implementation>
+    <Folder Name="Private" Id="{42798e24-c83a-0025-1549-bf054f87d68b}" />
+    <Method Name="ExecSetFeedback" Id="{088b4f01-a991-060d-3dfa-d513c0f36526}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PRIVATE ExecSetFeedback : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Set feedback 
+bOutputState := qbOutput ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecSetOutput" Id="{8f3954a4-6490-0db9-292c-4d4bf3f054ec}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PRIVATE ExecSetOutput : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Set Output to physical device
+IF bEnable OR bCmdManual THEN 
+	qbOutput := bCmdOn ; 
+ELSE 
+	qbOutput S= FALSE ; 
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_DevDigitalOutput">
+      <LineId Id="23" Count="0" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="42" Count="0" />
+      <LineId Id="39" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevDigitalOutput.ExecSetFeedback">
+      <LineId Id="7" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevDigitalOutput.ExecSetOutput">
+      <LineId Id="12" Count="5" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

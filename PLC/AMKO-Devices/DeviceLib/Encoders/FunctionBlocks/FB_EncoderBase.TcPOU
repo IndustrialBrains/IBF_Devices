@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.3">
+  <POU Name="FB_EncoderBase" Id="{78ccea55-8da3-46e5-834a-35136183596e}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_EncoderBase
+VAR_INPUT
+	nCfgUnitsPerPulse	: LREAL := 1	; // Scale factor for output [units/pulse]
+	nCfgOffset			: LREAL := 0	; // Offset for output
+	
+	bIcfInverted		: BOOL	:= FALSE; // Invert output position = standard false  
+END_VAR
+VAR_OUTPUT
+	nOutPosition		: LREAL	:= 0	; // Scaled position output
+	nOutRaw				: UDINT := 0	; // Raw output value	 
+	nVelocity			: LREAL	:= 0 	; // Velocity [units/sec]
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="FastTask" Id="{0ad38990-cab6-4c8e-9e02-268fa5106cf5}">
+      <Declaration><![CDATA[METHOD PUBLIC FastTask : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_EncoderBase">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_EncoderBase.FastTask">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
