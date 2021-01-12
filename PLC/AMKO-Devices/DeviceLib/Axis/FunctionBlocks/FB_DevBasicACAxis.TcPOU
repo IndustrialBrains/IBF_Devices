@@ -400,7 +400,6 @@ IF fbMcPower.Error THEN
 	stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 	stFault.Discription		:= CONCAT('Enable Fault ', UDINT_TO_STRING(fbMcPower.ErrorID));				;
 	stFault.FaultType		:= E_FaultTypes.FF				;
-	refFbFault.CmdAddFault( stFault );
 END_IF
 ]]></ST>
       </Implementation>
@@ -426,7 +425,6 @@ fbMcHalt (	Axis 		:= AxisRef,
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Halt Fault ', UDINT_TO_STRING(fbMcHalt.ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
-		refFbFault.CmdAddFault( stFault );
 	END_IF
 ]]></ST>
       </Implementation>
@@ -454,7 +452,6 @@ END_VAR
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Homing Fault ', UDINT_TO_STRING(fbMcHome.ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
-		refFbFault.CmdAddFault( stFault );
 	END_IF
 ]]></ST>
       </Implementation>
@@ -485,7 +482,6 @@ END_VAR
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Jog Fault ', UDINT_TO_STRING(fbMcJog.ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
-		refFbFault.CmdAddFault( stFault );
 	END_IF
 ]]></ST>
       </Implementation>
@@ -522,7 +518,6 @@ FOR i := 0 TO 1 DO
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Move absolute Fault ', UDINT_TO_STRING(fbMcMoveAbsolute[i].ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
-		refFbFault.CmdAddFault( stFault );
 	END_IF
 END_FOR 
 ]]></ST>
@@ -560,7 +555,6 @@ FOR i := 0 TO 1 DO
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Move relative Fault ', UDINT_TO_STRING(fbMCMoveRelative[i].ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF			;
-		refFbFault.CmdAddFault( stFault );
 	END_IF
 END_FOR]]></ST>
       </Implementation>
@@ -589,7 +583,6 @@ IF fbMcHalt.Error THEN
 	stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 	stFault.Discription		:= CONCAT('Move velocity Fault ', UDINT_TO_STRING(fbMcMoveVelocity.ErrorID));				;
 	stFault.FaultType		:= E_FaultTypes.FF				;
-	refFbFault.CmdAddFault( stFault );
 END_IF
 ]]></ST>
       </Implementation>
@@ -625,7 +618,6 @@ END_IF
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Reset Fault ', UDINT_TO_STRING(fbMcReset.ErrorID))			;
 		stFault.FaultType		:= E_FaultTypes.FF				;
-		refFbFault.CmdAddFault( stFault );
 	END_IF
 ]]></ST>
       </Implementation>
@@ -654,7 +646,6 @@ END_VAR
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Safe stop axis fault ', UDINT_TO_STRING(fbMcStop.ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
-		refFbFault.CmdAddFault( stFault );
 	END_IF
 
 // ===== Dev is safe feedback =====
@@ -883,7 +874,7 @@ END_VAR]]></Declaration>
       <LineId Id="65" Count="0" />
       <LineId Id="64" Count="0" />
       <LineId Id="25" Count="4" />
-      <LineId Id="38" Count="1" />
+      <LineId Id="38" Count="0" />
       <LineId Id="34" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
@@ -891,7 +882,7 @@ END_VAR]]></Declaration>
       <LineId Id="6" Count="5" />
       <LineId Id="37" Count="0" />
       <LineId Id="12" Count="6" />
-      <LineId Id="32" Count="1" />
+      <LineId Id="32" Count="0" />
       <LineId Id="23" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
@@ -900,7 +891,7 @@ END_VAR]]></Declaration>
       <LineId Id="11" Count="3" />
       <LineId Id="40" Count="0" />
       <LineId Id="15" Count="6" />
-      <LineId Id="35" Count="1" />
+      <LineId Id="35" Count="0" />
       <LineId Id="26" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
@@ -909,7 +900,7 @@ END_VAR]]></Declaration>
       <LineId Id="11" Count="9" />
       <LineId Id="52" Count="0" />
       <LineId Id="21" Count="6" />
-      <LineId Id="47" Count="1" />
+      <LineId Id="47" Count="0" />
       <LineId Id="32" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
@@ -921,7 +912,7 @@ END_VAR]]></Declaration>
       <LineId Id="43" Count="4" />
       <LineId Id="42" Count="0" />
       <LineId Id="20" Count="5" />
-      <LineId Id="59" Count="1" />
+      <LineId Id="59" Count="0" />
       <LineId Id="30" Count="1" />
       <LineId Id="5" Count="0" />
     </LineIds>
@@ -931,7 +922,6 @@ END_VAR]]></Declaration>
       <LineId Id="62" Count="0" />
       <LineId Id="41" Count="5" />
       <LineId Id="19" Count="7" />
-      <LineId Id="56" Count="0" />
       <LineId Id="30" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
@@ -941,7 +931,7 @@ END_VAR]]></Declaration>
       <LineId Id="58" Count="0" />
       <LineId Id="19" Count="0" />
       <LineId Id="45" Count="6" />
-      <LineId Id="53" Count="1" />
+      <LineId Id="54" Count="0" />
       <LineId Id="20" Count="0" />
     </LineIds>
     <LineIds Name="FB_DevBasicACAxis.ExecReset">
@@ -955,7 +945,7 @@ END_VAR]]></Declaration>
       <LineId Id="37" Count="1" />
       <LineId Id="40" Count="0" />
       <LineId Id="22" Count="6" />
-      <LineId Id="52" Count="1" />
+      <LineId Id="52" Count="0" />
       <LineId Id="33" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
@@ -966,7 +956,6 @@ END_VAR]]></Declaration>
       <LineId Id="6" Count="6" />
       <LineId Id="50" Count="0" />
       <LineId Id="17" Count="6" />
-      <LineId Id="41" Count="0" />
       <LineId Id="27" Count="0" />
       <LineId Id="47" Count="2" />
       <LineId Id="5" Count="0" />

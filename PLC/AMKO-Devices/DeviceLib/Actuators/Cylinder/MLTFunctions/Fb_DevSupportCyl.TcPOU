@@ -218,7 +218,6 @@ END_VAR]]></Declaration>
 		stFault.Discription		:= 'support not in safe (down) position';
 		stFault.MessageNumber	:= E_MessageNumbers.FF_Collision 		;
 		stFault.FaultType		:= E_FaultTypes.FF				;
-		refFbFault.CmdAddFault( stFault );
 	END_IF
 
 // ====== Make sure support Moves down ======
@@ -233,7 +232,6 @@ END_VAR]]></Declaration>
 		stFault.Discription		:= 'Emergency stop support cylinder not down';
 		stFault.MessageNumber	:= E_MessageNumbers.FF_Collision 		;
 		stFault.FaultType		:= E_FaultTypes.FF				;
-		refFbFault.CmdAddFault( stFault );
 	ELSIF bActMovRev 
 	AND nActPos > nTriggerPosUprev
 	AND nActPos < nTriggerPosCheckDownRe 
@@ -245,7 +243,6 @@ END_VAR]]></Declaration>
 		stFault.Discription		:= 'Emergency stop support cylinder not down';
 		stFault.MessageNumber	:= E_MessageNumbers.FF_Collision 		;
 		stFault.FaultType		:= E_FaultTypes.FF				;
-		refFbFault.CmdAddFault( stFault );
  	END_IF	
 	]]></ST>
       </Implementation>
@@ -393,13 +390,13 @@ END_VAR
     <LineIds Name="Fb_DevSupportCyl.ExecFaultHandling">
       <LineId Id="170" Count="19" />
       <LineId Id="191" Count="2" />
-      <LineId Id="251" Count="1" />
+      <LineId Id="251" Count="0" />
       <LineId Id="198" Count="9" />
       <LineId Id="209" Count="2" />
-      <LineId Id="253" Count="1" />
+      <LineId Id="253" Count="0" />
       <LineId Id="216" Count="6" />
       <LineId Id="224" Count="2" />
-      <LineId Id="255" Count="1" />
+      <LineId Id="255" Count="0" />
       <LineId Id="231" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>

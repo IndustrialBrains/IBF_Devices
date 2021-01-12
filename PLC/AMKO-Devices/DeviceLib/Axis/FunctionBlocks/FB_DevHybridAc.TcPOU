@@ -41,7 +41,6 @@ END_IF
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Halt Fault ', UDINT_TO_STRING(fbMcHalt.ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
-		refFbFault.CmdAddFault( stFault );
 	END_IF
 ]]></ST>
       </Implementation>
@@ -100,7 +99,6 @@ END_IF
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Reset Fault ', UDINT_TO_STRING(fbMcReset.ErrorID))			;
 		stFault.FaultType		:= E_FaultTypes.FF				;
-		refFbFault.CmdAddFault( stFault );
 	END_IF
 ]]></ST>
       </Implementation>
@@ -204,7 +202,8 @@ END_VAR]]></Declaration>
     <LineIds Name="FB_DevHybridAc.ExecHalt">
       <LineId Id="23" Count="0" />
       <LineId Id="25" Count="0" />
-      <LineId Id="7" Count="15" />
+      <LineId Id="7" Count="13" />
+      <LineId Id="22" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_DevHybridAc.ExecReadStatus">
@@ -222,7 +221,7 @@ END_VAR]]></Declaration>
       <LineId Id="40" Count="0" />
       <LineId Id="39" Count="0" />
       <LineId Id="22" Count="6" />
-      <LineId Id="52" Count="1" />
+      <LineId Id="52" Count="0" />
       <LineId Id="33" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>

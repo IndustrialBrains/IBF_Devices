@@ -184,7 +184,6 @@ END_VAR
 		stFault.Discription		:= CONCAT( sName,'Cylinder Opening instead of closing');
 		stFault.FaultType		:= E_FaultTypes.CF 					;
 		bErrorActive			:= TRUE 								;
-		refFbFault.CmdAddFault( stFault );
 	ELSIF q_Open AND fbSensorClosed.bReStatus AND NOT q_close THEN
 		stFault.Active			:= TRUE ;
 		stFault.MessageNumber	:= E_MessageNumbers.CF_WrongDirection 	;
@@ -313,11 +312,7 @@ END_IF
 			END_IF
 		END_IF
 	END_IF	
-
-// Handle faults 
-IF stFault.Active THEN 
-	refFbFault.CmdAddFault( stFault );
-END_IF]]></ST>
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="Init" Id="{db3610d9-73cc-44d4-8df3-a5e2149be4ab}">
@@ -430,7 +425,6 @@ Init := bInitOk ;]]></ST>
       <LineId Id="42" Count="1" />
       <LineId Id="74" Count="0" />
       <LineId Id="45" Count="3" />
-      <LineId Id="66" Count="0" />
       <LineId Id="52" Count="0" />
       <LineId Id="76" Count="0" />
       <LineId Id="54" Count="3" />
@@ -491,9 +485,7 @@ Init := bInitOk ;]]></ST>
       <LineId Id="170" Count="1" />
       <LineId Id="94" Count="1" />
       <LineId Id="97" Count="0" />
-      <LineId Id="191" Count="0" />
-      <LineId Id="67" Count="0" />
-      <LineId Id="192" Count="2" />
+      <LineId Id="194" Count="0" />
     </LineIds>
     <LineIds Name="Fb_DevCylWithFbk.Init">
       <LineId Id="52" Count="0" />
