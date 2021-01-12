@@ -2,85 +2,34 @@
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_DevBase" Id="{fd1f0090-6070-4291-b370-d3eae943f30f}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
-FUNCTION_BLOCK PUBLIC FB_DevBase
+FUNCTION_BLOCK PUBLIC FB_DevBase EXTENDS FB_FunctionBase
 VAR_INPUT
-	nModuleId		: UDINT		:= 	1 					; // Higher level module ID
-	bEnable			: BOOL 		:= TRUE 				; // Module enable signal reference Default := TRUE (when using system library := GVL_Main.stModules[nModuleId].bEnabled)
-	bSafetyOk		: BOOL 		:= TRUE 				; // Module can operate safely [default true]
-	bReset 			: BOOL 		:= FALSE				; // reset command bit reference Default := TRUE (when using system library := GVL_Main.stModules[nModuleId].bResetting)
-	refFbFault		: REFERENCE TO Fb_FaultHandler	 	; // reference to fault handler ( when using utilities library := GVL_Main.stModules[nModuleId].fbFaultHandler)
 	// function references 
 	refFbManualCtrl	: REFERENCE TO FB_ManualController := GVL_DevManual.fbManualControler	; // reference to manual handler
 	refFbParHandler	: REFERENCE TO Fb_ParLogging 	:= GVL_Parameters.fbParameterHandler	; // reference to parameter handler
 END_VAR
-VAR_IN_OUT
-END_VAR
 VAR_OUTPUT
-	sDevActiveState	: STRING 		:= 'Idle'	; // active state of device 
-	bInitOk			: BOOL 			:= FALSE 	; // function is initialized
-	bBussy 			: BOOL 			:= FALSE 	; // device is busy
-	bReady			: BOOL 			:= FALSE 	; // device is ready for new command 
-	bManual			: BOOL 			:= false 	; // device is in manual mode
-	bDevIsSafe		: BOOL 			:= FALSE	; // Device is locked and safe
-	bErrorActive	: BOOL			:= FALSE	; // device Error active 
-	bBlockedCommand	: BOOL 			:= False 	; // a device command is blocked because of collision detect 
-	sDevName		: STRING 		; // Name of device distilled from the path 
-	eDevType		: E_Devices	:= E_Devices.Undefined	; // Type of Device 	
-	nDevNumber		: UDINT 		:= 0 		; // device sub number
-	nDevId			: UDINT 		:= 0		; // device id number made up of module and device number				
+	eDevType		: E_Devices		:= E_Devices.Undefined	; // Type of Device 	
 END_VAR
 VAR
-	// Feedback request
-	bMessageTest	: BOOL  		:= FALSE	; // Send test message from device
-	// ===== Fault data =====
-	stFault			: UDT_Fault	; // Fault data from device
 	// Manual control variables
 	bAddedToManual	: BOOL 			:= FALSE 	; // device is added tot manual control function 	
-	bCmdManual 		: BOOL			:= FALSE	; // manual commands enabled control functions (thus disable automatic)
-	// Function path 
-	{attribute 'instance-path'} 
-    {attribute 'noinit'}
-	sPath			: STRING	; // Path name of function (used for manual reference)
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[ExecIdentifyDevice();
+      <ST><![CDATA[SUPER^(refFbFault := refFbFault);
 
-// Communicate active state
-IF NOT bSafetyOk THEN 
-	sDevActiveState := 'Safety not ok';
-ELSIF bErrorActive THEN 
-	sDevActiveState := TO_STRING(stFault.Discription);
-ELSIF NOT bInitOk THEN 
-	sDevActiveState := 'Not initialized';
-ELSIF bManual THEN 
-	sDevActiveState := 'Operational';
-END_IF 
+// Add device to manual screen
+IF NOT bAddedToManual AND eDevType <> E_Devices.Undefined THEN 
+	bAddedToManual S= refFbManualCtrl.CmdAddDevice(THIS^);
+END_IF
 
-// Set fault if commands are blocked
-IF bBlockedCommand THEN 
-	stFault.Active 			:= TRUE ;
-	stFault.ComponentType 	:= E_ComponentTypes.Assembly ;
-	stFault.Discription		:= CONCAT( STR1 := sDevName, STR2 := 'Movement path is blocked');
-	stFault.FaultType		:= E_FaultTypes.MC;
-	refFbFault.CmdAddFault( stFault);
-END_IF	
 // Call reset function 
 IF bReset THEN 
 	CmdReset();
 END_IF
 ]]></ST>
     </Implementation>
-    <Folder Name="Private" Id="{6f3beefb-a2d1-0bb4-3a9f-cd48592c8e20}" />
-    <Method Name="CalcDeviceId" Id="{821f405e-a996-09cf-2d6d-564182cfd77b}">
-      <Declaration><![CDATA[METHOD PROTECTED CalcDeviceId : BOOL
-VAR_INPUT
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[nDevId := (nModuleId * 10000) + nDevNumber * 100 ;]]></ST>
-      </Implementation>
-    </Method>
     <Method Name="CmdManual" Id="{26ba3ac1-09ba-01dd-32ca-9bbda4886bcd}">
       <Declaration><![CDATA[METHOD PUBLIC CmdManual : BOOL
 VAR_INPUT
@@ -106,77 +55,18 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// check if device is safe
-bDevIsSafe 	:= NOT bEnable ;
-CmdSafeStop := bDevIsSafe ;]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="ExecIdentifyDevice" Id="{54484a28-b20c-0028-16df-4783a8a55344}" FolderPath="Private\">
-      <Declaration><![CDATA[METHOD PRIVATE ExecIdentifyDevice : BOOL
-VAR_INPUT
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[// Check device ID
-IF bInitOk AND nDevId = 0 THEN 
-	CalcDeviceId();
-END_IF
-
-// set message location information
-stFault.LocationName	:= sDevName	;	
-stFault.LocationNumber	:= nDevId	;
-
-// Get device name from function and add device to manual
-IF sDevName = '' THEN 
-	sDevName := F_FBNameFromPath(sPath := sPath);
-ELSIF NOT bAddedToManual AND eDevType <> E_Devices.Undefined THEN 
-	bAddedToManual S= refFbManualCtrl.CmdAddDevice(THIS^);
-END_IF
-
-// Call message test function
-ExecMessagTest();
-
-bManual := bCmdManual ;]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="ExecMessagTest" Id="{96681161-373a-0a03-14f8-0586e5796f7f}">
-      <Declaration><![CDATA[METHOD ExecMessagTest : BOOL
-VAR_INPUT
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[IF bMessageTest THEN 
-	stFault.Active 			:= TRUE ;
-	stFault.Discription 	:= CONCAT(STR1 := 'This is a test message from: ',STR2 := sDevName);
-	stFault.MessageNumber 	:= E_MessageNumbers.OM_MessageTest ;
-	stFault.FaultType		:= Utilities_Library.E_FaultTypes.OM ;
-	refFbFault.CmdAddFault( stFault );
-END_IF
-]]></ST>
+bIsSafe 	:= NOT bEnable ;
+CmdSafeStop := bIsSafe ;]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_DevBase">
-      <LineId Id="191" Count="0" />
-      <LineId Id="548" Count="0" />
-      <LineId Id="596" Count="0" />
-      <LineId Id="646" Count="1" />
-      <LineId Id="598" Count="0" />
-      <LineId Id="597" Count="0" />
-      <LineId Id="599" Count="2" />
-      <LineId Id="603" Count="0" />
-      <LineId Id="605" Count="0" />
-      <LineId Id="690" Count="0" />
-      <LineId Id="689" Count="0" />
-      <LineId Id="691" Count="1" />
-      <LineId Id="694" Count="1" />
-      <LineId Id="697" Count="0" />
-      <LineId Id="699" Count="0" />
-      <LineId Id="693" Count="0" />
+      <LineId Id="759" Count="0" />
+      <LineId Id="751" Count="1" />
+      <LineId Id="755" Count="2" />
+      <LineId Id="762" Count="0" />
       <LineId Id="550" Count="2" />
       <LineId Id="555" Count="0" />
       <LineId Id="547" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBase.CalcDeviceId">
-      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_DevBase.CmdManual">
       <LineId Id="5" Count="0" />
@@ -186,17 +76,6 @@ END_IF
     </LineIds>
     <LineIds Name="FB_DevBase.CmdSafeStop">
       <LineId Id="6" Count="1" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBase.ExecIdentifyDevice">
-      <LineId Id="6" Count="3" />
-      <LineId Id="34" Count="0" />
-      <LineId Id="11" Count="9" />
-      <LineId Id="28" Count="3" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBase.ExecMessagTest">
-      <LineId Id="6" Count="6" />
       <LineId Id="5" Count="0" />
     </LineIds>
   </POU>

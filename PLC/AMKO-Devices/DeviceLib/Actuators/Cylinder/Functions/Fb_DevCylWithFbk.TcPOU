@@ -46,7 +46,7 @@ END_VAR
 	END_IF
 
 // call base function 
-	SUPER^();
+	SUPER^(refFbFault := refFbFault);
 
 // check for device init
 	IF NOT bInitOk THEN
@@ -181,14 +181,14 @@ END_VAR
  	IF q_Close AND fbSensorOpen.bReStatus AND NOT q_Open THEN
 		stFault.Active			:= TRUE ;
 		stFault.MessageNumber	:= E_MessageNumbers.CF_WrongDirection 	;
-		stFault.Discription		:= CONCAT( sDevName,'Cylinder Opening instead of closing');
+		stFault.Discription		:= CONCAT( sName,'Cylinder Opening instead of closing');
 		stFault.FaultType		:= E_FaultTypes.CF 					;
 		bErrorActive			:= TRUE 								;
 		refFbFault.CmdAddFault( stFault );
 	ELSIF q_Open AND fbSensorClosed.bReStatus AND NOT q_close THEN
 		stFault.Active			:= TRUE ;
 		stFault.MessageNumber	:= E_MessageNumbers.CF_WrongDirection 	;
-		stFault.Discription		:= CONCAT( sDevName,'Cylinder closing instead of opening');
+		stFault.Discription		:= CONCAT( sName,'Cylinder closing instead of opening');
 		stFault.FaultType		:= E_FaultTypes.CF 					;
 		bErrorActive			:= TRUE 								;
 	END_IF
@@ -204,7 +204,7 @@ END_VAR
       <Implementation>
         <ST><![CDATA[// ====== Call sensor Open function =======
 	IF bIcfFbkClosedPresent THEN 
-		fbSensorClosed();
+		fbSensorClosed(refFbFault := refFbFault);
 		bFco_Closed := fbSensorClosed.bFcoInputActive ;
 		bFeClosed 	:= fbSensorClosed.bFeStatus ;
 		bReClosed 	:= fbSensorClosed.bReStatus ;
@@ -215,7 +215,7 @@ END_VAR
 
 // ====== Call sensor Close function =======
 	IF bIcfFbkOpenPresent THEN 
-		fbSensorOpen() 	;
+		fbSensorOpen(refFbFault := refFbFault) 	;
 		bFco_open 	:= fbSensorOpen.bFcoInputActive ;
 		bFeOpen		:= fbSensorOpen.bFeStatus;
 		bReOpen		:= fbSensorOpen.bReStatus;
@@ -274,7 +274,7 @@ END_IF
 					// send message to HMI 
 					stFault.Active			:= TRUE 							;
 					stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToFast 	;
-					stFault.Discription		:= CONCAT( sDevName, 'Cylinder closing to fast' )	;
+					stFault.Discription		:= CONCAT( sName, 'Cylinder closing to fast' )	;
 					stFault.FaultType		:= E_FaultTypes.CF 					;
 					bErrorActive			:= TRUE 							;
 				END_IF
@@ -282,7 +282,7 @@ END_IF
 				// send message to HMI 
 				stFault.Active			:= TRUE ;
 				stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToSlow 	;
-				stFault.Discription		:= CONCAT( sDevName,'Cylinder closing to Slow')	;
+				stFault.Discription		:= CONCAT( sName,'Cylinder closing to Slow')	;
 				stFault.FaultType		:= E_FaultTypes.CF 				;
 				bErrorActive			:= TRUE 							;
 			END_IF
@@ -299,7 +299,7 @@ END_IF
 					// send message to HMI 
 					stFault.Active			:= TRUE ;
 					stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToFast 	;
-					stFault.Discription		:= CONCAT( sDevName,'Cylinder Opening to fast')		;
+					stFault.Discription		:= CONCAT( sName,'Cylinder Opening to fast')		;
 					stFault.FaultType		:= E_FaultTypes.CF 				;
 					bErrorActive			:= TRUE 							;
 				END_IF
@@ -307,7 +307,7 @@ END_IF
 				// send message to HMI 
 				stFault.Active			:= TRUE ;
 				stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToSlow 	;
-				stFault.Discription		:= CONCAT( sDevName,'Cylinder Opening to Slow')		;
+				stFault.Discription		:= CONCAT( sName,'Cylinder Opening to Slow')		;
 				stFault.FaultType		:= E_FaultTypes.CF 				;
 				bErrorActive			:= TRUE 							;
 			END_IF
@@ -323,8 +323,9 @@ END_IF]]></ST>
     <Method Name="Init" Id="{db3610d9-73cc-44d4-8df3-a5e2149be4ab}">
       <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
 VAR_INPUT
-	// Valve data
-	nDevNumber	: UDINT				:= 0		; // Cylinder identification number
+	// Message location data
+	nId			: UDINT ; // Identification number of object
+	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
 	// Command state
 	eResetState		: E_ValveResetState := 0		; // Cylinder reset state variable (default is idle) 
 	eSafeState		: E_ValveResetState	:= 0		; // Valve safe state
@@ -340,7 +341,7 @@ fbSensorOpen.bEnable	:= TRUE ;
 // Call feedback sensors 
 ExecSetFeedback(); 
 
-SUPER^.Init(nDevNumber, eResetState, eSafeState);
+SUPER^.Init(nId, nParentId, eResetState, eSafeState);
 
 // ===== Set device type for manual control =====
 eDevType := E_Devices.Cylinder ;
@@ -350,7 +351,9 @@ Init := bInitOk ;]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="Fb_DevCylWithFbk">
-      <LineId Id="924" Count="16" />
+      <LineId Id="924" Count="5" />
+      <LineId Id="992" Count="0" />
+      <LineId Id="931" Count="9" />
       <LineId Id="942" Count="0" />
       <LineId Id="944" Count="1" />
       <LineId Id="948" Count="0" />

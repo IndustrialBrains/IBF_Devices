@@ -579,7 +579,7 @@ END_VAR
 bCmdSafeStop := TRUE ; 
 
 // Set feedback output 
-CmdSafeStop := bDevIsSafe OR NOT bInitOk;]]></ST>
+CmdSafeStop := bIsSafe OR NOT bInitOk;]]></ST>
       </Implementation>
     </Method>
     <Method Name="ExecEnable" Id="{97d17d4c-4218-4969-bb76-cf3660f2ac5b}" FolderPath="Private\Organization\">
@@ -624,7 +624,7 @@ IF fbMcPower.Error THEN
 	stFault.Active 			:= TRUE 						;
 	stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 	stFault.Discription		:= CONCAT('Enable Fault ', UDINT_TO_STRING(fbMcPower.ErrorID));
-	stFault.Discription		:= CONCAT( sDevName , stfault.Discription ) ;
+	stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
 	stFault.FaultType		:= E_FaultTypes.FF				;
 	refFbFault.CmdAddFault( stFault );
 END_IF
@@ -659,7 +659,7 @@ END_VAR
 		stFault.Active 			:= TRUE 						;
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Gear dynamic Fault ', UDINT_TO_STRING(fbMcGearInDyn.ErrorID));	
-		stFault.Discription		:= CONCAT( sDevName , stfault.Discription ) ;
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 		refFbFault.CmdAddFault( stFault );
 	END_IF
@@ -695,7 +695,7 @@ END_VAR
 		stFault.Active 			:= TRUE 						;
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Gear as slave Fault ', UDINT_TO_STRING(fbMcGearInSlave.ErrorID));
-		stFault.Discription		:= CONCAT( sDevName , stfault.Discription ) ;
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 		refFbFault.CmdAddFault( stFault );
 	END_IF
@@ -722,7 +722,7 @@ END_VAR
 		stFault.Active 			:= TRUE 						;
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Gear out Fault ', UDINT_TO_STRING(fbMcGearOutSlave.ErrorID));
-		stFault.Discription		:= CONCAT( sDevName , stfault.Discription ) ;
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 		refFbFault.CmdAddFault( stFault );
 	END_IF
@@ -748,7 +748,7 @@ fbMcHalt (	Axis 		:= AxisRef,
 		stFault.Active 			:= TRUE 						;
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Halt Fault ', UDINT_TO_STRING(fbMcHalt.ErrorID));
-		stFault.Discription		:= CONCAT( sDevName , stfault.Discription ) ;
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 		refFbFault.CmdAddFault( stFault );
 	END_IF
@@ -777,7 +777,7 @@ END_VAR
 		stFault.Active 			:= TRUE 						;
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Homing Fault ', UDINT_TO_STRING(fbMcHome.ErrorID));
-		stFault.Discription		:= CONCAT( sDevName , stfault.Discription ) ;
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 		refFbFault.CmdAddFault( stFault );
 	END_IF
@@ -814,7 +814,7 @@ END_VAR
 		stFault.Active 			:= TRUE 						;
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Jog Fault ', UDINT_TO_STRING(fbMcJog.ErrorID));
-		stFault.Discription		:= CONCAT( sDevName , stfault.Discription ) ;
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 		refFbFault.CmdAddFault( stFault );
 	END_IF
@@ -856,7 +856,7 @@ FOR i := 0 TO 1 DO
 		stFault.Active 			:= TRUE 						;
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Move absolute Fault ', UDINT_TO_STRING(fbMcMoveAbsolute[i].ErrorID));
-		stFault.Discription		:= CONCAT( sDevName , stfault.Discription ) ;
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 		refFbFault.CmdAddFault( stFault );
 	END_IF
@@ -900,7 +900,7 @@ FOR i := 0 TO 1 DO
 		stFault.Active 			:= TRUE 						;
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Move module Fault ', UDINT_TO_STRING(fbMcMoveModulo[i].ErrorID));
-		stFault.Discription		:= CONCAT( sDevName , stfault.Discription ) ;
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
 		stFault.FaultType		:= E_FaultTypes.FF			;
 		refFbFault.CmdAddFault( stFault );
 	END_IF
@@ -943,7 +943,7 @@ FOR i := 0 TO 1 DO
 		stFault.Active 			:= TRUE 						;
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Move relative Fault ', UDINT_TO_STRING(fbMCMoveRelative[i].ErrorID));
-		stFault.Discription		:= CONCAT( sDevName , stfault.Discription ) ;
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
 		stFault.FaultType		:= E_FaultTypes.FF			;
 		refFbFault.CmdAddFault( stFault );
 	END_IF
@@ -978,7 +978,7 @@ IF fbMcHalt.Error THEN
 	stFault.Active 			:= TRUE 						;
 	stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 	stFault.Discription		:= CONCAT('Move velocity Fault ', UDINT_TO_STRING(fbMcMoveVelocity.ErrorID));
-	stFault.Discription		:= CONCAT( sDevName , stfault.Discription ) ;
+	stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
 	stFault.FaultType		:= E_FaultTypes.FF				;
 	refFbFault.CmdAddFault( stFault );
 END_IF
@@ -1014,7 +1014,7 @@ IF fbMcReadAxisStatus.Error THEN
 	stFault.Active 			:= TRUE 						;
 	stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 	stFault.Discription		:= CONCAT('Status read fault ', UDINT_TO_STRING(fbMcPower.ErrorID));
-	stFault.Discription		:= CONCAT( sDevName , stfault.Discription ) ;
+	stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
 	stFault.FaultType		:= E_FaultTypes.FF				;
 	refFbFault.CmdAddFault( stFault );
 END_IF
@@ -1052,7 +1052,7 @@ END_IF
 		stFault.Active 			:= TRUE 						;
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Reset Fault ', UDINT_TO_STRING(fbMcReset.ErrorID));
-		stFault.Discription		:= CONCAT( sDevName , stfault.Discription ) ;
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 		refFbFault.CmdAddFault( stFault );
 	END_IF
@@ -1083,7 +1083,7 @@ END_VAR
 		stFault.Active 			:= TRUE 						;
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Safe stop axis fault ', UDINT_TO_STRING(fbMcStop.ErrorID));
-		stFault.Discription		:= CONCAT( sDevName , stfault.Discription ) ;
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 		refFbFault.CmdAddFault( stFault );
 	END_IF
@@ -1099,15 +1099,16 @@ END_VAR
 	END_IF
 
 // ===== Dev is safe feedback =====
-bDevIsSafe := AxisRef.Status.HasBeenStopped AND NOT bCmdEnableAxis  ;
+bIsSafe := AxisRef.Status.HasBeenStopped AND NOT bCmdEnableAxis  ;
 ]]></ST>
       </Implementation>
     </Method>
     <Method Name="Init" Id="{0a8c2089-518e-4a9f-9c10-83a2f8fbff86}" FolderPath="Command Methods\">
       <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
 VAR_INPUT
-	// Axis message Data 
-	nDevNumber	: UDINT		:= 0	; // Axis number 
+	// Message location data
+	nId			: UDINT ; // Identification number of object
+	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
 	// Config Bits
 	bIcfCmdVelocityRpm	: BOOL := FALSE ; // input speeds in Rpm
 	bIcfEnableForward 	: BOOL := TRUE 	; // Enable forward motion
@@ -1130,9 +1131,8 @@ VAR
 	bActParamValid 		: BOOL ; // Parameter read is valid 
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// Calculate device number
-	THIS^.nDevNumber := nDevNumber ;
-	SUPER^.CalcDeviceId();
+        <ST><![CDATA[// ====== Calculate device id =====
+	ExecIdentifyDevice(nId,nParentId);
 
 // ===== Message data set =====
 	stFault.ComponentType		:= E_ComponentTypes.Axis ;
@@ -1589,8 +1589,7 @@ END_IF
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="Fb_DevAxis.Init">
-      <LineId Id="518" Count="0" />
-      <LineId Id="516" Count="1" />
+      <LineId Id="543" Count="1" />
       <LineId Id="443" Count="0" />
       <LineId Id="414" Count="0" />
       <LineId Id="417" Count="1" />

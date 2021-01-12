@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_DevAnalogOutput" Id="{c04f47fb-753a-07c6-1304-4d37cf041c4c}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevAnalogOutput EXTENDS FB_DevBase 
 VAR_INPUT
@@ -21,7 +21,8 @@ IF eDevType = E_Devices.Undefined THEN
 END_IF
 
 // Call base function
-SUPER^();
+SUPER^(refFbFault := refFbFault);
+
 
 // Call private functions
 ExecSetOutput();
@@ -58,7 +59,9 @@ END_IF
     <LineIds Name="FB_DevAnalogOutput">
       <LineId Id="95" Count="3" />
       <LineId Id="80" Count="0" />
-      <LineId Id="13" Count="4" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="111" Count="0" />
+      <LineId Id="14" Count="3" />
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_DevAnalogOutput.ExecSetFeedback">

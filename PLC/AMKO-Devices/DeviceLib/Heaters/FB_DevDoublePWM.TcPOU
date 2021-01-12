@@ -46,7 +46,8 @@ IF eDevType = E_Devices.Undefined THEN
 END_IF
 
 // Call base function
-SUPER^();
+SUPER^(refFbFault := refFbFault);
+
 
 // ===== hold all actions if not initialized ======
 IF NOT bInitOk THEN
@@ -124,7 +125,7 @@ bCmdChanelAOn 		:= FALSE ;
 bCmdChanelBOn		:= FALSE ;
 qbOutputMain 		:= FALSE ;
 
-bDevIsSafe := NOT (qbOutputA OR qbOutputB OR qbOutputMain);]]></ST>
+bIsSafe := NOT (qbOutputA OR qbOutputB OR qbOutputMain);]]></ST>
       </Implementation>
     </Method>
     <Method Name="ExecPWMCycle" Id="{7a1c56a1-834a-0185-2358-6154f346b7a0}" FolderPath="Private\">
@@ -176,13 +177,15 @@ tonIdle 	(IN := nPWMStep = 2	, PT := tIdleTime);]]></ST>
     <Method Name="Init" Id="{398f5054-4030-04cb-100b-1777db0e2325}">
       <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
 VAR_INPUT
-	nDevNumber		: UDINT	:= 0	; // Cylinder identification number
+	// Message location data
+	nId			: UDINT ; // Identification number of object
+	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
 END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// ====== Calculate device id =====
-	THIS^.nDevNumber := nDevNumber ;
-	SUPER^.CalcDeviceId();
+	ExecIdentifyDevice(nId,nParentId);
+
 // ====== Set message information =======
 	stFault.ComponentType	:= E_ComponentTypes.Heaters	;
 
@@ -193,18 +196,18 @@ END_VAR
 // ===== configure parameters =====
 	stParPeriodLength.fMinimum 		:= 0 		;
 	stParPeriodLength.fMaximum		:= 60000 	;
-	stParPeriodLength.nNumber 		:= nDevId + 1;
-	stParPeriodLength.sDiscription  := CONCAT( STR1 := sDevName, STR2 := 'Period length of the cycle in miliseconds');
-	stParPeriodLength.sName			:= CONCAT( STR1 := sDevName, STR2 := 'Period Length');
+	stParPeriodLength.nNumber 		:= nLocationId + 1;
+	stParPeriodLength.sDiscription  := CONCAT( STR1 := sName, STR2 := 'Period length of the cycle in miliseconds');
+	stParPeriodLength.sName			:= CONCAT( STR1 := sName, STR2 := 'Period Length');
 	stParPeriodLength.sType			:= 'MPar';
 	stParPeriodLength.sUnit			:= 'ms';
 	stParPeriodLength.fValue		:= 5000;
 
 	stParDutyCycle.fMinimum 		:= 0 		;
 	stParDutyCycle.fMaximum			:= 50 		;
-	stParDutyCycle.nNumber 			:= nDevId + 2;
-	stParDutyCycle.sDiscription  	:= CONCAT( STR1 := sDevName, STR2 := 'Percentage of period length in which an output is active');
-	stParDutyCycle.sName			:= CONCAT( STR1 := sDevName, STR2 := 'Duty Cyle');
+	stParDutyCycle.nNumber 			:= nLocationId + 2;
+	stParDutyCycle.sDiscription  	:= CONCAT( STR1 := sName, STR2 := 'Percentage of period length in which an output is active');
+	stParDutyCycle.sName			:= CONCAT( STR1 := sName, STR2 := 'Duty Cyle');
 	stParDutyCycle.sType			:= 'MPar';
 	stParDutyCycle.sUnit			:= '%';
 	stParPeriodLength.fValue		:= 10;
@@ -212,17 +215,17 @@ END_VAR
 	
 	stParSwitchOverTime.fMinimum 	:= 0 		;
 	stParSwitchOverTime.fMaximum	:= 500 		;
-	stParSwitchOverTime.nNumber 	:= nDevId + 3;
-	stParSwitchOverTime.sDiscription:= CONCAT( STR1 := sDevName, STR2 := 'Idle time between output chanel switchover in miliseconds');
-	stParSwitchOverTime.sName		:= CONCAT( STR1 := sDevName, STR2 := 'Switch Time');
+	stParSwitchOverTime.nNumber 	:= nLocationId + 3;
+	stParSwitchOverTime.sDiscription:= CONCAT( STR1 := sName, STR2 := 'Idle time between output chanel switchover in miliseconds');
+	stParSwitchOverTime.sName		:= CONCAT( STR1 := sName, STR2 := 'Switch Time');
 	stParSwitchOverTime.sType		:= 'CPar';
 	stParSwitchOverTime.sUnit		:= 'ms';
 
 	stMaxTimeOn.fMinimum 	:= 0 		;
 	stMaxTimeOn.fMaximum	:= 5000 	;
-	stMaxTimeOn.nNumber 	:= nDevId + 4;
-	stMaxTimeOn.sDiscription:= CONCAT( STR1 := sDevName, STR2 := 'Maximum time a heater can be fully on without burning through');
-	stMaxTimeOn.sName		:= CONCAT( STR1 := sDevName, STR2 := 'Max heating time');
+	stMaxTimeOn.nNumber 	:= nLocationId + 4;
+	stMaxTimeOn.sDiscription:= CONCAT( STR1 := sName, STR2 := 'Maximum time a heater can be fully on without burning through');
+	stMaxTimeOn.sName		:= CONCAT( STR1 := sName, STR2 := 'Max heating time');
 	stMaxTimeOn.sType		:= 'MPar';
 	stMaxTimeOn.sUnit		:= 'ms';
 	
@@ -280,7 +283,9 @@ bCmdHold := FALSE ;]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_DevDoublePWM">
-      <LineId Id="201" Count="11" />
+      <LineId Id="201" Count="5" />
+      <LineId Id="250" Count="0" />
+      <LineId Id="207" Count="5" />
       <LineId Id="200" Count="0" />
       <LineId Id="9" Count="0" />
       <LineId Id="124" Count="0" />
@@ -342,7 +347,9 @@ bCmdHold := FALSE ;]]></ST>
       <LineId Id="41" Count="2" />
     </LineIds>
     <LineIds Name="FB_DevDoublePWM.Init">
-      <LineId Id="13" Count="8" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="82" Count="1" />
+      <LineId Id="16" Count="5" />
       <LineId Id="25" Count="8" />
       <LineId Id="58" Count="0" />
       <LineId Id="34" Count="7" />

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_DevBasicACAxis" Id="{399212fc-3ad5-0237-1986-954c33e143fb}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevBasicACAxis EXTENDS FB_DevBase
 VAR_INPUT
@@ -356,7 +356,7 @@ END_VAR
 bCmdSafeStop := TRUE ; 
 
 // Set feedback output 
-CmdSafeStop := bDevIsSafe OR NOT bInitOk;]]></ST>
+CmdSafeStop := bIsSafe OR NOT bInitOk;]]></ST>
       </Implementation>
     </Method>
     <Method Name="ExecEnable" Id="{090a0249-1749-0de7-24c6-e8a259604e68}" FolderPath="Private\Motion\">
@@ -658,15 +658,16 @@ END_VAR
 	END_IF
 
 // ===== Dev is safe feedback =====
-bDevIsSafe := NOT bCmdEnableAxis  ;
+bIsSafe := NOT bCmdEnableAxis  ;
 ]]></ST>
       </Implementation>
     </Method>
     <Method Name="Init" Id="{d9ee605e-1b43-0849-35b2-d86a67775109}" FolderPath="Commands\">
       <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
 VAR_INPUT
-	// Axis message Data 
-	nDevNumber	: UDINT		:= 0	; // Axis number 
+	// Message location data
+	nId			: UDINT ; // Identification number of object
+	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
 	// Config Bits
 	bIcfCmdVelocityRpm	: BOOL := FALSE ; // input speeds in Rpm
 	bIcfEnableForward 	: BOOL := TRUE 	; // Enable forward motion
@@ -685,28 +686,27 @@ VAR
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[// Calculate device number
-	THIS^.nDevNumber := nDevNumber ;
-	SUPER^.CalcDeviceId();
+	ExecIdentifyDevice(nId,nParentId);
 
 // ===== Message data set =====
 	stFault.ComponentType		:= E_ComponentTypes.Axis ;
 	
 // ===== Write parameters =====
-	stMParMaxAcc.nNumber		:= nDevId + 1;
-	stMParMaxAcc.sDiscription 	:= CONCAT(STR1 := sDevName, STR2:= ' hardware maximum accaleration (0 = HWMaximum)'); 
-	stMParMaxAcc.sName			:= CONCAT(STR1 := sDevName, STR2:= 'HardMaxAceleration');
+	stMParMaxAcc.nNumber		:= nLocationId + 1;
+	stMParMaxAcc.sDiscription 	:= CONCAT(STR1 := sName, STR2:= ' hardware maximum accaleration (0 = HWMaximum)'); 
+	stMParMaxAcc.sName			:= CONCAT(STR1 := sName, STR2:= 'Hard max aceleration');
 	stMParMaxAcc.sType			:= 'MPar';
 	stMParMaxAcc.sUnit			:= 'Units/Sec^2';
 	
-	stMParMaxDec.nNumber		:= nDevId + 2;
-	stMParMaxDec.sDiscription 	:= CONCAT(STR1 := sDevName, STR2:= ' hardware maximum deceleration(0 = HWMaximum)'); 
-	stMParMaxDec.sName			:= CONCAT(STR1 := sDevName, STR2:= 'HardMaxDeceleration');
+	stMParMaxDec.nNumber		:= nLocationId + 2;
+	stMParMaxDec.sDiscription 	:= CONCAT(STR1 := sName, STR2:= ' hardware maximum deceleration(0 = HWMaximum)'); 
+	stMParMaxDec.sName			:= CONCAT(STR1 := sName, STR2:= 'Hard max deceleration');
 	stMParMaxDec.sType			:= 'MPar';
 	stMParMaxDec.sUnit			:= 'Units/Sec^2';
 	
-	stMparMaxVelo.nNumber		:= nDevId + 3;
-	stMparMaxVelo.sDiscription 	:= CONCAT(STR1 := sDevName, STR2:= ' hardware maximum velocity'); 
-	stMparMaxVelo.sName			:= CONCAT(STR1 := sDevName, STR2:= 'HardMaxVelocity');
+	stMparMaxVelo.nNumber		:= nLocationId + 3;
+	stMparMaxVelo.sDiscription 	:= CONCAT(STR1 := sName, STR2:= ' hardware maximum velocity'); 
+	stMparMaxVelo.sName			:= CONCAT(STR1 := sName, STR2:= 'Hard max velocity');
 	stMparMaxVelo.sType			:= 'MPar';
 	stMparMaxVelo.sUnit			:= 'Units/Sec';
 
@@ -972,7 +972,8 @@ END_VAR]]></Declaration>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_DevBasicACAxis.Init">
-      <LineId Id="156" Count="2" />
+      <LineId Id="156" Count="0" />
+      <LineId Id="178" Count="0" />
       <LineId Id="155" Count="0" />
       <LineId Id="27" Count="1" />
       <LineId Id="102" Count="1" />

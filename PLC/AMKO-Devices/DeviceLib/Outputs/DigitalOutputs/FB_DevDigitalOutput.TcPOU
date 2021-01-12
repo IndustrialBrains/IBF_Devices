@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_DevDigitalOutput" Id="{88d6c6d5-b226-0e14-13a4-cf37841a6f20}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevDigitalOutput EXTENDS FB_DevBase
 VAR_INPUT
@@ -14,7 +14,8 @@ END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[// Call base function
-SUPER^();
+SUPER^(refFbFault := refFbFault);
+
 
 // Call private functions
 ExecSetOutput();
@@ -48,6 +49,7 @@ END_IF
     </Method>
     <LineIds Name="FB_DevDigitalOutput">
       <LineId Id="23" Count="0" />
+      <LineId Id="53" Count="0" />
       <LineId Id="34" Count="0" />
       <LineId Id="37" Count="0" />
       <LineId Id="36" Count="0" />

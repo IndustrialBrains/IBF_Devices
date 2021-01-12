@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="Fb_DevDigitalInputFunctions" Id="{16e23114-15c6-4173-b508-aebf2e55c05f}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC Fb_DevDigitalInputFunctions EXTENDS Fb_DevDigitalInput
 VAR_OUTPUT
@@ -18,7 +18,8 @@ VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[SUPER^();
+      <ST><![CDATA[SUPER^(refFbFault := refFbFault);
+
 
 // ====== process functions if enabled ======
 	// ***** Set Delayed inputs and time elapsed ****
@@ -38,6 +39,7 @@ END_VAR
 ]]></ST>
     </Implementation>
     <LineIds Name="Fb_DevDigitalInputFunctions">
+      <LineId Id="225" Count="0" />
       <LineId Id="193" Count="16" />
       <LineId Id="9" Count="0" />
     </LineIds>

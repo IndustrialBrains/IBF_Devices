@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="Fb_DevSupportCyl" Id="{6f79fb02-e31e-4a90-b3f7-c5099f5ae08a}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC Fb_DevSupportCyl EXTENDS Fb_DevCylWithFbk
 VAR_INPUT
@@ -276,7 +276,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// ====== initi valve ======
-	SUPER^.Init(nInValveNumber, eResetState, eSafeState);
+	SUPER^.Init(ninValveNumber,2, eResetState, eSafeState);
 	
 // ====== Set support data =======
 	nSupportPosition 	:= nInSupportPosition 	;

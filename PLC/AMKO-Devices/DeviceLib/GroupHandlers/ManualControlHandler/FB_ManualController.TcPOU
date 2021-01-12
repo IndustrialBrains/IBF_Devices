@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_ManualController" Id="{791f33e7-9b25-0d7d-213d-2739874fa7e2}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_ManualController
 VAR_INPUT
@@ -55,7 +55,7 @@ END_VAR
       <Implementation>
         <ST><![CDATA[// Check if device is not already in the array 
 FOR i:= 0 TO nNumberOfDevices DO 
-	IF arDeviceArray[i].sName = refToDevice.sDevName THEN 
+	IF arDeviceArray[i].sName = refToDevice.sName THEN 
 		bDevAdded := TRUE ;
 	END_IF 
 END_FOR
@@ -64,7 +64,7 @@ END_FOR
 IF NOT bDevAdded THEN 
 	nNumberOfDevices := LIMIT(0, nNumberOfDevices + 1 ,GVL_DevManual.nMAXDEVCOUNT)	;
 	arDeviceArray[nNumberOfDevices].sType 		:= TO_STRING(refToDevice.eDevType)	;
-	arDeviceArray[nNumberOfDevices].sName		:= refToDevice.sDevName	;
+	arDeviceArray[nNumberOfDevices].sName		:= refToDevice.sName	;
 	arDeviceArray[nNumberOfDevices].pFunction 	:= ADR(refToDevice)		;	
 	bDevAdded := TRUE ;
 END_IF
@@ -115,7 +115,7 @@ arDeviceArray[nCmdLookupindex].pFunction^.bReset := bReset ;
 // Set device state feedback
 bManual 		:= arDeviceArray[nCmdLookupindex].pFunction^.bManual ;
 bErroractive	:= arDeviceArray[nCmdLookupindex].pFunction^.bErrorActive ;
-sDeviceState	:= arDeviceArray[nCmdLookupindex].pFunction^.sDevActiveState ;
+sDeviceState	:= arDeviceArray[nCmdLookupindex].pFunction^.sActiveState ;
 
 // Set device screen control 
 eDevType := arDeviceArray[nCmdLookupindex].pFunction^.eDevType ; 

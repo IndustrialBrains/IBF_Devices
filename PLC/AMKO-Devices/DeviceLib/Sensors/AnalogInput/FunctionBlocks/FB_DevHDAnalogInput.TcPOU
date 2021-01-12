@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_DevHDAnalogInput" Id="{17595e23-620c-00d9-1a3c-cd0af05163c6}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevHDAnalogInput EXTENDS FB_DevBase
 VAR_INPUT
@@ -20,7 +20,7 @@ END_VAR
 eDevType := E_Devices.AnalogSensor ;
 
 // Call base function
-SUPER^();
+SUPER^(refFbFault := refFbFault);
 
 // set feedback
 ExecSetFeedback();]]></ST>
@@ -41,7 +41,8 @@ END_IF
       </Implementation>
     </Method>
     <LineIds Name="FB_DevHDAnalogInput">
-      <LineId Id="16" Count="4" />
+      <LineId Id="16" Count="3" />
+      <LineId Id="38" Count="0" />
       <LineId Id="22" Count="0" />
       <LineId Id="12" Count="0" />
       <LineId Id="24" Count="0" />
