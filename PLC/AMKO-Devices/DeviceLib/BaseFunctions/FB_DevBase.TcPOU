@@ -6,7 +6,6 @@ FUNCTION_BLOCK PUBLIC FB_DevBase EXTENDS FB_FunctionBase
 VAR_INPUT
 	// function references 
 	refFbManualCtrl	: REFERENCE TO FB_ManualController := GVL_DevManual.fbManualControler	; // reference to manual handler
-	refFbParHandler	: REFERENCE TO Fb_ParLogging 	:= GVL_Parameters.fbParameterHandler	; // reference to parameter handler
 END_VAR
 VAR_OUTPUT
 	eDevType		: E_Devices		:= E_Devices.Undefined	; // Type of Device 	
