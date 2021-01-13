@@ -261,7 +261,7 @@ bCmdManual 	:= FALSE ;
     <Method Name="Init" Id="{b8e244d6-5d8d-4fc7-8d11-89f2fc179f0b}">
       <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
 VAR_INPUT
-	// Valve data 
+	// Messagedata 
 	nId			: UDINT ; // Identification number of object
 	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
 
