@@ -18,7 +18,7 @@
     <Company>AMKO-Engineering</Company>
     <Released>false</Released>
     <Title>Device_Library</Title>
-    <ProjectVersion>1.3.0.0</ProjectVersion>
+    <ProjectVersion>1.3.0.1</ProjectVersion>
     <Description>Device library of AMKO-Engineering.</Description>
     <Author>AMKO-Engineering</Author>
     <CompilerDefines>InclSerialCom := 'true'</CompilerDefines>
@@ -147,6 +147,7 @@
     </Compile>
     <Compile Include="Actuators\Cylinder\MLTFunctions\Fb_DevSupportCyl.TcPOU">
       <SubType>Code</SubType>
+      <ExcludeFromBuild>true</ExcludeFromBuild>
     </Compile>
     <Compile Include="Axis\DataTypes\E_AxisCmd.TcTLEO">
       <SubType>Code</SubType>
