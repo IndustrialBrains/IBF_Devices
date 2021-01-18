@@ -159,9 +159,9 @@ END_VAR
 	ExecMoveVelocity();
 	
 // ===== Execute gearing functions =====
+	ExecGearOut		();
 	ExecGearIn		();
 	ExecGearDynamic	();
-	ExecGearOut		();
 	
 // ====== reset velocity lmiting =====
 	bVelocityLimited	:= bCmdLimitVelocity ;	
@@ -234,8 +234,9 @@ END_VAR
 bBlockedCommand := fbMcHalt.Active ;
 
 // Set command to true
-bExec_GearOutSlave := TRUE ;
-bExec_GearSlaveDyn := FALSE;
+bExec_GearOutSlave 	:= TRUE ;
+bExec_GearAsSlave	:= FALSE;
+bExec_GearSlaveDyn 	:= FALSE;
 
 // Set feedback Output
 CmdGearOut := fbMcGearOutSlave.Done;]]></ST>
@@ -650,6 +651,7 @@ END_VAR
 						Acceleration	:= fCmdAcc	); 
 						
 // ===== reset command =====
+	bExec_GearSlaveDyn	:= FALSE ;
 	bGearedAsSlave		:= fbMcGearInDyn.InGear ; 
 
 // Gearing fault handling 
@@ -1211,8 +1213,9 @@ END_IF
     <LineIds Name="Fb_DevAxis.CallMotionFunctions">
       <LineId Id="6" Count="1" />
       <LineId Id="39" Count="1" />
-      <LineId Id="8" Count="18" />
-      <LineId Id="5" Count="0" />
+      <LineId Id="8" Count="16" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="25" Count="1" />
       <LineId Id="30" Count="1" />
       <LineId Id="34" Count="0" />
       <LineId Id="32" Count="0" />
@@ -1246,6 +1249,7 @@ END_IF
       <LineId Id="15" Count="1" />
       <LineId Id="14" Count="0" />
       <LineId Id="5" Count="1" />
+      <LineId Id="20" Count="0" />
       <LineId Id="8" Count="1" />
       <LineId Id="7" Count="0" />
       <LineId Id="10" Count="0" />
@@ -1435,7 +1439,9 @@ END_IF
     <LineIds Name="Fb_DevAxis.ExecGearDynamic">
       <LineId Id="6" Count="5" />
       <LineId Id="42" Count="0" />
-      <LineId Id="13" Count="14" />
+      <LineId Id="13" Count="6" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="20" Count="7" />
       <LineId Id="47" Count="0" />
       <LineId Id="36" Count="0" />
       <LineId Id="32" Count="0" />
