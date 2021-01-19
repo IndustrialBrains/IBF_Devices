@@ -23,6 +23,7 @@ VAR_OUTPUT
 		bIdle			: BOOL 	:= FALSE;
 		fVelocity		: LREAL	:= 0	; // Axis velocity [rpm or units/sec] depending on config
 		fActPosition	: LREAL := 0	; // Axis actual position [Units] depending on config	
+		bReInTargetPos	: BOOL 	:= false; // rising edge axis is in position
 	// ====== axis reference ======
 		AxisRef			: AXIS_REF	; // Axis reference to hardware 
 	// ====== Axis Settings ======
@@ -110,6 +111,8 @@ END_VAR
 VAR
 	// ===== Loop variables =====
 		i : DINT := 0 ; // For loop increment
+	// ===== check variable ======
+		rtrigInPosition	: R_TRIG ; // in position trigger 
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -1027,7 +1030,10 @@ IF fbMcReadAxisStatus.Error THEN
 	stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
 	stFault.FaultType		:= E_FaultTypes.FF				;
 END_IF
-]]></ST>
+
+// In position 
+	rtrigInPosition( 	CLK := AxisRef.Status.InTargetPosition, 
+						Q => bReInTargetPos);]]></ST>
       </Implementation>
     </Method>
     <Method Name="ExecReset" Id="{289eb010-9ce0-40f7-84c2-391c18144f9a}" FolderPath="Private\Organization\">
@@ -1604,7 +1610,9 @@ END_IF
       <LineId Id="53" Count="0" />
       <LineId Id="42" Count="0" />
       <LineId Id="23" Count="0" />
+      <LineId Id="57" Count="0" />
       <LineId Id="5" Count="0" />
+      <LineId Id="58" Count="1" />
     </LineIds>
     <LineIds Name="Fb_DevAxis.ExecReset">
       <LineId Id="58" Count="0" />
