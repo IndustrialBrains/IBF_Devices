@@ -11,10 +11,10 @@ VAR_OUTPUT
 END_VAR
 VAR
 	// ***** Fucntion blocks *****
-		FB_delIStatus: TON; // Timer function for delayed input status 
-		FB_feIStatus: F_TRIG; // generate falling edge pulse edge from Istatus
-		FB_reIStatus: R_TRIG; // generate falling edge pulse edge from Istatus
-		FB_rsIStatus: RS; // Set Reset function for flip flop input
+		FB_delIStatus	: TON	; // Timer function for delayed input status 
+		FB_feIStatus	: F_TRIG; // generate falling edge pulse edge from Istatus
+		FB_reIStatus	: R_TRIG; // generate falling edge pulse edge from Istatus
+		FB_rsIStatus	: RS	; // Set Reset function for flip flop input
 END_VAR
 ]]></Declaration>
     <Implementation>

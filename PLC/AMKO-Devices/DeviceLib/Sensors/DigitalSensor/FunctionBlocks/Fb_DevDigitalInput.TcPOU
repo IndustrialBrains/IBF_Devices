@@ -24,7 +24,7 @@ END_IF
 SUPER^(refFbFault := refFbFault);
 
 // ***** Direct input when enabled *****
-IF bEnable THEN 
+IF bEnable OR bCmdManual THEN 
 	IF bCmdSimulate  THEN 
 		bFcoInputActive := bSimState ;
 		bCmdSimulate	:= FALSE ;  
@@ -36,6 +36,22 @@ ELSE
 END_IF
 ]]></ST>
     </Implementation>
+    <Method Name="Init" Id="{a23a738b-81f2-0d03-0b16-a913f5bc6c96}">
+      <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
+VAR_INPUT
+	// Location data for messages  
+	nId			: UDINT ; // Identification number of object
+	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ====== Calculate device id =====
+	ExecIdentifyDevice(nId,nParentId);
+
+// ====== Set feedback ======
+	bInitOk := true ;]]></ST>
+      </Implementation>
+    </Method>
     <LineIds Name="Fb_DevDigitalInput">
       <LineId Id="222" Count="0" />
       <LineId Id="239" Count="0" />
@@ -46,6 +62,11 @@ END_IF
       <LineId Id="221" Count="0" />
       <LineId Id="195" Count="10" />
       <LineId Id="86" Count="0" />
+    </LineIds>
+    <LineIds Name="Fb_DevDigitalInput.Init">
+      <LineId Id="11" Count="2" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="14" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

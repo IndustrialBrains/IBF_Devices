@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_DevPWMGenerator" Id="{70704aac-3999-09c6-25fa-8ebc3616cfee}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevPWMGenerator EXTENDS FB_DevBase
 VAR_INPUT
@@ -112,6 +112,22 @@ END_IF
 bCmdOn := false ;]]></ST>
       </Implementation>
     </Method>
+    <Method Name="Init" Id="{277eefb3-b176-0843-2ffb-794fc209fa4e}">
+      <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
+VAR_INPUT
+	// Location data for messages  
+	nId			: UDINT ; // Identification number of object
+	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ====== Calculate device id =====
+	ExecIdentifyDevice(nId,nParentId);
+
+// ====== Set feedback ======
+	bInitOk := true ;]]></ST>
+      </Implementation>
+    </Method>
     <LineIds Name="FB_DevPWMGenerator">
       <LineId Id="59" Count="1" />
       <LineId Id="64" Count="1" />
@@ -165,6 +181,11 @@ bCmdOn := false ;]]></ST>
       <LineId Id="30" Count="0" />
       <LineId Id="29" Count="0" />
       <LineId Id="31" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevPWMGenerator.Init">
+      <LineId Id="11" Count="2" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="14" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

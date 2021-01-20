@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="Fb_DevLight" Id="{96f8b868-5c9a-4b69-bf1f-8b217a5e80f7}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC Fb_DevLight EXTENDS FB_DevBase ;
 VAR
@@ -84,6 +84,22 @@ bCmdBlinkSlow 	:= FALSE ;
 ]]></ST>
       </Implementation>
     </Method>
+    <Method Name="Init" Id="{d03dbd27-c5b0-07f0-09cd-2e6227187307}">
+      <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
+VAR_INPUT
+	// Location data for messages  
+	nId			: UDINT ; // Identification number of object
+	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ====== Calculate device id =====
+	ExecIdentifyDevice(nId,nParentId);
+
+// ====== Set feedback ======
+	bInitOk := true ;]]></ST>
+      </Implementation>
+    </Method>
     <LineIds Name="Fb_DevLight">
       <LineId Id="56" Count="3" />
       <LineId Id="55" Count="0" />
@@ -115,6 +131,11 @@ bCmdBlinkSlow 	:= FALSE ;
       <LineId Id="8" Count="0" />
       <LineId Id="40" Count="2" />
       <LineId Id="36" Count="0" />
+    </LineIds>
+    <LineIds Name="Fb_DevLight.Init">
+      <LineId Id="11" Count="2" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="14" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

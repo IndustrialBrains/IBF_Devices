@@ -40,6 +40,22 @@ END_IF
 ]]></ST>
       </Implementation>
     </Method>
+    <Method Name="Init" Id="{3357007e-f480-0c2c-080e-7ce021956725}">
+      <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
+VAR_INPUT
+	// Location data for messages  
+	nId			: UDINT ; // Identification number of object
+	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ====== Calculate device id =====
+	ExecIdentifyDevice(nId,nParentId);
+
+// ====== Set feedback ======
+	bInitOk := true ;]]></ST>
+      </Implementation>
+    </Method>
     <LineIds Name="FB_DevAnalogInput">
       <LineId Id="16" Count="3" />
       <LineId Id="38" Count="0" />
@@ -54,6 +70,11 @@ END_IF
       <LineId Id="10" Count="0" />
       <LineId Id="7" Count="0" />
       <LineId Id="6" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_DevAnalogInput.Init">
+      <LineId Id="11" Count="2" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="14" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>
