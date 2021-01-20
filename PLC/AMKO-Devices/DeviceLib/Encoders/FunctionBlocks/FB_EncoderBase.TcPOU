@@ -28,7 +28,7 @@ END_VAR
       </Implementation>
     </Method>
     <Method Name="Init" Id="{4b96b077-08c2-0f5d-0b64-41873bbad573}">
-      <Declaration><![CDATA[METHOD PROTECTED Init : BOOL
+      <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
 VAR_INPUT
 	// Message location data
 	nId			: UDINT ; // Identification number of object
