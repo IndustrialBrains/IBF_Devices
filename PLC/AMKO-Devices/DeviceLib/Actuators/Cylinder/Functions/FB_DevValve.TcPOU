@@ -115,7 +115,7 @@ END_VAR
       </Implementation>
     </Method>
     <Method Name="CmdReset" Id="{f243310c-6787-45be-b839-74681681062f}">
-      <Declaration><![CDATA[METHOD CmdReset : BOOL
+      <Declaration><![CDATA[METHOD PUBLIC CmdReset : BOOL
 VAR_INPUT
 END_VAR
 ]]></Declaration>
@@ -139,7 +139,9 @@ END_VAR
 // ======= Reset Error bit ======
 	bErrorActive 	:= FALSE;
 	bBussy			:= FALSE;
-	]]></ST>
+	
+// ======= set feedback =======
+	CmdReset := TRUE ;]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdSafeStop" Id="{e95074f6-7b45-0ac3-1b01-bd35092d95b2}">
@@ -376,6 +378,7 @@ END_VAR]]></Declaration>
       <LineId Id="8" Count="0" />
       <LineId Id="23" Count="3" />
       <LineId Id="31" Count="0" />
+      <LineId Id="35" Count="1" />
     </LineIds>
     <LineIds Name="FB_DevValve.CmdSafeStop">
       <LineId Id="6" Count="1" />

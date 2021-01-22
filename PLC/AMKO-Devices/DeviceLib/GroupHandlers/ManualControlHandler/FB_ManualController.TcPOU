@@ -110,7 +110,9 @@ CASE arDeviceArray[nCmdLookupindex].pFunction^.eDevType OF
 END_CASE
 
 // Set device command 
-arDeviceArray[nCmdLookupindex].pFunction^.bReset := bReset ;
+IF bReset THEN 
+	bReset R= arDeviceArray[nCmdLookupindex].pFunction^.CmdReset();
+END_IF
 
 // Set device state feedback
 bManual 		:= arDeviceArray[nCmdLookupindex].pFunction^.bManual ;
@@ -152,7 +154,8 @@ eDevType := arDeviceArray[nCmdLookupindex].pFunction^.eDevType ;
       <LineId Id="81" Count="1" />
       <LineId Id="29" Count="1" />
       <LineId Id="11" Count="0" />
-      <LineId Id="71" Count="2" />
+      <LineId Id="71" Count="1" />
+      <LineId Id="86" Count="2" />
       <LineId Id="67" Count="0" />
       <LineId Id="66" Count="0" />
       <LineId Id="68" Count="2" />
