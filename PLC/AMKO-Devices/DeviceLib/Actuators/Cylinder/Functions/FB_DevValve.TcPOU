@@ -10,6 +10,8 @@ VAR_OUTPUT
 	// ===== Status indicators =======
 	bFco_Closed		:	BOOL := FALSE ;
 	bFco_Open		: 	BOOL := FALSE ;
+	fTimeToOpen		: 	LREAL ;
+	fTimeToClose	: 	LREAL ;
 END_VAR
 VAR
 	// Pararmeters
@@ -219,7 +221,11 @@ END_VAR
 // ====== set outputs =======
 	bFco_Closed := fbTOnClose.Q ;
 	bFco_Open	:= FbTOnOpen.Q	;
-	bReady		:= bFco_Closed OR bFco_Open ;]]></ST>
+	bReady		:= bFco_Closed OR bFco_Open ;
+	
+// ====== Timer values =====
+	fTimeToClose	:= stParTimeToClose.fValue;
+	fTimeToOpen		:= stParTimeToOpen.fValue;]]></ST>
       </Implementation>
     </Method>
     <Method Name="ExecSetOutPuts" Id="{c7a194a0-0cdb-4788-8c09-c5fb927df87c}" FolderPath="Private\">
@@ -415,6 +421,7 @@ END_VAR]]></Declaration>
       <LineId Id="25" Count="0" />
       <LineId Id="20" Count="0" />
       <LineId Id="26" Count="1" />
+      <LineId Id="50" Count="3" />
     </LineIds>
     <LineIds Name="FB_DevValve.ExecSetOutPuts">
       <LineId Id="5" Count="0" />
