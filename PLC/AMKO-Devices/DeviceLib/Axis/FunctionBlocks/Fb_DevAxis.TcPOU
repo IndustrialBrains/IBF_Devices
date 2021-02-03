@@ -106,13 +106,20 @@ VAR	// =============== Motion status functions ================
 		arExec_MoveRelative	: ARRAY [0..1] OF BOOL ; // Execute move relative
 		arExec_MoveAbs		: ARRAY [0..1] OF BOOL ; // Execute move absolute reverse
 		arExec_MoveModulo	: ARRAY [0..1] OF BOOL ; // Execute move modulo
-		
+
+	// ===== Internal variables =======
+		fAcceleration	: LREAL := 0 ; // Acceleration used for functions 
+		fDeceleration	: LREAL := 0 ; // Deceleration used for functions
 END_VAR
 VAR
 	// ===== Loop variables =====
 		i : DINT := 0 ; // For loop increment
 	// ===== check variable ======
 		rtrigInPosition	: R_TRIG ; // in position trigger 
+END_VAR
+VAR // Parameters 
+	ParAccManualScaling	: Udt_Parameter := (fValue := 50, fFactory := 50, bTeachable := FALSE)  ; // Acceleration scaling factor for manual functions 
+	ParDecManualScaling	: Udt_Parameter := (fValue := 50, fFactory := 50, bTeachable := FALSE)	; // Deceleration scaling factor for manual functions 
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -152,6 +159,11 @@ END_VAR
 		RETURN ;
 	END_IF
 
+// ===== Set acceleratio and deceleration values =======
+	IF bCmdManual THEN 
+		fAcceleration 	:= fCmdAcc * (ParAccManualScaling.fvalue / 100);
+		fDeceleration	:= fCmdDecc* (ParDecManualScaling.fValue / 100);
+	END_IF
 // ===== Homing functions =====
 	ExecHome		(); 
 
@@ -174,7 +186,9 @@ END_VAR
 	bVelocityLimited	:= bCmdLimitVelocity ;	
 	bCmdLimitVelocity 	:= FALSE ; 
 
-]]></ST>
+// ====== Reset acceleration deceleration values ======
+	fAcceleration	:= fCmdAcc;
+	fDeceleration	:= fCmdDecc;]]></ST>
       </Implementation>
     </Method>
     <Method Name="CallOrganizationFunctions" Id="{30788d1f-d292-49da-a183-d882588243a9}" FolderPath="Private\">
@@ -187,7 +201,8 @@ END_VAR
 	ExecReadStatus		(); 
 	ExecEnable			();
 	ExecReset			();
-	ExecWriteParameter	();]]></ST>
+	ExecWriteParameter	();
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdGearDynamic" Id="{7011281c-220c-4832-81a9-6de31a7ec1a3}" FolderPath="Command Methods\">
@@ -547,6 +562,30 @@ bBlockedCommand := fbMcHalt.Active ;
 	CmdMoveVelocity := fbMcMoveVelocity.Active ;]]></ST>
       </Implementation>
     </Method>
+    <Method Name="CmdOverwriteAcc" Id="{0bcd5b3c-1fc1-0254-21e2-286bd45e95c0}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdOverwriteAcc : BOOL // temporarilly overwrite deceleration values
+VAR_INPUT	
+	fValue	: LREAL ; // Overwrite value 
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fAcceleration := fValue ;
+
+CmdOverwriteAcc := true ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdOverwriteDec" Id="{d18160bd-16ee-085d-3a89-64c41286e618}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdOverwriteDec : BOOL // Temporarilly overwrite deceleration values
+VAR_INPUT
+	fValue	: LREAL ; // Overwrite value 
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fDeceleration := fValue ;
+
+CmdOverwriteDec := TRUE ;]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="CmdReset" Id="{9ed88b7b-6fd1-4ff9-a6de-53b6c8907919}" FolderPath="Command Methods\">
       <Declaration><![CDATA[METHOD PUBLIC CmdReset : BOOL
 VAR_INPUT
@@ -670,7 +709,7 @@ END_VAR
 	fbMcGearInDyn ( 	Master 			:= refMasterAxis,
 						Slave			:= AxisRef,
 						Enable 			:= bExec_GearSlaveDyn AND bDelayedEnable,
-						Acceleration	:= fCmdAcc	); 
+						Acceleration	:= fAcceleration	); 
 						
 // ===== reset command =====
 	bExec_GearSlaveDyn	:= FALSE ;
@@ -819,8 +858,8 @@ END_VAR
 	fbMcJog (	Axis 		:= AxisRef,
 				JogForward	:= bExec_JogPositive AND bDelayedEnable,
 				JogBackwards:= bExec_JogNegative AND bDelayedEnable,
-				Acceleration:= fCmdAcc,
-				Deceleration:= fCmdDecc );
+				Acceleration:= fAcceleration,
+				Deceleration:= fDeceleration );
 
 // ===== reset command =====
 	bExec_JogPositive 	:= FALSE  ;
@@ -855,8 +894,8 @@ FOR i := 0 TO 1 DO
 	// function call
 	fbMcMoveAbsolute[i](	Axis 		:= AxisRef,
 							Execute 	:= arExec_MoveAbs[i] AND bDelayedEnable,
-							Acceleration:= fCmdAcc,
-							Deceleration:= fCmdDecc );  
+							Acceleration:= fAcceleration,
+							Deceleration:= fDeceleration );  
 
 	// If function is done then reset command values
 	IF fbMcMoveAbsolute[i].Done OR fbMcMoveAbsolute[i].CommandAborted OR NOT arExec_MoveAbs[i] THEN 
@@ -898,8 +937,8 @@ FOR i := 0 TO 1 DO
 	// function call
 	fbMcMoveModulo[i](	Axis 		:= AxisRef,
 						Execute 	:= arExec_MoveModulo[i] AND bDelayedEnable,
-						Acceleration:= fCmdAcc,
-						Deceleration:= fCmdDecc);  
+						Acceleration:= fAcceleration,
+						Deceleration:= fDeceleration);  
 	
 	// If function is done then reset command values
 	IF fbMcMoveModulo[i].Done OR fbMcMoveModulo[i].CommandAborted OR NOT arExec_MoveModulo[i] THEN 
@@ -940,8 +979,8 @@ FOR i := 0 TO 1 DO
 	// function call
 	fbMCMoveRelative[i](	Axis 		:= AxisRef,
 							Execute		:= arExec_MoveRelative[i] AND bDelayedEnable,
-							Acceleration:= fCmdAcc,
-							Deceleration:= fCmdDecc );
+							Acceleration:= fAcceleration,
+							Deceleration:= fDeceleration );
 
 	// If function is done then reset command values
 	IF fbMCMoveRelative[i].Done OR fbMCMoveRelative[i].CommandAborted OR NOT arExec_MoveRelative[i] THEN 
@@ -980,8 +1019,8 @@ END_IF
 // function call
 fbMcMoveVelocity (	Axis 		:= AxisRef,
 					Execute		:= bExec_MoveVelocity  AND bDelayedEnable,
-					Acceleration:= fCmdAcc,
-					Deceleration:= fCmdDecc );
+					Acceleration:= fAcceleration,
+					Deceleration:= fDeceleration );
 
 // ===== reset command =====
 bExec_MoveVelocity := FALSE ;
@@ -1242,9 +1281,23 @@ END_VAR]]></Declaration>
 	// ***** Time delay enable off *****
 		THIS^.tEnableDelay		:= tEnableDelay	;
 		THIS^.tDisableDelay 	:= tDisabledelay ;		
+		
+// ===== configure parameters =====
+	ParAccManualScaling.fMinimum 		:= 1 	;
+	ParAccManualScaling.fMaximum		:= 100 	;
+	ParAccManualScaling.nNumber 		:= nLocationId + 1;
+	ParAccManualScaling.sDiscription  	:= CONCAT( STR1 := sName, STR2 := 'percantage of acceleration used For jogging');
+	ParAccManualScaling.sName			:= CONCAT( STR1 := sName, STR2 := 'Manual acc scaling');
+	ParAccManualScaling.sType			:= 'Mpar';
+	ParAccManualScaling.sUnit			:= '%';
 
-// ===== Set device type for manual control =====
-	eDevType := E_Devices.Axis ;
+	ParDecManualScaling.fMinimum 		:= 1 	;
+	ParDecManualScaling.fMaximum		:= 100 	;
+	ParDecManualScaling.nNumber 		:= nLocationId + 2;
+	ParDecManualScaling.sDiscription  	:= CONCAT( STR1 := sName, STR2 := 'percantage of deceleration used For jogging');
+	ParDecManualScaling.sName			:= CONCAT( STR1 := sName, STR2 := 'Manual dec scaling');
+	ParDecManualScaling.sType			:= 'Mpar';
+	ParDecManualScaling.sUnit			:= '%';
 		
 // ===== reset axis state indicators ======
 	bError 	:= FALSE;
@@ -1269,18 +1322,24 @@ END_IF
     <LineIds Name="Fb_DevAxis.CallMotionFunctions">
       <LineId Id="6" Count="1" />
       <LineId Id="39" Count="1" />
-      <LineId Id="8" Count="16" />
+      <LineId Id="8" Count="1" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="55" Count="3" />
+      <LineId Id="11" Count="13" />
       <LineId Id="47" Count="0" />
       <LineId Id="25" Count="1" />
       <LineId Id="30" Count="1" />
       <LineId Id="34" Count="0" />
       <LineId Id="32" Count="0" />
       <LineId Id="41" Count="1" />
+      <LineId Id="53" Count="1" />
     </LineIds>
     <LineIds Name="Fb_DevAxis.CallOrganizationFunctions">
       <LineId Id="6" Count="2" />
       <LineId Id="5" Count="0" />
       <LineId Id="12" Count="0" />
+      <LineId Id="16" Count="0" />
     </LineIds>
     <LineIds Name="Fb_DevAxis.CmdGearDynamic">
       <LineId Id="35" Count="1" />
@@ -1451,6 +1510,16 @@ END_IF
       <LineId Id="17" Count="0" />
       <LineId Id="16" Count="0" />
       <LineId Id="18" Count="0" />
+    </LineIds>
+    <LineIds Name="Fb_DevAxis.CmdOverwriteAcc">
+      <LineId Id="5" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="10" Count="0" />
+    </LineIds>
+    <LineIds Name="Fb_DevAxis.CmdOverwriteDec">
+      <LineId Id="5" Count="0" />
+      <LineId Id="8" Count="0" />
+      <LineId Id="7" Count="0" />
     </LineIds>
     <LineIds Name="Fb_DevAxis.CmdReset">
       <LineId Id="28" Count="1" />
@@ -1668,8 +1737,8 @@ END_IF
       <LineId Id="274" Count="4" />
       <LineId Id="389" Count="0" />
       <LineId Id="279" Count="0" />
-      <LineId Id="339" Count="0" />
-      <LineId Id="337" Count="1" />
+      <LineId Id="570" Count="0" />
+      <LineId Id="572" Count="15" />
       <LineId Id="280" Count="2" />
       <LineId Id="313" Count="0" />
       <LineId Id="286" Count="3" />
