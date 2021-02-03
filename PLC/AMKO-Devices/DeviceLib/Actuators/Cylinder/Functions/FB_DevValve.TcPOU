@@ -279,7 +279,7 @@ VAR_INPUT
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[// ====== Calculate device id =====
-	ExecIdentifyDevice(nId,nParentId);
+	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Cylinder);
 	
 // ====== Set message information =======
 	stFault.ComponentType	:= E_ComponentTypes.Cylinder 		;

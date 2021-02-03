@@ -184,7 +184,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// ====== Calculate device id =====
-	ExecIdentifyDevice(nId,nParentId);
+	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Heaters);
 
 // ====== Set message information =======
 	stFault.ComponentType	:= E_ComponentTypes.Heaters	;

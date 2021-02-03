@@ -50,7 +50,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// ====== Calculate device id =====
-	ExecIdentifyDevice(nId,nParentId);
+	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.AnInput);
 
 // ====== Set feedback ======
 	bInitOk := true ;]]></ST>
