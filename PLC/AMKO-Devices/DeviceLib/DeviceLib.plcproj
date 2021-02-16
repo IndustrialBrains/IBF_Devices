@@ -95,7 +95,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Actuators\Cylinder\DataTypes\ManualControls" />
-    <Folder Include="Actuators\Cylinder\MLTFunctions" />
     <Folder Include="Axis" />
     <Folder Include="Axis\DataTypes" />
     <Folder Include="Axis\FunctionBlocks" />
@@ -144,10 +143,6 @@
     </Compile>
     <Compile Include="Actuators\Cylinder\Functions\Fb_DevCylWithFbk.TcPOU">
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Actuators\Cylinder\MLTFunctions\Fb_DevSupportCyl.TcPOU">
-      <SubType>Code</SubType>
-      <ExcludeFromBuild>true</ExcludeFromBuild>
     </Compile>
     <Compile Include="Axis\DataTypes\E_AxisCmd.TcTLEO">
       <SubType>Code</SubType>

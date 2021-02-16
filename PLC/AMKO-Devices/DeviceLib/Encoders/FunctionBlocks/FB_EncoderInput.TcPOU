@@ -15,7 +15,7 @@ VAR
 	
 	nScaledValue		: LREAL ; // Only scaled value for internal use
 	nValueWithOffset	: LREAL ; // scaled value with added offset
-	
+	fOldPos				: LREAL ; // Old position
 	
 END_VAR
 ]]></Declaration>
@@ -33,11 +33,16 @@ END_VAR
 	
 // ====== Add offset ======= 
 	nValueWithOffset := nScaledValue + fOffset ;
-
+	
+// ====== Caclulate velocity =====
+	IF Sys_Variables.Pulse100ms THEN 
+		nVelocity 	:= (nOutPosition - fOldPos) * 10 ;
+		fOldPos		:= nOutPosition;
+	END_IF
+	
 // ====== Set Outputs =======
 	nOutPosition 	:= nValueWithOffset ;
 	nOutRaw			:= iCounterValue	; 	
-
 ]]></ST>
     </Implementation>
     <Method Name="CheckBoxStatus" Id="{955108e9-c9df-0ec1-0ba8-cf8484910c33}">
@@ -79,9 +84,9 @@ END_VAR
       </Implementation>
     </Method>
     <LineIds Name="FB_EncoderInput">
-      <LineId Id="90" Count="1" />
-      <LineId Id="89" Count="0" />
-      <LineId Id="74" Count="14" />
+      <LineId Id="133" Count="16" />
+      <LineId Id="155" Count="0" />
+      <LineId Id="150" Count="4" />
       <LineId Id="33" Count="0" />
     </LineIds>
     <LineIds Name="FB_EncoderInput.CheckBoxStatus">

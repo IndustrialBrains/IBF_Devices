@@ -571,7 +571,7 @@ END_VAR
       <Implementation>
         <ST><![CDATA[fAcceleration := fValue ;
 
-CmdOverwriteAcc := true ;]]></ST>
+CmdOverwriteAcc := TRUE ;]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdOverwriteDec" Id="{d18160bd-16ee-085d-3a89-64c41286e618}" FolderPath="Command Methods\">
