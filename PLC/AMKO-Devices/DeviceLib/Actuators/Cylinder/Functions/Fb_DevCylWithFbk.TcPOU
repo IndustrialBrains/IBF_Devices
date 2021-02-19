@@ -330,12 +330,15 @@ END_VAR
         <ST><![CDATA[bFcoCalcDone := FALSE;
 
 // Enable sensor feedback
-fbSensorClosed.Init(	nId 		:= 0,
-						nParentId 	:= nLocationId) ;
-fbSensorClosed.Init(	nId 		:= 1,
-						nParentId 	:= nLocationId) ;
+fbSensorClosed.bEmbeded := TRUE ;
 fbSensorClosed.bEnable	:= TRUE ;
+fbSensorClosed.Init	(	nId 		:= 0,
+						nParentId 	:= nLocationId) ;
+
+fbSensorOpen.bEmbeded := TRUE ;
 fbSensorOpen.bEnable	:= TRUE ;
+fbSensorOpen.Init	(	nId 		:= 1,
+						nParentId 	:= nLocationId) ;
 
 // Call feedback sensors 
 ExecSetFeedback(); 
@@ -495,11 +498,14 @@ Init 	:= bInitOk ;]]></ST>
     <LineIds Name="Fb_DevCylWithFbk.Init">
       <LineId Id="52" Count="0" />
       <LineId Id="68" Count="0" />
-      <LineId Id="65" Count="0" />
-      <LineId Id="103" Count="0" />
-      <LineId Id="105" Count="2" />
-      <LineId Id="64" Count="0" />
-      <LineId Id="66" Count="0" />
+      <LineId Id="121" Count="0" />
+      <LineId Id="126" Count="0" />
+      <LineId Id="128" Count="0" />
+      <LineId Id="122" Count="1" />
+      <LineId Id="133" Count="0" />
+      <LineId Id="132" Count="0" />
+      <LineId Id="130" Count="0" />
+      <LineId Id="124" Count="1" />
       <LineId Id="71" Count="0" />
       <LineId Id="70" Count="0" />
       <LineId Id="72" Count="0" />
