@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.6">
   <POU Name="FB_ManualController" Id="{791f33e7-9b25-0d7d-213d-2739874fa7e2}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_ManualController
 VAR_INPUT
@@ -40,7 +40,10 @@ END_VAR
 IF bManualActive THEN 
 	// insert a device 
 	ExecSelectDevice();
-END_IF]]></ST>
+END_IF
+
+// Make sure compiler does not skip unused variables
+fbNodevice;]]></ST>
     </Implementation>
     <Folder Name="Private" Id="{aa1be144-3e85-00ba-24ed-50747e4a9031}" />
     <Method Name="CmdAddDevice" Id="{0bc99b03-d325-0236-3e6c-84d8051938b0}">
@@ -124,45 +127,5 @@ eDevType := arDeviceArray[nCmdLookupindex].pFunction^.eDevType ;
 ]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_ManualController">
-      <LineId Id="138" Count="0" />
-      <LineId Id="133" Count="0" />
-      <LineId Id="9" Count="0" />
-      <LineId Id="25" Count="0" />
-      <LineId Id="134" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ManualController.CmdAddDevice">
-      <LineId Id="72" Count="15" />
-      <LineId Id="26" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ManualController.ExecSelectDevice">
-      <LineId Id="5" Count="0" />
-      <LineId Id="47" Count="0" />
-      <LineId Id="33" Count="0" />
-      <LineId Id="36" Count="0" />
-      <LineId Id="35" Count="0" />
-      <LineId Id="37" Count="0" />
-      <LineId Id="22" Count="1" />
-      <LineId Id="25" Count="1" />
-      <LineId Id="28" Count="0" />
-      <LineId Id="31" Count="1" />
-      <LineId Id="54" Count="1" />
-      <LineId Id="51" Count="1" />
-      <LineId Id="56" Count="2" />
-      <LineId Id="53" Count="0" />
-      <LineId Id="59" Count="3" />
-      <LineId Id="81" Count="1" />
-      <LineId Id="29" Count="1" />
-      <LineId Id="11" Count="0" />
-      <LineId Id="71" Count="1" />
-      <LineId Id="86" Count="2" />
-      <LineId Id="67" Count="0" />
-      <LineId Id="66" Count="0" />
-      <LineId Id="68" Count="2" />
-      <LineId Id="75" Count="0" />
-      <LineId Id="74" Count="0" />
-      <LineId Id="77" Count="0" />
-      <LineId Id="76" Count="0" />
-    </LineIds>
   </POU>
 </TcPlcObject>

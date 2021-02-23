@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.6">
   <POU Name="FB_DevAnalogInput" Id="{438fca26-964b-0408-10a5-3e8ee84a0164}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevAnalogInput EXTENDS FB_DevBase
 VAR_INPUT
@@ -23,7 +23,12 @@ eDevType := E_Devices.AnalogSensor ;
 SUPER^(refFbFault := refFbFault);
 
 // set feedback
-ExecSetFeedback();]]></ST>
+ExecSetFeedback();
+
+// Make sure compiler does not skip unused variables
+nLimitMin;
+nLimitMax;
+]]></ST>
     </Implementation>
     <Method Name="ExecSetFeedback" Id="{7a115a3e-3411-01c5-2bf8-56b6258af2f3}">
       <Declaration><![CDATA[METHOD ExecSetFeedback : BOOL
@@ -56,25 +61,5 @@ END_VAR
 	bInitOk := true ;]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_DevAnalogInput">
-      <LineId Id="16" Count="3" />
-      <LineId Id="38" Count="0" />
-      <LineId Id="22" Count="0" />
-      <LineId Id="12" Count="0" />
-      <LineId Id="24" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevAnalogInput.ExecSetFeedback">
-      <LineId Id="8" Count="1" />
-      <LineId Id="11" Count="0" />
-      <LineId Id="13" Count="0" />
-      <LineId Id="10" Count="0" />
-      <LineId Id="7" Count="0" />
-      <LineId Id="6" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevAnalogInput.Init">
-      <LineId Id="11" Count="2" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="14" Count="0" />
-    </LineIds>
   </POU>
 </TcPlcObject>
