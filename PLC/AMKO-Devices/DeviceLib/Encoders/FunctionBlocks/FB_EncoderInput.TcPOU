@@ -24,7 +24,7 @@ END_VAR
 	CheckBoxStatus();
 
 // ====== Scale Output value ======
-	nScaledValue := UDINT_TO_LREAL(iCounterValue) - fPulsesPerUnit ;
+	nScaledValue := UDINT_TO_LREAL(iCounterValue) / fPulsesPerUnit ;
 
 // ====== Invert ======
 	IF bIcfInverted THEN 
