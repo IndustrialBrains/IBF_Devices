@@ -24,7 +24,7 @@ END_VAR
 	CheckBoxStatus();
 
 // ====== Scale Output value ======
-	nScaledValue := UDINT_TO_LREAL(iCounterValue) * fUnitsPerPulse ;
+	nScaledValue := UDINT_TO_LREAL(iCounterValue) - fPulsesPerUnit ;
 
 // ====== Invert ======
 	IF bIcfInverted THEN 
@@ -83,27 +83,5 @@ END_VAR
         <ST><![CDATA[]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_EncoderInput">
-      <LineId Id="133" Count="16" />
-      <LineId Id="155" Count="0" />
-      <LineId Id="150" Count="4" />
-      <LineId Id="33" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_EncoderInput.CheckBoxStatus">
-      <LineId Id="5" Count="1" />
-      <LineId Id="8" Count="0" />
-      <LineId Id="10" Count="0" />
-      <LineId Id="12" Count="0" />
-      <LineId Id="11" Count="0" />
-      <LineId Id="14" Count="3" />
-      <LineId Id="13" Count="0" />
-      <LineId Id="19" Count="3" />
-      <LineId Id="18" Count="0" />
-      <LineId Id="24" Count="3" />
-      <LineId Id="7" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_EncoderInput.FastTask">
-      <LineId Id="5" Count="0" />
-    </LineIds>
   </POU>
 </TcPlcObject>

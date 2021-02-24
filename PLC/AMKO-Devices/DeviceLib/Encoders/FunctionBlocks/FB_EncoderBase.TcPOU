@@ -10,9 +10,9 @@ VAR_OUTPUT
 	nVelocity			: LREAL	:= 0 	; // Velocity [units/sec]
 END_VAR
 VAR
-	fUnitsPerPulse	: LREAL := 1	; // Scale factor for output [units/pulse]
-	fOffset			: LREAL := 0	; // Offset for output
-	bIcfInverted	: BOOL	:= FALSE; // Invert output position = standard false  
+	fPulsesPerUnit		: LREAL := 1	; // Scale factor for output [units/pulse]
+	fOffset				: LREAL := 0	; // Offset for output
+	bIcfInverted		: BOOL	:= FALSE; // Invert output position = standard false  
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -34,17 +34,19 @@ VAR_INPUT
 	nId			: UDINT ; // Identification number of object
 	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
 	// Configuration
-	fUnitsPerPulse	: LREAL := 1	; // Scale factor for output [units/pulse]
-	fOffset			: LREAL := 0	; // Offset for output
-	bIcfInverted	: BOOL	:= FALSE; // Invert output position = standard false  
+	fPulsesPerUnit	: LREAL	; // Scale factor for output [units/pulse]
+	fOffset			: LREAL	; // Offset for output
+	bIcfInverted	: BOOL	; // Invert output position = standard false  
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ====== Calculate device id =====
+        <ST><![CDATA[
+
+// ====== Calculate device id =====
 	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Encoder);
 
 // ===== Coppy values to function memory ======
-	THIS^.fUnitsPerPulse	:= fUnitsPerPulse;
+	THIS^.fPulsesPerUnit	:= MAX(fPulsesPerUnit,0.01); // Minimum value of 1
 	THIS^.fOffset			:= fOffset;
 	THIS^.bIcfInverted		:= bIcfInverted;
 	
@@ -52,19 +54,5 @@ END_VAR
 bInitOk := TRUE ;]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_EncoderBase">
-      <LineId Id="9" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_EncoderBase.FastTask">
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_EncoderBase.Init">
-      <LineId Id="10" Count="1" />
-      <LineId Id="22" Count="0" />
-      <LineId Id="12" Count="0" />
-      <LineId Id="25" Count="2" />
-      <LineId Id="23" Count="1" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
   </POU>
 </TcPlcObject>
