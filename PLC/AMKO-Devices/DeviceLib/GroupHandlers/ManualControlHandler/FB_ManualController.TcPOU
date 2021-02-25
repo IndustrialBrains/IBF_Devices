@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.6">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_ManualController" Id="{791f33e7-9b25-0d7d-213d-2739874fa7e2}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_ManualController
 VAR_INPUT
@@ -27,6 +27,7 @@ VAR
 	pDevDigitalOut		: POINTER TO FB_DevDigitalOutput		; // Device pointer to digital output
 	pDevPWMController	: POINTER TO FB_DevPWMGenerator			; // Device pointer to PWM controller
 	pDevDoublePWM		: POINTER TO FB_DevDoublePWM			; // Device pointer to Double PWM controller
+	pDevEncoder			: POINTER TO FB_EncoderBase				; // Device Pointer to encoder Base
 	
 	fbNodevice			: FB_DevBase ;
 	stNoDevice			: UDT_DeviceID := (sName := 'No device', sType := TO_STRING(E_Devices.Undefined), pFunction := ADR(fbNodevice)); 
@@ -108,6 +109,8 @@ CASE arDeviceArray[nCmdLookupindex].pFunction^.eDevType OF
 		pDevPWMController	:= arDeviceArray[nCmdLookupindex].pFunction ;
 	E_Devices.DoublePWMController :
 		pDevDoublePWM		:= arDeviceArray[nCmdLookupindex].pFunction ;
+	E_Devices.Encoder :
+		pDevEncoder			:= arDeviceArray[nCmdLookupindex].pFunction ;
 	ELSE
 		;
 END_CASE

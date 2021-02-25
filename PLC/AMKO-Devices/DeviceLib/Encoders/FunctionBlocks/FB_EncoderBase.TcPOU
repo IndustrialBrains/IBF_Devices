@@ -45,6 +45,10 @@ END_VAR
 // ====== Calculate device id =====
 	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Encoder);
 
+// ====== Set manual device type ======
+	eDevType := E_Devices.Encoder ;	
+
+	
 // ===== Coppy values to function memory ======
 	THIS^.fPulsesPerUnit	:= MAX(fPulsesPerUnit,0.01); // Minimum value of 1
 	THIS^.fOffset			:= fOffset;
