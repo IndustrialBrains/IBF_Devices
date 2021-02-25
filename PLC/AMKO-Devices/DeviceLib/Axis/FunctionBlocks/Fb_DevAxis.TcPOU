@@ -1026,7 +1026,7 @@ fbMcMoveVelocity (	Axis 		:= AxisRef,
 bExec_MoveVelocity := FALSE ;
 	
 // Halt fault handling 
-IF fbMcHalt.Error THEN 
+IF fbMcMoveVelocity.Error THEN 
 	bError					:= TRUE							;
 	stFault.Active 			:= TRUE 						;
 	stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
