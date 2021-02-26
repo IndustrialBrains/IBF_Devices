@@ -677,8 +677,8 @@ END_IF
 	bInternalEnable := FALSE ; 	
 
 // ===== Delayed enable function =====	
-	TonMotionEnable(IN := fbMcPower.Enable, PT := tEnableDelay);
-	bDelayedEnable := TonMotionEnable.Q AND NOT AxisRef.Status.Operational;	
+	TonMotionEnable(IN := fbMcPower.Status, PT := tEnableDelay);
+	bDelayedEnable := TonMotionEnable.Q ;	
 
 
 IF fbMcPower.Error THEN 
