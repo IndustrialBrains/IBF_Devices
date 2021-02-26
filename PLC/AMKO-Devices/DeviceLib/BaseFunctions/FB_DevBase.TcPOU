@@ -21,7 +21,10 @@ END_VAR
 
 // Add device to manual screen
 IF NOT bEmbeded THEN 
-	IF NOT bAddedToManual AND sName <> ''  THEN 
+	IF NOT bAddedToManual 
+	AND sName <> '' 
+	AND __ISVALIDREF( refFbManualCtrl)  
+	THEN 
 		bAddedToManual S= refFbManualCtrl.CmdAddDevice(THIS^);
 	END_IF
 END_IF
@@ -48,21 +51,5 @@ bIsSafe 	:= NOT bEnable ;
 CmdSafeStop := bIsSafe ;]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_DevBase">
-      <LineId Id="759" Count="0" />
-      <LineId Id="751" Count="1" />
-      <LineId Id="777" Count="0" />
-      <LineId Id="780" Count="2" />
-      <LineId Id="779" Count="0" />
-      <LineId Id="762" Count="0" />
-      <LineId Id="547" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBase.CmdManual">
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBase.CmdSafeStop">
-      <LineId Id="6" Count="1" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
   </POU>
 </TcPlcObject>
