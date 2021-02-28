@@ -44,6 +44,7 @@ VAR // Axis configuration
  		bIcfEnablereverse	: BOOL ; // Enable reverse motion
 		bIcfAlwaysEnable	: BOOL ; // 1 = Axis always enabled, 0 = Axis disabled at Idle 
 		bIcfSimulationMode	: BOOL := FALSE ; // Simulation mode is active [default set to False] 
+		bIcfModuloAxis		: BOOL := FALSE ; // Show axis position as modulo
 	// ===== Internal motion values ======
 		fHomePosition		: LREAL := 0 ; // set position at homing
 	// Command Modes
@@ -1055,7 +1056,11 @@ ELSE
 END_IF
 
 // write position output
-fActPosition := AxisRef.NcToPlc.ActPos ;
+IF bIcfModuloAxis THEN 
+	fActPosition := AxisRef.NcToPlc.ModuloActPos ;
+ELSE
+	fActPosition := AxisRef.NcToPlc.ActPos ;
+END_IF
 						
 // set status bits 
 bIdle := NOT AxisRef.Status.HasJob ;
@@ -1198,6 +1203,7 @@ VAR_INPUT
 	bIcfEnablereverse	: BOOL := TRUE 	; // Enable reverse motion
 	bIcfAlwaysEnable	: BOOL := FALSE ; // 1 = Axis always enabled, 0 = Axis disabled at Idle 
 	bIcfSimulationMode	: BOOL := FALSE ; // Simulation mode is active [default set to False] Used for testing without hardware present 
+	bIcfModuloAxis		: BOOL := FALSE ; // Show axis position as modulo
 	
 	// Config Values 
 	mcHomingMode 		: MC_HomingMode := MC_HomingMode.MC_DefaultHoming; 
@@ -1273,6 +1279,7 @@ END_VAR]]></Declaration>
 		THIS^.bIcfEnablereverse		:= bIcfEnablereverse	; // Enable reverse motion
 		THIS^.bIcfAlwaysEnable		:= bIcfAlwaysEnable		; // Always enable motor and brake if safety is ok
 		THIS^.bIcfSimulationMode	:= bIcfSimulationMode 	; // Simulation mode is active [default set to False] 
+		THIS^.bIcfModuloAxis		:= bIcfModuloAxis		; // show axis position as modulo
 
 	// ***** config homing Mode ***** 
  		THIS^.mcHomingMode 			:= mcHomingMode ; // set homing mode
