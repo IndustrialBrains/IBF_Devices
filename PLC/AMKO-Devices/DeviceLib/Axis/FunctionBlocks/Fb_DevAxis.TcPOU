@@ -154,7 +154,9 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// ===== Check if safe to move =====
-	IF bCmdSafeStop THEN 
+	IF (bManual AND bSafetyOk) THEN
+		;
+	ELSIF bCmdSafeStop THEN 
 		// ===== reset safe commands ======
 		bCmdSafeStop	:= FALSE ; 
 		RETURN ;
@@ -1134,7 +1136,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// ==== Stop when safety is not ok =====
-	bCmdSafeStop := NOT bSafetyOk ;
+	bCmdSafeStop S= NOT bSafetyOk ;
 
 // ==== Safe operation functions (overrule all other motion functions) =====
 	fbMcStop( 	Axis 			:= AxisRef		,
