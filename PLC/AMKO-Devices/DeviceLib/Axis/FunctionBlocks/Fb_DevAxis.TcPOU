@@ -392,8 +392,6 @@ IF stManualCtrl.bCmdJogForward OR stManualCtrl.bCmdJogReverse THEN
 			fPos := stManualCtrl.fDistance, 
 			bJogNegative := stManualCtrl.bCmdJogReverse, 
 			eJogmode := eJogmode);
-	stManualCtrl.bCmdJogForward := FALSE ;
-	stManualCtrl.bCmdJogReverse	:= FALSE ;
 ELSIF stManualCtrl.bCmdToPos THEN 
 	CmdMoveAbs( fPosition := stManualCtrl.fPosition, 
 				fVelocity := stManualCtrl.fVelocity, 
