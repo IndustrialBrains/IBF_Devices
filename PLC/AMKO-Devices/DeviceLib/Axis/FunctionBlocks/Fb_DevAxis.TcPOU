@@ -374,6 +374,11 @@ bBlockedCommand := fbMcHalt.Active ;
 // Enable axis for manual control
 bCmdManual := TRUE ;
 
+// check safety 
+IF NOT bSafetyOk THEN 
+	RETURN;
+END_IF
+
 // set jog mode 
 IF stManualCtrl.bCmdInching THEN 
 	eJogmode := E_JogMode.MC_JOGMODE_INCHING ;
@@ -385,6 +390,8 @@ IF stManualCtrl.bCmdJogForward OR stManualCtrl.bCmdJogReverse THEN
 			fPos := stManualCtrl.fDistance, 
 			bJogNegative := stManualCtrl.bCmdJogReverse, 
 			eJogmode := eJogmode);
+	stManualCtrl.bCmdJogForward := FALSE ;
+	stManualCtrl.bCmdJogReverse	:= FALSE ;
 ELSIF stManualCtrl.bCmdToPos THEN 
 	CmdMoveAbs( fPosition := stManualCtrl.fPosition, 
 				fVelocity := stManualCtrl.fVelocity, 
@@ -652,14 +659,14 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// ===== Set axis enable ======
-IF NOT bEnable AND NOT bCmdManual AND AxisRef.Status.Moving THEN
-	CmdHalt(fDeceleration := fCmdDecc, mcBuffermode := MC_BufferMode.MC_Aborting);
-ELSIF bCmdManual THEN 
+IF bCmdManual AND bSafetyOk THEN 
 	bCmdEnableAxis 	:= TRUE ;
 	bInternalEnable S= bCmdManual ;
 	bCmdManual 		:= FALSE ;
+ELSIF NOT bEnable AND AxisRef.Status.Moving THEN
+	CmdHalt(fDeceleration := fCmdDecc, mcBuffermode := MC_BufferMode.MC_Aborting);
 ELSE 
-	bCmdEnableAxis	:= bEnable AND NOT bExec_ParWritePers  ;
+	bCmdEnableAxis	:= bEnable AND NOT bExec_ParWritePers ;
 END_IF
 
 // ===== Check if axis is bussy with a command =====
