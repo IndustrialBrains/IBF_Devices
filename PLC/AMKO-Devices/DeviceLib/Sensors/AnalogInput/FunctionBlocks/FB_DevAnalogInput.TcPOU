@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.6">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_DevAnalogInput" Id="{438fca26-964b-0408-10a5-3e8ee84a0164}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevAnalogInput EXTENDS FB_DevBase
 VAR_INPUT
@@ -26,8 +26,6 @@ SUPER^(refFbFault := refFbFault);
 ExecSetFeedback();
 
 // Make sure compiler does not skip unused variables
-nLimitMin;
-nLimitMax;
 ]]></ST>
     </Implementation>
     <Method Name="ExecSetFeedback" Id="{7a115a3e-3411-01c5-2bf8-56b6258af2f3}">

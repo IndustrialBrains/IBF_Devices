@@ -44,7 +44,7 @@ IF bManualActive THEN
 END_IF
 
 // Make sure compiler does not skip unused variables
-fbNodevice;]]></ST>
+]]></ST>
     </Implementation>
     <Folder Name="Private" Id="{aa1be144-3e85-00ba-24ed-50747e4a9031}" />
     <Method Name="CmdAddDevice" Id="{0bc99b03-d325-0236-3e6c-84d8051938b0}">
