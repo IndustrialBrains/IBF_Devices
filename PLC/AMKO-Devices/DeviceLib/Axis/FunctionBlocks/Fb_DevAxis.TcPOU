@@ -654,13 +654,15 @@ END_VAR
         <ST><![CDATA[// ===== Set axis enable ======
 IF NOT bEnable AND NOT bCmdManual AND AxisRef.Status.Moving THEN
 	CmdHalt(fDeceleration := fCmdDecc, mcBuffermode := MC_BufferMode.MC_Aborting);
+ELSIF bCmdManual THEN 
+	bCmdEnableAxis 	:= TRUE ;
+	bInternalEnable S= bCmdManual ;
+	bCmdManual 		:= FALSE ;
 ELSE 
-	bCmdEnableAxis	:= (bEnable OR bCmdManual) AND NOT bExec_ParWritePers  ;
-	bCmdManual := FALSE ;
+	bCmdEnableAxis	:= bEnable AND NOT bExec_ParWritePers  ;
 END_IF
 
 // ===== Check if axis is bussy with a command =====
-	bInternalEnable s= bCmdManual ;
 	bInternalEnable S= AxisRef.Status.HasJob;
 	bInternalEnable	S= bIcfAlwaysEnable ; // always enable axis if configured
 	bInternalEnable	S= AxisRef.Status.Coupled ;
