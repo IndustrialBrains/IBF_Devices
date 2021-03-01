@@ -660,6 +660,7 @@ ELSE
 END_IF
 
 // ===== Check if axis is bussy with a command =====
+	bInternalEnable s= bCmdManual ;
 	bInternalEnable S= AxisRef.Status.HasJob;
 	bInternalEnable	S= bIcfAlwaysEnable ; // always enable axis if configured
 	bInternalEnable	S= AxisRef.Status.Coupled ;
