@@ -645,7 +645,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[bExec_ParWritePers 					:= TRUE ;
+        <ST><![CDATA[bExec_ParWritePers 					S= NOT fbMcWriteParameter.Busy OR fbMcWriteParameter.Done ;
 fbMcWriteParameter.Value 			:= fPosition ;
 fbMcWriteParameter.ParameterNumber 	:= MC_AxisParameter.AxisEncoderOffset;
 
@@ -1177,9 +1177,10 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// check if axis is disabled before writeing parameter
-	IF bExec_ParWritePers AND AxisRef.Status.Disabled THEN
+	IF bExec_ParWritePers AND NOT fbMcPower.Status THEN
 		; 
 	ELSE
+		fbMcWriteParameter.Execute := FALSE ;
 		RETURN;	
 	END_IF
 
@@ -1198,7 +1199,7 @@ END_VAR
 	END_IF
  
 // reset commands
-	bExec_ParWritePers := FALSE ;]]></ST>
+	bExec_ParWritePers R= fbMcWriteParameter.Busy OR fbMcWriteParameter.Done ;]]></ST>
       </Implementation>
     </Method>
     <Method Name="Init" Id="{0a8c2089-518e-4a9f-9c10-83a2f8fbff86}" FolderPath="Command Methods\">
