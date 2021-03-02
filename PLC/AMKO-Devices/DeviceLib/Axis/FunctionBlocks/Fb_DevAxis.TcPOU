@@ -667,7 +667,7 @@ IF bCmdManual AND bSafetyOk THEN
 ELSIF NOT bEnable AND AxisRef.Status.Moving THEN
 	CmdHalt(fDeceleration := fCmdDecc, mcBuffermode := MC_BufferMode.MC_Aborting);
 ELSE 
-	bCmdEnableAxis	:= bEnable AND NOT bExec_ParWritePers OR fbMcWriteParameter.Busy ;
+	bCmdEnableAxis	:= bEnable AND NOT bExec_ParWritePers AND NOT fbMcWriteParameter.Busy ;
 END_IF
 
 // ===== Check if axis is bussy with a command =====
@@ -1178,18 +1178,13 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// check if axis is disabled before writeing parameter
-	IF (bExec_ParWritePers 
-	AND NOT fbMcPower.Status) 
-	OR	fbMcWriteParameter.Busy THEN
-		; 
-	ELSE
+	IF fbMcPower.Status THEN 
 		fbMcWriteParameter.Execute := FALSE ;
-		RETURN;	
+		RETURN ;
+	ELSIF fbMcWriteParameter.Busy OR bExec_ParWritePers THEN
+		fbMcWriteParameter	( 	Axis 	:= AxisRef,
+								Execute	:= bExec_ParWritePers);
 	END_IF
-
-// Write parameter
-	fbMcWriteParameter	( 	Axis 	:= AxisRef,
-							Execute	:= bExec_ParWritePers);
 						
 // fault handling 
 	IF fbMcWriteParameter.Error THEN 
