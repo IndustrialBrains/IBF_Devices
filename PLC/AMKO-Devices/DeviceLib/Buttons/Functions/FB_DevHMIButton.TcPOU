@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_DevHMIButton" Id="{976bfa1c-85fd-4d4c-b554-67d8ef93bfe5}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevHMIButton EXTENDS FB_DevBase // Button function for HMI 
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC FB_DevHMIButton EXTENDS FB_DevBase // Button function for HMI 
 VAR_INPUT
 	Istatus			: BOOL	:= FALSE;// Digital sensor, Direct input status
 	tDelay			: TIME 	:= T#5S	;// Time before delayed signal becomes active 
@@ -55,14 +56,5 @@ END_IF
 		FB_reIStatus (Clk := Istatus , Q => bReStatus); // Generate rising edge from push button input signal
 ]]></ST>
     </Implementation>
-    <LineIds Name="FB_DevHMIButton">
-      <LineId Id="432" Count="0" />
-      <LineId Id="453" Count="0" />
-      <LineId Id="430" Count="0" />
-      <LineId Id="379" Count="1" />
-      <LineId Id="384" Count="0" />
-      <LineId Id="386" Count="24" />
-      <LineId Id="10" Count="0" />
-    </LineIds>
   </POU>
 </TcPlcObject>

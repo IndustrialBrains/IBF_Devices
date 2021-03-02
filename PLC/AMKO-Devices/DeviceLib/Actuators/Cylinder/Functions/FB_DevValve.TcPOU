@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_DevValve" Id="{ba396402-0ac8-4d5d-a8f4-911b90a2c3dc}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevValve EXTENDS FB_DevBase
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC FB_DevValve EXTENDS FB_DevBase
 VAR_INPUT
 	// Manual control 
 	stManualCtrl	: UDT_ManualValveControl ;

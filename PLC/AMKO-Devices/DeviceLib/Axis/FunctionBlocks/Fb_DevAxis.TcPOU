@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="Fb_DevAxis" Id="{bc69e9b9-3f3d-4df5-a0a1-a0954c261e17}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC Fb_DevAxis EXTENDS FB_DevBase
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC Fb_DevAxis EXTENDS FB_DevBase
 VAR_INPUT
 	// ===== General Function input =====
 		fCmdAcc			: LREAL := 15000;

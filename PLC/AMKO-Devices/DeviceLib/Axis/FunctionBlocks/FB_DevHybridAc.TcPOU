@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_DevHybridAc" Id="{2835e4c9-b10f-0483-2c3e-9715ab7ba1da}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevHybridAc EXTENDS Fb_DevAxis
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC FB_DevHybridAc EXTENDS Fb_DevAxis
 VAR_INPUT
 END_VAR
 VAR_OUTPUT

@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_DevDoublePWM" Id="{597d6264-d5f7-07b8-20b6-bf7abd467b88}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevDoublePWM EXTENDS FB_DevBase // PWM control for 2 outputs that cannot be switchid on simultaniously
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC FB_DevDoublePWM EXTENDS FB_DevBase // PWM control for 2 outputs that cannot be switchid on simultaniously
 VAR_INPUT
 	bCmdPWMOn			: BOOL := FALSE ; // PWM controller on 
 END_VAR
@@ -282,109 +283,5 @@ END_IF
 bCmdHold := FALSE ;]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_DevDoublePWM">
-      <LineId Id="201" Count="5" />
-      <LineId Id="250" Count="0" />
-      <LineId Id="207" Count="5" />
-      <LineId Id="200" Count="0" />
-      <LineId Id="9" Count="0" />
-      <LineId Id="124" Count="0" />
-      <LineId Id="161" Count="0" />
-      <LineId Id="125" Count="0" />
-      <LineId Id="162" Count="1" />
-      <LineId Id="126" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevDoublePWM.CalcCycleTimes">
-      <LineId Id="5" Count="0" />
-      <LineId Id="18" Count="0" />
-      <LineId Id="6" Count="0" />
-      <LineId Id="10" Count="0" />
-      <LineId Id="12" Count="0" />
-      <LineId Id="11" Count="0" />
-      <LineId Id="13" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevDoublePWM.CmdHold">
-      <LineId Id="5" Count="0" />
-      <LineId Id="10" Count="0" />
-      <LineId Id="9" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevDoublePWM.CmdOutputAOn">
-      <LineId Id="11" Count="0" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="10" Count="0" />
-      <LineId Id="9" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevDoublePWM.CmdOutputBOn">
-      <LineId Id="9" Count="0" />
-      <LineId Id="6" Count="1" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevDoublePWM.CmdSafeStop">
-      <LineId Id="11" Count="0" />
-      <LineId Id="5" Count="2" />
-      <LineId Id="9" Count="0" />
-      <LineId Id="8" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevDoublePWM.ExecPWMCycle">
-      <LineId Id="51" Count="0" />
-      <LineId Id="56" Count="1" />
-      <LineId Id="59" Count="3" />
-      <LineId Id="66" Count="0" />
-      <LineId Id="63" Count="0" />
-      <LineId Id="58" Count="0" />
-      <LineId Id="64" Count="1" />
-      <LineId Id="55" Count="0" />
-      <LineId Id="18" Count="0" />
-      <LineId Id="17" Count="0" />
-      <LineId Id="19" Count="0" />
-      <LineId Id="21" Count="2" />
-      <LineId Id="25" Count="1" />
-      <LineId Id="28" Count="1" />
-      <LineId Id="31" Count="6" />
-      <LineId Id="27" Count="0" />
-      <LineId Id="38" Count="2" />
-      <LineId Id="16" Count="0" />
-      <LineId Id="41" Count="2" />
-    </LineIds>
-    <LineIds Name="FB_DevDoublePWM.Init">
-      <LineId Id="13" Count="0" />
-      <LineId Id="82" Count="1" />
-      <LineId Id="16" Count="5" />
-      <LineId Id="25" Count="8" />
-      <LineId Id="58" Count="0" />
-      <LineId Id="34" Count="7" />
-      <LineId Id="60" Count="0" />
-      <LineId Id="59" Count="0" />
-      <LineId Id="49" Count="0" />
-      <LineId Id="51" Count="6" />
-      <LineId Id="67" Count="7" />
-      <LineId Id="50" Count="0" />
-      <LineId Id="42" Count="3" />
-      <LineId Id="61" Count="1" />
-      <LineId Id="47" Count="1" />
-      <LineId Id="12" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevDoublePWM.SetOutputs">
-      <LineId Id="13" Count="0" />
-      <LineId Id="12" Count="0" />
-      <LineId Id="14" Count="0" />
-      <LineId Id="11" Count="0" />
-      <LineId Id="8" Count="0" />
-      <LineId Id="7" Count="0" />
-      <LineId Id="10" Count="0" />
-      <LineId Id="23" Count="0" />
-      <LineId Id="9" Count="0" />
-      <LineId Id="24" Count="1" />
-      <LineId Id="27" Count="0" />
-      <LineId Id="26" Count="0" />
-      <LineId Id="28" Count="1" />
-      <LineId Id="34" Count="3" />
-      <LineId Id="33" Count="0" />
-      <LineId Id="40" Count="5" />
-      <LineId Id="47" Count="4" />
-      <LineId Id="39" Count="0" />
-      <LineId Id="56" Count="0" />
-      <LineId Id="55" Count="0" />
-    </LineIds>
   </POU>
 </TcPlcObject>

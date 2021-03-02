@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_DevAnalogInput" Id="{438fca26-964b-0408-10a5-3e8ee84a0164}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevAnalogInput EXTENDS FB_DevBase
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC FB_DevAnalogInput EXTENDS FB_DevBase
 VAR_INPUT
 	bCmdSimulate	: BOOL 	:= FALSE ;// Simulate sensor Input 
 	fSimValue		: INT	:= 0 ;// Simulated sensor state

@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_EncoderInput" Id="{0f518a76-74dc-4426-927f-5208a6bc0566}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_EncoderInput EXTENDS FB_EncoderBase
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK FB_EncoderInput EXTENDS FB_EncoderBase
 VAR_INPUT
 END_VAR
 VAR_OUTPUT

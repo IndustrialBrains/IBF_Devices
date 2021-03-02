@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_DevPushButton" Id="{85c12aac-0056-4bb7-94d2-526e184c7433}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevPushButton EXTENDS Fb_DevDigitalInputFunctions
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC FB_DevPushButton EXTENDS Fb_DevDigitalInputFunctions
 VAR_INPUT
 END_VAR
 VAR_OUTPUT
@@ -18,12 +19,5 @@ END_IF
 SUPER^(refFbFault := refFbFault);
 ]]></ST>
     </Implementation>
-    <LineIds Name="FB_DevPushButton">
-      <LineId Id="18" Count="0" />
-      <LineId Id="22" Count="2" />
-      <LineId Id="19" Count="0" />
-      <LineId Id="32" Count="0" />
-      <LineId Id="9" Count="0" />
-    </LineIds>
   </POU>
 </TcPlcObject>

@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="Fb_DevDigitalInput" Id="{611498ce-bd86-46dc-9066-1bac29019612}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC Fb_DevDigitalInput EXTENDS FB_DevBase 
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC Fb_DevDigitalInput EXTENDS FB_DevBase 
 VAR_INPUT
 	tDelay			: TIME 	:= T#1S	;// Time before delayed signal becomes active 
 	bCmdSimulate	: BOOL 	:= FALSE ;// Simulate sensor Input 
@@ -52,21 +53,5 @@ END_VAR
 	bInitOk := true ;]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="Fb_DevDigitalInput">
-      <LineId Id="222" Count="0" />
-      <LineId Id="239" Count="0" />
-      <LineId Id="223" Count="1" />
-      <LineId Id="240" Count="0" />
-      <LineId Id="225" Count="0" />
-      <LineId Id="253" Count="0" />
-      <LineId Id="221" Count="0" />
-      <LineId Id="195" Count="10" />
-      <LineId Id="86" Count="0" />
-    </LineIds>
-    <LineIds Name="Fb_DevDigitalInput.Init">
-      <LineId Id="11" Count="2" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="14" Count="0" />
-    </LineIds>
   </POU>
 </TcPlcObject>

@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_DevPWMGenerator" Id="{70704aac-3999-09c6-25fa-8ebc3616cfee}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevPWMGenerator EXTENDS FB_DevBase
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC FB_DevPWMGenerator EXTENDS FB_DevBase
 VAR_INPUT
 	nPeriodLength	: DINT	:= 2000 ; // desired PWM cycle time length [ms] 
 	nDutyCycle 		: DINT	:= 50 ; // percentage of power [%]
@@ -128,64 +129,5 @@ END_VAR
 	bInitOk := true ;]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_DevPWMGenerator">
-      <LineId Id="59" Count="1" />
-      <LineId Id="64" Count="1" />
-      <LineId Id="20" Count="0" />
-      <LineId Id="34" Count="0" />
-      <LineId Id="37" Count="1" />
-      <LineId Id="83" Count="0" />
-      <LineId Id="82" Count="0" />
-      <LineId Id="39" Count="0" />
-      <LineId Id="35" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevPWMGenerator.CalcCycle">
-      <LineId Id="13" Count="0" />
-      <LineId Id="15" Count="0" />
-      <LineId Id="14" Count="0" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="10" Count="0" />
-      <LineId Id="7" Count="1" />
-    </LineIds>
-    <LineIds Name="FB_DevPWMGenerator.CmdOutputCycle">
-      <LineId Id="11" Count="0" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="10" Count="0" />
-      <LineId Id="9" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevPWMGenerator.CmdOutputOff">
-      <LineId Id="5" Count="3" />
-    </LineIds>
-    <LineIds Name="FB_DevPWMGenerator.CmdOutputOn">
-      <LineId Id="5" Count="0" />
-      <LineId Id="9" Count="1" />
-    </LineIds>
-    <LineIds Name="FB_DevPWMGenerator.ExecSetOutput">
-      <LineId Id="36" Count="0" />
-      <LineId Id="27" Count="0" />
-      <LineId Id="22" Count="0" />
-      <LineId Id="13" Count="0" />
-      <LineId Id="15" Count="0" />
-      <LineId Id="19" Count="0" />
-      <LineId Id="16" Count="0" />
-      <LineId Id="23" Count="0" />
-      <LineId Id="25" Count="0" />
-      <LineId Id="17" Count="0" />
-      <LineId Id="26" Count="0" />
-      <LineId Id="11" Count="0" />
-      <LineId Id="42" Count="0" />
-      <LineId Id="28" Count="0" />
-      <LineId Id="43" Count="0" />
-      <LineId Id="46" Count="1" />
-      <LineId Id="45" Count="0" />
-      <LineId Id="30" Count="0" />
-      <LineId Id="29" Count="0" />
-      <LineId Id="31" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevPWMGenerator.Init">
-      <LineId Id="11" Count="2" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="14" Count="0" />
-    </LineIds>
   </POU>
 </TcPlcObject>

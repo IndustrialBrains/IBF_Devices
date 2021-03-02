@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_DevDigitalOutput" Id="{88d6c6d5-b226-0e14-13a4-cf37841a6f20}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevDigitalOutput EXTENDS FB_DevBase
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC FB_DevDigitalOutput EXTENDS FB_DevBase
 VAR_INPUT
 	bCmdOn			: BOOL ; // command output status
 END_VAR
@@ -63,27 +64,5 @@ END_VAR
 	bInitOk := true ;]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_DevDigitalOutput">
-      <LineId Id="23" Count="0" />
-      <LineId Id="53" Count="0" />
-      <LineId Id="34" Count="0" />
-      <LineId Id="37" Count="0" />
-      <LineId Id="36" Count="0" />
-      <LineId Id="42" Count="0" />
-      <LineId Id="39" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevDigitalOutput.ExecSetFeedback">
-      <LineId Id="7" Count="0" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevDigitalOutput.ExecSetOutput">
-      <LineId Id="12" Count="5" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevDigitalOutput.Init">
-      <LineId Id="11" Count="2" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="14" Count="0" />
-    </LineIds>
   </POU>
 </TcPlcObject>

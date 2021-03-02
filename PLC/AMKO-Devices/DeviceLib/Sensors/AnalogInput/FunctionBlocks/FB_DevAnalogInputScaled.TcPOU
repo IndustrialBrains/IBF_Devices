@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_DevAnalogInputScaled" Id="{43638945-f4e4-0cff-025b-6c03ae4b4de9}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevAnalogInputScaled EXTENDS FB_DevAnalogInput
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC FB_DevAnalogInputScaled EXTENDS FB_DevAnalogInput
 VAR_INPUT
 END_VAR
 VAR_OUTPUT
@@ -52,23 +53,5 @@ nOfset := LREAL_TO_INT(fOfset * fGainFactor) ;
 ]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_DevAnalogInputScaled">
-      <LineId Id="19" Count="0" />
-      <LineId Id="9" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevAnalogInputScaled.ExecSetFeedback">
-      <LineId Id="17" Count="7" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevAnalogInputScaled.SetScaling">
-      <LineId Id="56" Count="0" />
-      <LineId Id="67" Count="1" />
-      <LineId Id="70" Count="0" />
-      <LineId Id="72" Count="0" />
-      <LineId Id="69" Count="0" />
-      <LineId Id="73" Count="0" />
-      <LineId Id="58" Count="0" />
-      <LineId Id="11" Count="0" />
-    </LineIds>
   </POU>
 </TcPlcObject>

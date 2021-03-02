@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="Fb_DevDigitalInputFunctions" Id="{16e23114-15c6-4173-b508-aebf2e55c05f}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC Fb_DevDigitalInputFunctions EXTENDS Fb_DevDigitalInput
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC Fb_DevDigitalInputFunctions EXTENDS Fb_DevDigitalInput
 VAR_OUTPUT
 	bFcoDelay			: BOOL			;// Digital sensor, Delayed input status (3 seconds) 
 	bFeStatus			: BOOL			;// Digital sensor, Falling edge of input signal	
@@ -38,10 +39,5 @@ END_VAR
 					 ); // Generate set reset function from pushbutton input status
 ]]></ST>
     </Implementation>
-    <LineIds Name="Fb_DevDigitalInputFunctions">
-      <LineId Id="225" Count="0" />
-      <LineId Id="193" Count="16" />
-      <LineId Id="9" Count="0" />
-    </LineIds>
   </POU>
 </TcPlcObject>
