@@ -646,7 +646,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[bExec_ParWritePers 					S= NOT fbMcWriteParameter.Busy OR fbMcWriteParameter.Done ;
+        <ST><![CDATA[bExec_ParWritePers 					S= NOT (fbMcWriteParameter.Busy OR fbMcWriteParameter.Done);
 fbMcWriteParameter.Value 			:= fPosition ;
 fbMcWriteParameter.ParameterNumber 	:= MC_AxisParameter.AxisEncoderOffset;
 
@@ -667,7 +667,7 @@ IF bCmdManual AND bSafetyOk THEN
 ELSIF NOT bEnable AND AxisRef.Status.Moving THEN
 	CmdHalt(fDeceleration := fCmdDecc, mcBuffermode := MC_BufferMode.MC_Aborting);
 ELSE 
-	bCmdEnableAxis	:= bEnable AND NOT bExec_ParWritePers ;
+	bCmdEnableAxis	:= bEnable AND NOT bExec_ParWritePers OR fbMcWriteParameter.Busy ;
 END_IF
 
 // ===== Check if axis is bussy with a command =====
@@ -1200,7 +1200,7 @@ END_VAR
 	END_IF
  
 // reset commands
-	bExec_ParWritePers R= fbMcWriteParameter.Busy OR fbMcWriteParameter.Done ;]]></ST>
+	bExec_ParWritePers := FALSE ;]]></ST>
       </Implementation>
     </Method>
     <Method Name="Init" Id="{0a8c2089-518e-4a9f-9c10-83a2f8fbff86}" FolderPath="Command Methods\">
