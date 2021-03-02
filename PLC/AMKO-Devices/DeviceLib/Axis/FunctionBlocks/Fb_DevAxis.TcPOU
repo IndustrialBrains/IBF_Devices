@@ -667,7 +667,7 @@ IF bCmdManual AND bSafetyOk THEN
 ELSIF NOT bEnable AND AxisRef.Status.Moving THEN
 	CmdHalt(fDeceleration := fCmdDecc, mcBuffermode := MC_BufferMode.MC_Aborting);
 ELSE 
-	bCmdEnableAxis	:= bEnable AND NOT bExec_ParWritePers AND NOT fbMcWriteParameter.Busy ;
+	bCmdEnableAxis	:= bEnable  ;
 END_IF
 
 // ===== Check if axis is bussy with a command =====
@@ -678,6 +678,9 @@ END_IF
 // ===== Axis disable timer after last command =====
 	TofIntAxisEnable (	IN:= bInternalEnable, PT := tDisableDelay);
 
+// ===== check if parameter write is not busy =====
+	bCmdEnableAxis R= bExec_ParWritePers OR fbMcWriteParameter.Busy;
+	
 // ===== Enable drive =====
 	fbMcPower(	Axis			:= AxisRef , 
 				Enable			:= bCmdEnableAxis AND TofIntAxisEnable.Q, 
@@ -1178,12 +1181,14 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// check if axis is disabled before writeing parameter
-	IF fbMcPower.Status THEN 
-		fbMcWriteParameter.Execute := FALSE ;
-		RETURN ;
-	ELSIF fbMcWriteParameter.Busy OR bExec_ParWritePers THEN
+	AxisRef.ReadStatus();
+	IF AxisRef.Status.Disabled 
+	AND (fbMcWriteParameter.Busy OR bExec_ParWritePers) THEN
 		fbMcWriteParameter	( 	Axis 	:= AxisRef,
-								Execute	:= bExec_ParWritePers);
+								Execute	:= bExec_ParWritePers );
+	ELSE
+		fbMcWriteParameter.Execute := FALSE ; 
+		RETURN;
 	END_IF
 						
 // fault handling 
