@@ -1178,7 +1178,9 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// check if axis is disabled before writeing parameter
-	IF bExec_ParWritePers AND NOT fbMcPower.Status THEN
+	IF (bExec_ParWritePers 
+	AND NOT fbMcPower.Status) 
+	OR	fbMcWriteParameter.Busy THEN
 		; 
 	ELSE
 		fbMcWriteParameter.Execute := FALSE ;
