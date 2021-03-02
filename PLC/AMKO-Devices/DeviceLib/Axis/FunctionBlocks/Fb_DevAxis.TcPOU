@@ -80,7 +80,8 @@ VAR	// =============== Motion status functions ================
 		fbMcGearInSlave		: MC_GearIn		;		// FB to gear axis to master 
 		fbMcGearInDyn		: MC_GearInDyn	;		// FB to gear axis dynamicly to master
 		fbMcGearOutSlave	: MC_GearOut	;		// FB to decouple gearing
-		fbMcWriteParameter	: MC_WriteParameterPersistent ; // FB to write parameters in persistend data
+		fbMcSetPosition		: MC_SetPosition;		// FB to Set axis position
+//		fbMcWriteParameter	: MC_WriteParameterPersistent ; // FB to write parameters in persistend data
 
 	(* PtoP Motion move commands are in arrays so multiple commands can be stacked *) 
 		fbMCMoveRelative	: ARRAY [0..1] OF MC_MoveRelative	;		// FB to move relative
@@ -99,7 +100,8 @@ VAR	// =============== Motion status functions ================
 		bExec_GearAsSlave	: BOOL := FALSE; // Execute gear as slave
 		bExec_GearSlaveDyn	: BOOL := FALSE; // Execute gear slave dynamic
 		bExec_GearOutSlave	: BOOL := FALSE; // Execute gear out slave
-		bExec_ParWritePers	: BOOL := FALSE; // Execute parameter write persistent 
+		bExec_SetPosition	: BOOL := FALSE; // execute set position
+//		bExec_ParWritePers	: BOOL := FALSE; // Execute parameter write persistent 
 		
 	// ===== Move ristrictions ======
 		bCmdLimitVelocity 	: BOOL := FALSE			; // velocity limiting is active 
@@ -117,7 +119,8 @@ VAR
 	// ===== Loop variables =====
 		i : DINT := 0 ; // For loop increment
 	// ===== check variable ======
-		rtrigInPosition	: R_TRIG ; // in position trigger 
+		rtrigInPosition	: R_TRIG ; // in position trigger
+	// ===== Par write timer ===== 
 END_VAR
 VAR // Parameters 
 	ParAccManualScaling	: Udt_Parameter := (fValue := 50, fFactory := 50, bTeachable := FALSE)  ; // Acceleration scaling factor for manual functions 
@@ -205,8 +208,8 @@ END_VAR
 	ExecReadStatus		(); 
 	ExecEnable			();
 	ExecReset			();
-	ExecWriteParameter	();
-]]></ST>
+//	ExecWriteParameter	();
+	ExecSetPosition		();]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdGearDynamic" Id="{7011281c-220c-4832-81a9-6de31a7ec1a3}" FolderPath="Command Methods\">
@@ -642,15 +645,16 @@ CmdSafeStop := bIsSafe OR NOT bInitOk;]]></ST>
     <Method Name="CmdSetPosition" Id="{cdd58728-eb33-090b-146a-18a5bc82ad75}" FolderPath="Command Methods\">
       <Declaration><![CDATA[METHOD PUBLIC CmdSetPosition : BOOL
 VAR_INPUT
-	fPosition	: LREAL ; // encoder position
+	fPosition		: LREAL ; // encoder position
+	bSetRelative	: BOOL 	; // TRUE = relative position offset, FALSE = Absolute position
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[bExec_ParWritePers 					S= NOT (fbMcWriteParameter.Busy OR fbMcWriteParameter.Done);
-fbMcWriteParameter.Value 			:= fPosition ;
-fbMcWriteParameter.ParameterNumber 	:= MC_AxisParameter.AxisEncoderOffset;
+        <ST><![CDATA[bExec_SetPosition 			:= NOT fbMcSetPosition.Busy AND NOT fbMcSetPosition.Done ; 
+fbMcSetPosition.Position	:= fPosition ;
+fbMcSetPosition.Mode		:= bSetRelative ;
 
-CmdSetPosition := fbMcWriteParameter.Done;]]></ST>
+CmdSetPosition := fbMcSetPosition.Done;]]></ST>
       </Implementation>
     </Method>
     <Method Name="ExecEnable" Id="{97d17d4c-4218-4969-bb76-cf3660f2ac5b}" FolderPath="Private\Organization\">
@@ -679,7 +683,7 @@ END_IF
 	TofIntAxisEnable (	IN:= bInternalEnable, PT := tDisableDelay);
 
 // ===== check if parameter write is not busy =====
-	bCmdEnableAxis R= bExec_ParWritePers OR fbMcWriteParameter.Busy;
+//	bCmdEnableAxis R= bExec_ParWritePers OR fbMcWriteParameter.Busy;
 	
 // ===== Enable drive =====
 	fbMcPower(	Axis			:= AxisRef , 
@@ -1172,6 +1176,20 @@ END_VAR
 // ===== Dev is safe feedback =====
 bIsSafe := AxisRef.Status.HasBeenStopped AND NOT bCmdEnableAxis  ;
 ]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecSetPosition" Id="{42f95ac0-57d0-06e7-037d-d914ca0d57d6}" FolderPath="Private\Organization\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecSetPosition : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ====== set position of axis ======
+IF bExec_SetPosition OR fbMcSetPosition.Busy THEN 
+	fbMcSetPosition (	Axis 	:= AxisRef,
+						Execute	:= bExec_SetPosition );
+	bExec_SetPosition := TRUE ;
+END_IF					]]></ST>
       </Implementation>
     </Method>
     <Method Name="ExecWriteParameter" Id="{e25e6df9-2845-09eb-3e44-2acd7fb0470d}" FolderPath="Private\Organization\">
