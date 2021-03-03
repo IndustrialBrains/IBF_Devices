@@ -58,6 +58,7 @@ END_VAR
 VAR	// ====== Axis enable =====
 		bCmdEnableAxis 		: BOOL 	:= FALSE; // Command to enable the axis (External)
 		bInternalEnable		: BOOL 	:= FALSE; // internal enable command (turns off after set time, and on at new motion command
+		bAxisIsEnabled		: BOOL 	:= false; // Axis is enabled and ready for commands
 		bDelayedEnable		: BOOL 	:= false; // Delayed enable signal for motion commands
 		TonMotionEnable		: TON 			; // Timer on for motion command enable
 		TofIntAxisEnable	: TOF  			; // Timer off for internal axis enable 
@@ -695,7 +696,13 @@ END_IF
 	bInternalEnable := FALSE ; 	
 
 // ===== Delayed enable function =====	
-	TonMotionEnable	(IN := fbMcPower.Status, PT := tEnableDelay);
+	IF fbMcPower.Enable AND fbMcPower.Status THEN
+		bAxisIsEnabled := TRUE ;
+	ELSIF NOT fbMcPower.Enable OR AxisRef.Status.Error THEN 
+		bAxisIsEnabled := FALSE ; 
+	END_IF
+
+	TonMotionEnable	(IN := bAxisIsEnabled, PT := tEnableDelay);
 	bDelayedEnable 	:= TonMotionEnable.Q ;	
 
 IF fbMcPower.Error THEN 
