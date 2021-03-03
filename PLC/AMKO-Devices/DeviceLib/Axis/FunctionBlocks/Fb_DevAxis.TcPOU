@@ -67,7 +67,6 @@ VAR	// ====== Axis enable =====
 		IAxisHome AT %I* 	: BOOL 			; // Axis homing sensor from PLC (if MC_DefaultHoming is used)
 END_VAR
 VAR	// =============== Motion status functions ================
-		fbMcReadAxisStatus	: MC_ReadStatus ;	// Fb for reading axis status	
 	// =============== Motion function blocks =================
 		fbMcPower 			: MC_Power		;		// FB for enable and override
 		fbMcReset 			: MC_Reset		;		// FB to reset axis
@@ -696,9 +695,8 @@ END_IF
 	bInternalEnable := FALSE ; 	
 
 // ===== Delayed enable function =====	
-	TonMotionEnable(IN := fbMcPower.Status, PT := tEnableDelay);
-	bDelayedEnable := TonMotionEnable.Q ;	
-
+	TonMotionEnable	(IN := fbMcPower.Active, PT := tEnableDelay);
+	bDelayedEnable 	:= TonMotionEnable.Q ;	
 
 IF fbMcPower.Error THEN 
 	bError					:= TRUE							;
@@ -1062,10 +1060,8 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// Read axis status from drive
-fbMcReadAxisStatus (	Enable 	:= TRUE ,
-						Axis 	:= AxisRef );
-						
+        <ST><![CDATA[AxisRef.ReadStatus();
+					
 // convert velocity to RPM for output if aplicable
 IF bIcfCmdVelocityRpm THEN 
 	fVelocity := AxisRef.NcToPlc.ActVelo / 6 ;
@@ -1082,16 +1078,6 @@ END_IF
 						
 // set status bits 
 bIdle := NOT AxisRef.Status.HasJob ;
-
-// read fault handling 
-IF fbMcReadAxisStatus.Error THEN 
-	bError					:= TRUE							;
-	stFault.Active 			:= TRUE 						;
-	stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
-	stFault.Discription		:= CONCAT('Status read fault ', UDINT_TO_STRING(fbMcPower.ErrorID));
-	stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
-	stFault.FaultType		:= E_FaultTypes.FF				;
-END_IF
 
 // In position 
 	rtrigInPosition( 	CLK := AxisRef.Status.InTargetPosition, 

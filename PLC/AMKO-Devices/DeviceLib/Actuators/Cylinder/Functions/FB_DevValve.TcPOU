@@ -157,9 +157,9 @@ END_VAR
 	E_ValveResetState.Res_Idle:
 		bIsSafe := TRUE ;
 	E_ValveResetState.Res_Closed:
-		bIsSafe := bFco_Closed ;
+		bIsSafe := bFco_Closed OR NOT bFco_Open ;
 	E_ValveResetState.Res_Open:
-		bIsSafe := bFco_Open ;
+		bIsSafe := bFco_Open OR NOT bFco_Closed;
 END_CASE
 
 CmdSafeStop := bIsSafe OR NOT bInitOk ;]]></ST>
