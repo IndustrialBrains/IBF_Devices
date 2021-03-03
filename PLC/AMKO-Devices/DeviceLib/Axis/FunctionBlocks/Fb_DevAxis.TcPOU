@@ -229,7 +229,7 @@ bInternalEnable		:= TRUE ;
 fCmdGearRatio 				:= fGearRatio ;
 
 // Set feedback output 
-CmdGearDynamic := fbMcGearInDyn.Active ;]]></ST>
+CmdGearDynamic := bGearedAsSlave ;]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdGearIn" Id="{d39d912d-cd60-47f9-9c58-f4c673b83377}" FolderPath="Command Methods\">
@@ -250,7 +250,7 @@ bInternalEnable		:= TRUE ;
 fCmdGearRatio 				:= fGearRatio ;
 
 // Set feedback output 
-CmdGearIn := fbMcGearInSlave.Active ;]]></ST>
+CmdGearIn := bGearedAsSlave ;]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdGearOut" Id="{0eba1dc5-045c-4e71-9b15-315cb2debe34}" FolderPath="Command Methods\">
@@ -695,7 +695,7 @@ END_IF
 	bInternalEnable := FALSE ; 	
 
 // ===== Delayed enable function =====	
-	TonMotionEnable	(IN := fbMcPower.Active, PT := tEnableDelay);
+	TonMotionEnable	(IN := fbMcPower.Status, PT := tEnableDelay);
 	bDelayedEnable 	:= TonMotionEnable.Q ;	
 
 IF fbMcPower.Error THEN 
