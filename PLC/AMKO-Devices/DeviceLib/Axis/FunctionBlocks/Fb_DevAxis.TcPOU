@@ -132,20 +132,16 @@ END_VAR
 SUPER^(refFbFault := refFbFault);
 
 // ==== Check if axis is initiated =====
-//IF NOT bInitOk THEN 
-//	RETURN ; 
-//END_IF
-
+IF NOT bInitOk THEN 
+	RETURN ; 
+END_IF
 // ===== Execute safe functions =====
 	ExecSafeFunctions(); 
 	
 // ==== Execute organizational functions =====
 	CallOrganizationFunctions();
-
 // ==== execute motion functions =====
-IF bInitOk THEN 
 	CallMotionFunctions();
-END_IF
 ]]></ST>
     </Implementation>
     <Folder Name="Command Methods" Id="{e50539d8-81cc-4181-8633-d48ea6a3afe6}" />
