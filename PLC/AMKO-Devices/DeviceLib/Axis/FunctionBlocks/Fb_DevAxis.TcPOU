@@ -1174,7 +1174,7 @@ END_VAR
 	END_IF
 
 // ===== Dev is safe feedback =====
-bIsSafe := AxisRef.Status.HasBeenStopped AND NOT bCmdEnableAxis  ;
+bIsSafe := AxisRef.Status.HasBeenStopped  ;
 ]]></ST>
       </Implementation>
     </Method>
