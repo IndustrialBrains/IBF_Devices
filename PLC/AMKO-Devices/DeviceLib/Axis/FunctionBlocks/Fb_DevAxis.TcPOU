@@ -132,9 +132,9 @@ END_VAR
 SUPER^(refFbFault := refFbFault);
 
 // ==== Check if axis is initiated =====
-IF NOT bInitOk THEN 
-	RETURN ; 
-END_IF
+//IF NOT bInitOk THEN 
+//	RETURN ; 
+//END_IF
 
 // ===== Execute safe functions =====
 	ExecSafeFunctions(); 
@@ -143,7 +143,9 @@ END_IF
 	CallOrganizationFunctions();
 
 // ==== execute motion functions =====
+IF bInitOk THEN 
 	CallMotionFunctions();
+END_IF
 ]]></ST>
     </Implementation>
     <Folder Name="Command Methods" Id="{e50539d8-81cc-4181-8633-d48ea6a3afe6}" />
@@ -157,16 +159,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ===== Check if safe to move =====
-	IF (bManual AND bSafetyOk) THEN
-		;
-	ELSIF bCmdSafeStop THEN 
-		// ===== reset safe commands ======
-		bCmdSafeStop	:= FALSE ; 
-		RETURN ;
-	END_IF
-
-// ===== Set acceleratio and deceleration values =======
+        <ST><![CDATA[// ===== Set acceleratio and deceleration values =======
 	IF bCmdManual THEN 
 		fAcceleration 	:= fCmdAcc * (ParAccManualScaling.fvalue / 100);
 		fDeceleration	:= fCmdDecc* (ParDecManualScaling.fValue / 100);
@@ -690,7 +683,8 @@ END_IF
 				Enable			:= bCmdEnableAxis AND TofIntAxisEnable.Q, 
 				Enable_Positive	:= bIcfEnableForward, 
 				Enable_Negative	:= bIcfEnablereverse, 
-				Override		:= 100 );  
+				Override		:= 100,
+				BufferMode		:= MC_Buffered );  
 				
 // ===== Reset internal enable signal =====
 	bInternalEnable := FALSE ; 	
