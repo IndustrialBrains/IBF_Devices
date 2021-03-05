@@ -153,7 +153,10 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[CASE eSafeState OF 
+        <ST><![CDATA[bCmdOpen := FALSE ;
+bCmdClose:= FALSE ;
+
+CASE eSafeState OF 
 	E_ValveResetState.Res_Idle:
 		q_Close := FALSE ;
 		q_Open  := FALSE ;
