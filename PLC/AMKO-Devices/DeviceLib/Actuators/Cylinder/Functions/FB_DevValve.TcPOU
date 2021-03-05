@@ -155,10 +155,16 @@ END_VAR
       <Implementation>
         <ST><![CDATA[CASE eSafeState OF 
 	E_ValveResetState.Res_Idle:
+		q_Close := FALSE ;
+		q_Open  := FALSE ;
 		bIsSafe := TRUE ;
 	E_ValveResetState.Res_Closed:
+		q_Close := TRUE ;
+		q_Open  := FALSE ;
 		bIsSafe := bFco_Closed OR NOT bFco_Open ;
 	E_ValveResetState.Res_Open:
+		q_Close := TRUE ;
+		q_Open  := FALSE ;
 		bIsSafe := bFco_Open OR NOT bFco_Closed;
 END_CASE
 
