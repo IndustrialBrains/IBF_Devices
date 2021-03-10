@@ -166,8 +166,8 @@ CASE eSafeState OF
 		q_Open  := FALSE ;
 		bIsSafe := bFco_Closed OR NOT bFco_Open ;
 	E_ValveResetState.Res_Open:
-		q_Close := TRUE ;
-		q_Open  := FALSE ;
+		q_Close := FALSE ;
+		q_Open  := TRUE ;
 		bIsSafe := bFco_Open OR NOT bFco_Closed;
 END_CASE
 

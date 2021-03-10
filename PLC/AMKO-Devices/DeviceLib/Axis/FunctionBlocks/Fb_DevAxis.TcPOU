@@ -623,7 +623,10 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
+        <ST><![CDATA[IF AxisRef.Status.Coupled THEN 
+	CmdSafeStop := AxisRef.Status.NotMoving ;
+	RETURN;
+END_IF
 // Set safestop command
 bCmdSafeStop := TRUE ; 
 
