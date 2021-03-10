@@ -1090,6 +1090,8 @@ END_VAR
         <ST><![CDATA[IF  AxisRef.Status.Moving AND bExec_Reset THEN // If the axis is still moving execute safe stop first
 	CmdSafeStop();
 	RETURN;
+ELSIF AxisRef.Status.Coupled THEN 
+	RETURN;
 END_IF
 
 // ===== Reset axis, drive and axis functions =====
