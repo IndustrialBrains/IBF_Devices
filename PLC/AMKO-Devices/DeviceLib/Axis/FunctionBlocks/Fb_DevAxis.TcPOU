@@ -458,7 +458,7 @@ bBlockedCommand := fbMcHalt.Active ;
 	END_IF
 
 // Determine function for command stacking
-	IF fbMcMoveModulo[0].Active THEN 
+	IF fbMcMoveModulo[0].Busy THEN 
 		arExec_MoveModulo[1] 		:= (fPosition <> fbMcMoveModulo[0].Position OR fVelocity <> fbMcMoveModulo[0].Velocity)	;
 		fbMcMoveModulo[1].Velocity 	:= fVelocity 	;
 		fbMcMoveModulo[1].Position 	:= fPosition 	;
@@ -484,15 +484,12 @@ bInternalEnable	:= TRUE ;
  	END_IF 
 *)
 // set feedback
-	CmdMoveModulo := AxisRef.NcToPlc.SetPos = fPosition ;
-
-(* 
-IF arExec_MoveModulo[1] OR fbMcMoveModulo[1].Busy THEN 
+IF fbMcMoveModulo[1].Busy THEN 
 	CmdMoveModulo :=	fbMcMoveModulo[1].Active OR fbMcMoveModulo[1].Done;
 ELSE
 	CmdMoveModulo :=	fbMcMoveModulo[0].Active OR fbMcMoveModulo[0].Done ;
 END_IF
-*)]]></ST>
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdMoveRelative" Id="{2ed540a9-f0c6-4ad5-b603-5e75ef38aff1}" FolderPath="Command Methods\">
