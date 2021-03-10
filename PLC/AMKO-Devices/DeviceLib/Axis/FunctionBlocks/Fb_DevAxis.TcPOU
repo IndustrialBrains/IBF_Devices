@@ -484,12 +484,15 @@ bInternalEnable	:= TRUE ;
  	END_IF 
 *)
 // set feedback
+	CmdMoveModulo := AxisRef.NcToPlc.SetPos = fPosition ;
+
+(* 
 IF arExec_MoveModulo[1] OR fbMcMoveModulo[1].Busy THEN 
 	CmdMoveModulo :=	fbMcMoveModulo[1].Active OR fbMcMoveModulo[1].Done;
 ELSE
 	CmdMoveModulo :=	fbMcMoveModulo[0].Active OR fbMcMoveModulo[0].Done ;
 END_IF
-]]></ST>
+*)]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdMoveRelative" Id="{2ed540a9-f0c6-4ad5-b603-5e75ef38aff1}" FolderPath="Command Methods\">
