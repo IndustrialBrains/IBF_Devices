@@ -424,17 +424,13 @@ END_VAR
         <ST><![CDATA[// set blocked command if halt is active 
 bBlockedCommand := fbMcHalt.Active ;
 
-// check if command buffer is empty 
-	IF AxisRef.Status.CmdBuffered AND mcBuffermode <> MC_Aborting THEN 
-		RETURN ;
-	END_IF 
-
 // Velocity conversion from RPM to deg/sec
 	IF bIcfCmdVelocityRpm THEN 
 		fVelocity := Rpm_To_DegS(fVelocity);
 	END_IF
 
 // Determine function for command stacking
+IF NOT AxisRef.Status.CmdBuffered OR mcBuffermode <> MC_Aborting THEN 
 	IF fbMcMoveAbsolute[0].Active THEN 
 		arExec_MoveAbs[1] 				:= (fPosition <> fbMcMoveAbsolute[0].Position OR fVelocity <> fbMcMoveAbsolute[0].Velocity) ;
 		fbMcMoveAbsolute[1].Position 	:= fPosition ;
@@ -446,7 +442,8 @@ bBlockedCommand := fbMcHalt.Active ;
 		fbMcMoveAbsolute[0].Velocity 	:= fVelocity ; 
 		fbMcMoveAbsolute[0].BufferMode 	:= mcBuffermode ;
 	END_IF
-
+END_IF
+	
 bInternalEnable	:= TRUE ;
 
 // set feedback
@@ -471,10 +468,6 @@ END_VAR
         <ST><![CDATA[// set blocked command if halt is active 
 bBlockedCommand := fbMcHalt.Active ;
 
-// check if command buffer is empty 
-	IF AxisRef.Status.CmdBuffered AND mcBuffermode <> MC_Aborting THEN 
-		RETURN ;
-	END_IF 
 
 // Velocity conversion from RPM to deg/sec
 	IF bIcfCmdVelocityRpm THEN 
@@ -482,6 +475,7 @@ bBlockedCommand := fbMcHalt.Active ;
 	END_IF
 
 // Determine function for command stacking
+IF NOT AxisRef.Status.CmdBuffered OR mcBuffermode <> MC_Aborting THEN 
 	IF fbMcMoveModulo[0].Busy THEN 
 		arExec_MoveModulo[1] 		:= (fPosition <> fbMcMoveModulo[0].Position OR fVelocity <> fbMcMoveModulo[0].Velocity)	;
 		fbMcMoveModulo[1].Velocity 	:= fVelocity 	;
@@ -495,7 +489,8 @@ bBlockedCommand := fbMcHalt.Active ;
 		fbMcMoveModulo[0].Direction	:= mcDirection	;
 		fbMcMoveModulo[0].BufferMode:= mcBuffermode ;
 	END_IF
-
+END_IF 
+	
 bInternalEnable	:= TRUE ;
 
 // set feedback
@@ -519,17 +514,13 @@ END_VAR
         <ST><![CDATA[// set blocked command if halt is active 
 bBlockedCommand := fbMcHalt.Active ;
 
-// check if command buffer is empty 
-	IF AxisRef.Status.CmdBuffered AND mcBuffermode <> MC_Aborting THEN 
-		RETURN ;
-	END_IF 
-
 // Velocity conversion from RPM to deg/sec
 	IF bIcfCmdVelocityRpm THEN 
 		fVelocity := Rpm_To_DegS(fVelocity);
 	END_IF
 
 // Determine function for command stacking
+IF NOT AxisRef.Status.CmdBuffered OR mcBuffermode <> MC_Aborting THEN 
 	IF fbMCMoveRelative[0].Active THEN 
 		arExec_MoveRelative[1] := (fDistance <> fbMCMoveRelative[0].Distance OR fVelocity <> fbMCMoveRelative[0].Velocity) ;
 		fbMCMoveRelative[1].Velocity	:= fVelocity 	;
@@ -541,7 +532,7 @@ bBlockedCommand := fbMcHalt.Active ;
 		fbMCMoveRelative[0].Distance	:= fDistance	;
 		fbMCMoveRelative[0].BufferMode	:= mcBuffermode	;
 	END_IF
-
+END_IF
 bInternalEnable	:= TRUE ;
 
 // set feedback
@@ -565,20 +556,17 @@ END_VAR
         <ST><![CDATA[// set blocked command if halt is active 
 bBlockedCommand := fbMcHalt.Active ;
 
-// check if command buffer is empty 
-	IF AxisRef.Status.CmdBuffered AND mcBuffermode <> MC_Aborting THEN 
-		RETURN ;
-	END_IF 
-
 // Velocity conversion from RPM to deg/sec
 	IF bIcfCmdVelocityRpm THEN 
 		fVelocity := Rpm_To_DegS(fVelocity);
 	END_IF
 
 // Set command to true 
-	bExec_MoveVelocity 	:= TRUE ;
-	bInternalEnable		:= TRUE ;
-
+	IF NOT AxisRef.Status.CmdBuffered OR mcBuffermode <> MC_Aborting THEN 
+		bExec_MoveVelocity 	:= TRUE ;
+		bInternalEnable		:= TRUE ;
+	END_IF
+	
 // coppy parameters
 	fbMcMoveVelocity.Velocity	:= fVelocity 	;
 	fbMcMoveVelocity.Direction 	:= mcDirection	;
@@ -748,7 +736,8 @@ END_VAR
 	fbMcGearInDyn ( 	Master 			:= refMasterAxis,
 						Slave			:= AxisRef,
 						Enable 			:= bExec_GearSlaveDyn AND bDelayedEnable,
-						Acceleration	:= fAcceleration	); 
+						Acceleration	:= 0,
+						Deceleration	:= 0	); 
 						
 // ===== reset command =====
 	bExec_GearSlaveDyn	:= FALSE ;
@@ -783,7 +772,9 @@ END_VAR
 	fbMcGearInSlave ( 	Master 			:= refMasterAxis,
 						Slave			:= AxisRef,
 						Execute 		:= bExec_GearAsSlave AND bDelayedEnable,
-						RatioDenominator:= 1	); 
+						RatioDenominator:= 1,
+						Acceleration	:= 0,
+						Deceleration	:= 0	); 
 						
 // ===== reset command =====
 	bExec_GearAsSlave 	:= FALSE  ;
