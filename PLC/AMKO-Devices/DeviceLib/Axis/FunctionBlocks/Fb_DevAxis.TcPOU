@@ -160,18 +160,22 @@ END_VAR
 		fAcceleration 	:= fCmdAcc * (ParAccManualScaling.fvalue / 100);
 		fDeceleration	:= fCmdDecc* (ParDecManualScaling.fValue / 100);
 	END_IF
-// ===== Homing functions =====
-	ExecHome		(); 
 
-// ===== Motion standstil commands =====
-	ExecHalt		();
-
-// ===== Motion move functions
-	ExecJog			(); 
-	ExecMoveAbsolute();
-	ExecMoveRelative();
-	ExecMoveModulo	();
-	ExecMoveVelocity();
+// ===== block all other commands if axis is coupled =====
+	IF NOT AxisRef.Status.Coupled THEN 
+	// ===== Homing functions =====
+		ExecHome		(); 
+	
+	// ===== Motion standstil commands =====
+		ExecHalt		();
+	
+	// ===== Motion move functions
+		ExecJog			(); 
+		ExecMoveAbsolute();
+		ExecMoveRelative();
+		ExecMoveModulo	();
+		ExecMoveVelocity();
+	END_IF
 	
 // ===== Execute gearing functions =====
 	ExecGearOut		();
@@ -209,17 +213,22 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// set blocked command if halt is active 
-bBlockedCommand := fbMcHalt.Active ;
+bBlockedCommand 		:= fbMcHalt.Active ;
+
+// check if command buffer is empty 
+	IF AxisRef.Status.CmdBuffered THEN 
+		RETURN ;
+	END_IF 
 
 // Set command to true 
-bExec_GearSlaveDyn 	:= TRUE ;
-bInternalEnable		:= TRUE ;
+	bExec_GearSlaveDyn 	:= TRUE ;
+	bInternalEnable		:= TRUE ;
 
 // coppy parameters
-fCmdGearRatio 				:= fGearRatio ;
+	fCmdGearRatio 		:= fGearRatio ;
 
 // Set feedback output 
-CmdGearDynamic := bGearedAsSlave ;]]></ST>
+	CmdGearDynamic 		:= bGearedAsSlave ;]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdGearIn" Id="{d39d912d-cd60-47f9-9c58-f4c673b83377}" FolderPath="Command Methods\">
@@ -230,17 +239,22 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// set blocked command if halt is active 
-bBlockedCommand := fbMcHalt.Active ;
+	bBlockedCommand := fbMcHalt.Active ;
 
+// check if command buffer is empty 
+	IF AxisRef.Status.CmdBuffered THEN 
+		RETURN ;
+	END_IF 
+	
 // Set command to true 
-bExec_GearAsSlave 	:= TRUE ;
-bInternalEnable		:= TRUE ;
+	bExec_GearAsSlave 	:= TRUE ;
+	bInternalEnable		:= TRUE ;
 
 // coppy parameters
-fCmdGearRatio 				:= fGearRatio ;
+	fCmdGearRatio 				:= fGearRatio ;
 
 // Set feedback output 
-CmdGearIn := bGearedAsSlave ;]]></ST>
+	CmdGearIn := bGearedAsSlave ;]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdGearOut" Id="{0eba1dc5-045c-4e71-9b15-315cb2debe34}" FolderPath="Command Methods\">
@@ -410,6 +424,11 @@ END_VAR
         <ST><![CDATA[// set blocked command if halt is active 
 bBlockedCommand := fbMcHalt.Active ;
 
+// check if command buffer is empty 
+	IF AxisRef.Status.CmdBuffered AND mcBuffermode <> MC_Aborting THEN 
+		RETURN ;
+	END_IF 
+
 // Velocity conversion from RPM to deg/sec
 	IF bIcfCmdVelocityRpm THEN 
 		fVelocity := Rpm_To_DegS(fVelocity);
@@ -451,6 +470,11 @@ END_VAR
       <Implementation>
         <ST><![CDATA[// set blocked command if halt is active 
 bBlockedCommand := fbMcHalt.Active ;
+
+// check if command buffer is empty 
+	IF AxisRef.Status.CmdBuffered AND mcBuffermode <> MC_Aborting THEN 
+		RETURN ;
+	END_IF 
 
 // Velocity conversion from RPM to deg/sec
 	IF bIcfCmdVelocityRpm THEN 
@@ -495,6 +519,11 @@ END_VAR
         <ST><![CDATA[// set blocked command if halt is active 
 bBlockedCommand := fbMcHalt.Active ;
 
+// check if command buffer is empty 
+	IF AxisRef.Status.CmdBuffered AND mcBuffermode <> MC_Aborting THEN 
+		RETURN ;
+	END_IF 
+
 // Velocity conversion from RPM to deg/sec
 	IF bIcfCmdVelocityRpm THEN 
 		fVelocity := Rpm_To_DegS(fVelocity);
@@ -535,6 +564,11 @@ END_VAR
       <Implementation>
         <ST><![CDATA[// set blocked command if halt is active 
 bBlockedCommand := fbMcHalt.Active ;
+
+// check if command buffer is empty 
+	IF AxisRef.Status.CmdBuffered AND mcBuffermode <> MC_Aborting THEN 
+		RETURN ;
+	END_IF 
 
 // Velocity conversion from RPM to deg/sec
 	IF bIcfCmdVelocityRpm THEN 
@@ -584,10 +618,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// set blocked command if halt is active 
-bBlockedCommand := fbMcHalt.Active ;
-
-// Set reset axis to true 				
+        <ST><![CDATA[// Set reset axis to true 				
 	bExec_Reset 	:= TRUE ; 
 	bInternalEnable	:= TRUE ;
 	
@@ -1124,9 +1155,11 @@ END_VAR
 	bCmdSafeStop S= NOT bSafetyOk ;
 
 // ==== Safe operation functions (overrule all other motion functions) =====
-	fbMcStop( 	Axis 			:= AxisRef		,
-				Execute 		:= bCmdSafeStop	,
-				Deceleration	:= fMaxDec		);
+	IF NOT AxisRef.Status.Coupled THEN 
+		fbMcStop( 	Axis 			:= AxisRef		,
+					Execute 		:= bCmdSafeStop	,
+					Deceleration	:= fMaxDec		);
+	END_IF
 	
 	// Reset axis command			
 	bCmdSafeStop 	R= fbMcStop.Done OR AxisRef.Status.HasBeenStopped ;
