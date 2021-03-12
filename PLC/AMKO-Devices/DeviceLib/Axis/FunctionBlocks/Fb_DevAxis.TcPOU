@@ -474,17 +474,8 @@ bBlockedCommand := fbMcHalt.Active ;
 
 bInternalEnable	:= TRUE ;
 
-(*// Reset position position and velocity commands
-	IF fbMcMoveModulo[1].Active AND NOT fbMcMoveModulo[0].Busy THEN 
-		fbMcMoveModulo[0].Velocity := 0 ;
-		fbMcMoveModulo[0].Position := 0 ;
-	ELSIF fbMcMoveModulo[0].Active AND NOT fbMcMoveModulo[1].Busy THEN 
-		fbMcMoveModulo[1].Velocity := 0 ;
-		fbMcMoveModulo[1].Position := 0 ;
- 	END_IF 
-*)
 // set feedback
-IF fbMcMoveModulo[1].Busy THEN 
+IF arExec_MoveModulo[1] OR fbMcMoveModulo[1].Busy THEN 
 	CmdMoveModulo :=	fbMcMoveModulo[1].Active OR fbMcMoveModulo[1].Done;
 ELSE
 	CmdMoveModulo :=	fbMcMoveModulo[0].Active OR fbMcMoveModulo[0].Done ;
