@@ -117,6 +117,7 @@ VAR_INPUT
 	bIcfAlwaysEnable	: BOOL := FALSE ; // 1 = Axis always enabled, 0 = Axis disabled at Idle 
 	bIcfSimulationMode	: BOOL := FALSE ; // Simulation mode is active [default set to False] Used for testing without hardware present 
 	bIcfModuloAxis		: BOOL := FALSE ; // Show axis position as modulo
+	bIcfSTOPresent		: BOOL := FALSE ; // Axis safe torque off is present	
 	
 	// Config Values 
 	mcHomingMode 		: MC_HomingMode := MC_HomingMode.MC_DefaultHoming; 

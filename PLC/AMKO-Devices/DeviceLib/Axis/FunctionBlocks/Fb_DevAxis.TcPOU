@@ -46,6 +46,7 @@ VAR // Axis configuration
 		bIcfAlwaysEnable	: BOOL ; // 1 = Axis always enabled, 0 = Axis disabled at Idle 
 		bIcfSimulationMode	: BOOL := FALSE ; // Simulation mode is active [default set to False] 
 		bIcfModuloAxis		: BOOL := FALSE ; // Show axis position as modulo
+		bIcfSTOPresent		: BOOL := FALSE ; // Axis Safe torque off is present
 	// ===== Internal motion values ======
 		fHomePosition		: LREAL := 0 ; // set position at homing
 	// Command Modes
@@ -62,10 +63,12 @@ VAR	// ====== Axis enable =====
 		bDelayedEnable		: BOOL 	:= false; // Delayed enable signal for motion commands
 		TonMotionEnable		: TON 			; // Timer on for motion command enable
 		TofIntAxisEnable	: TOF  			; // Timer off for internal axis enable 
+		bSTOOK				: BOOL 	:= false; // Axis safet torque off is ok
 	// Parameter read status 
 		Cmd_EnDriveParRead	: BOOL 			; // Enable parameter read 
 	// ===== Physical Homing signal =====
-		IAxisHome AT %I* 	: BOOL 			; // Axis homing sensor from PLC (if MC_DefaultHoming is used)
+		IAxisHome 	AT %I* 	: BOOL 			; // Axis homing sensor from PLC (if MC_DefaultHoming is used)
+		IAxisSTOOK	AT %I* 	: BOOL 			; // Axis STO is ok
 END_VAR
 VAR	// =============== Motion status functions ================
 	// =============== Motion function blocks =================
@@ -293,6 +296,24 @@ fbMcHalt.BufferMode		:= mcBuffermode	;
 
 // Set feedback output 
 CmdHalt := fbMchalt.Active OR fbMcHalt.Done ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdHold" Id="{addb655d-652c-0e59-2bae-c9b2b7cd0849}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdHold : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Set command to true 
+bExec_Halt 		:= TRUE ;
+bInternalEnable	:= TRUE ;
+
+// coppy parameters
+fbMcHalt.Deceleration	:= 0;
+fbMcHalt.BufferMode		:= 0;
+
+// Set feedback output 
+CmdHold := fbMchalt.Active OR fbMcHalt.Done ;]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdHome" Id="{9156a5be-9684-4b33-891a-938949533f96}" FolderPath="Command Methods\">
@@ -672,8 +693,10 @@ IF bCmdManual AND bSafetyOk THEN
 	bCmdManual 		:= FALSE ;
 ELSIF NOT bEnable AND AxisRef.Status.Moving THEN
 	CmdHalt(fDeceleration := fCmdDecc, mcBuffermode := MC_BufferMode.MC_Aborting);
+ELSIF NOT bSafetyOk AND bStopped THEN 
+	bCmdEnableAxis := FALSE ;
 ELSE 
-	bCmdEnableAxis	:= bEnable  ;
+	bCmdEnableAxis	:= bEnable AND bSTOOK  ;
 END_IF
 
 // ===== Check if axis is bussy with a command =====
@@ -1144,7 +1167,7 @@ END_VAR
       <Implementation>
         <ST><![CDATA[// ==== Stop when safety is not ok =====
 	bCmdSafeStop S= NOT bSafetyOk ;
-
+	
 // ==== Safe operation functions (overrule all other motion functions) =====
 	IF NOT AxisRef.Status.Coupled THEN 
 		fbMcStop( 	Axis 			:= AxisRef		,
@@ -1178,7 +1201,13 @@ END_VAR
 
 // ===== Dev is safe feedback =====
 bIsSafe := AxisRef.Status.HasBeenStopped OR AxisRef.Status.Disabled  ;
-]]></ST>
+
+// ===== Safe torque off function =====
+	IF bIcfSTOPresent THEN 
+		bSTOOK := IAxisSTOOK ;
+	ELSE 
+		bSTOOK := true ;
+	END_IF]]></ST>
       </Implementation>
     </Method>
     <Method Name="ExecSetPosition" Id="{42f95ac0-57d0-06e7-037d-d914ca0d57d6}" FolderPath="Private\Organization\">
@@ -1239,7 +1268,7 @@ VAR_INPUT
 	bIcfAlwaysEnable	: BOOL := FALSE ; // 1 = Axis always enabled, 0 = Axis disabled at Idle 
 	bIcfSimulationMode	: BOOL := FALSE ; // Simulation mode is active [default set to False] Used for testing without hardware present 
 	bIcfModuloAxis		: BOOL := FALSE ; // Show axis position as modulo
-	
+	bIcfSTOPresent		: BOOL := FALSE ; // Axis safe torque off is present	
 	// Config Values 
 	mcHomingMode 		: MC_HomingMode := MC_HomingMode.MC_DefaultHoming; 
 	fHomePosition		: LREAL := 0 	; // set position at homing
@@ -1315,6 +1344,7 @@ END_VAR]]></Declaration>
 		THIS^.bIcfAlwaysEnable		:= bIcfAlwaysEnable		; // Always enable motor and brake if safety is ok
 		THIS^.bIcfSimulationMode	:= bIcfSimulationMode 	; // Simulation mode is active [default set to False] 
 		THIS^.bIcfModuloAxis		:= bIcfModuloAxis		; // show axis position as modulo
+		THIS^.bIcfSTOPresent		:= bIcfSTOPresent		; // Axis has safe torque off function
 
 	// ***** config homing Mode ***** 
  		THIS^.mcHomingMode 			:= mcHomingMode ; // set homing mode

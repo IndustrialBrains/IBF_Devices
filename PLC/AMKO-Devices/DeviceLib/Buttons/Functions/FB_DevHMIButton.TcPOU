@@ -17,9 +17,9 @@ VAR_OUTPUT
 	bDeactivate			: BOOL 			;// Button, Deactivate button 
 END_VAR
 VAR
-	FB_delIStatus: TON; // Timer function for delayed input status 
-	FB_feIStatus: F_TRIG; // generate falling edge pulse edge from Istatus
-	FB_reIStatus: R_TRIG; // generate falling edge pulse edge from Istatus
+	FB_delIStatus	: TON; // Timer function for delayed input status 
+	FB_feIStatus	: F_TRIG; // generate falling edge pulse edge from Istatus
+	FB_reIStatus	: R_TRIG; // generate falling edge pulse edge from Istatus
 END_VAR
 ]]></Declaration>
     <Implementation>
