@@ -98,6 +98,9 @@
     <Folder Include="Axis" />
     <Folder Include="Axis\DataTypes" />
     <Folder Include="Axis\FunctionBlocks" />
+    <Folder Include="Axis\FunctionBlocks\Analog" />
+    <Folder Include="Axis\FunctionBlocks\ServoHybrid" />
+    <Folder Include="Axis\FunctionBlocks\Servo" />
     <Folder Include="Axis\Interface" />
     <Folder Include="Buttons" />
     <Folder Include="Buttons\DataTypes" />
@@ -153,13 +156,16 @@
     <Compile Include="Axis\DataTypes\UDT_AxVal.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Axis\FunctionBlocks\FB_DevBasicACAxis.TcPOU">
+    <Compile Include="Axis\FunctionBlocks\Analog\FB_DevAnalogAxis.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Axis\FunctionBlocks\Fb_DevAxis.TcPOU">
+    <Compile Include="Axis\FunctionBlocks\ServoHybrid\FB_DevBasicACAxis.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Axis\FunctionBlocks\FB_DevHybridAc.TcPOU">
+    <Compile Include="Axis\FunctionBlocks\ServoHybrid\FB_DevHybridAc.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Axis\FunctionBlocks\Servo\Fb_DevAxis.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Axis\FunctionBlocks\UDT_ManualAxisCtrl.TcDUT">

@@ -61,8 +61,9 @@ END_IF
       <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
 VAR_INPUT
 	// Location data for messages  
-	nId			: UDINT ; // Identification number of object
-	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
+	nId				: UDINT; // Identification number of object
+	nParentId		: UDINT; // Id of higher level If aplicable (0 = no parent)
+	benableNegative	: BOOL ; // Enable negative values
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -70,7 +71,14 @@ END_VAR
 	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.AnOutput);
 
 // ====== Set feedback ======
-	bInitOk := true ;]]></ST>
+	bInitOk := TRUE ;
+	
+// ====== set minimum value ========
+	IF benableNegative THEN 
+		nLimitMin := -32767;
+	ELSE
+		nLimitMin := 0 ;
+	END_IF]]></ST>
       </Implementation>
     </Method>
   </POU>

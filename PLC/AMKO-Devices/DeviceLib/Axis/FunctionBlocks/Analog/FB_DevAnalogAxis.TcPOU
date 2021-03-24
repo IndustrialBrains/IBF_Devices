@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+  <POU Name="FB_DevAnalogAxis" Id="{2d577320-0726-040c-269d-52c0e83d50e7}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevAnalogAxis EXTENDS FB_DevBase
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	fbAnalogOutput	: FB_DevAnalogOutputScaled 	;
+	fbRun			: FB_DevDigitalOutput		;
+	fbReset			: FB_DevDigitalOutput		;
+	fbReverse		: FB_DevDigitalOutput		;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Init" Id="{1d9ecc1b-c37a-0e07-3bc6-88c35083f504}">
+      <Declaration><![CDATA[METHOD Init : BOOL
+VAR_INPUT
+	// Message location data
+	nId			: UDINT ; // Identification number of object
+	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
+
+	// Motor settings
+	fMaxVelocity : LREAL ; // Maximum motor velocity for scaling
+	fMinVelocity : LREAL ; // Minimum velocity for scaling
+END_VAR
+
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ====== Calculate device id =====
+	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Axis);
+
+// ====== Set manual device type ======
+	eDevType := E_Devices.Axis ;	
+]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>
