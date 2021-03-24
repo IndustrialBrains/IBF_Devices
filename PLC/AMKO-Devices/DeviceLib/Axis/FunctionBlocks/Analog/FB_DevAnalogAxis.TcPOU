@@ -23,14 +23,21 @@ VAR // Internal commands
 	bCmdRunCW 		: BOOL ;
 	bCmdRunCCW		: BOOL ;
 	bCmdReset		: BOOL ;	 
+	bInternalEnable : BOOL ;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[SUPER^(refFbFault := refFbFault);
 
+// ===== Check inputs =====
+	fbiEnabled( bEmbeded	:= TRUE,
+				refFbFault 	:= refFbFault);
+
 IF bInitOk THEN 
 	ExecSetOutputs() ;
 	bDriveOk	:= fbiEnabled.bFcoInputActive ;
-END_IF]]></ST>
+END_IF
+
+]]></ST>
     </Implementation>
     <Folder Name="Commands" Id="{25bd60d6-a0c4-006b-1e1e-40f55b890b42}" />
     <Folder Name="Private" Id="{a644719c-3261-0f8c-3b05-3c6242d33819}" />
@@ -102,10 +109,10 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// ====== Check safety and enable ======
-IF bIsSafe 
+IF bSafetyOk 
 AND fbiEnabled.bFcoInputActive 
 AND (bEnable OR bManual) THEN 
-	;
+	bInternalEnable := TRUE;
 ELSE
 	fCmdVelocity 	:= 0;
 	bCmdRunCW		:= FALSE;
@@ -115,25 +122,25 @@ END_IF
 // ====== Set outputs =======
 	fbVelocity	(	bEmbeded 	:= TRUE,
 					bSafetyOk	:= bSafetyOk,
-					bEnable		:= bEnable,
+					bEnable		:= bInternalEnable,
 					fCmdValue	:= fCmdVelocity, 
 					refFbFault	:= refFbFault);
 				
 	fbqRun		(	bEmbeded 	:= TRUE,
 					bSafetyOk	:= bSafetyOk,
-					bEnable		:= bEnable,
+					bEnable		:= bInternalEnable,
 					bCmdOn		:= bCmdRunCW OR bCmdRunCCW,
 					refFbFault	:= refFbFault);
 				
 	fbqReverse	(	bEmbeded 	:= TRUE,
 					bSafetyOk	:= bSafetyOk,
-					bEnable		:= bEnable,
+					bEnable		:= bInternalEnable,
 					bCmdOn		:= bCmdRunCCW,
 					refFbFault	:= refFbFault);
 
-	fbqRun		(	bEmbeded 	:= TRUE,
+	fbqReset	(	bEmbeded 	:= TRUE,
 					bSafetyOk	:= bSafetyOk,
-					bEnable		:= bEnable,
+					bEnable		:= bInternalEnable,
 					bCmdOn		:= bCmdReset,
 					refFbFault	:= refFbFault);
 
@@ -142,11 +149,13 @@ END_IF
 	bCmdRunCW		:= FALSE;
 	bCmdRunCCW		:= FALSE;
 	bCmdManual		:= false;
+	bInternalEnable := FALSE;
 // ===== set feedback =====
 
 bMovingCW		:= fbqRun.bOutputState AND NOT fbqReverse.bOutputState;
 bMovingCCW		:= fbqRun.bOutputState AND fbqReverse.bOutputState;
-fActVelocity	:= fbVelocity.fOutputValue ;]]></ST>
+fActVelocity	:= fbVelocity.fOutputValue ;
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="Init" Id="{1d9ecc1b-c37a-0e07-3bc6-88c35083f504}" FolderPath="Commands\">
