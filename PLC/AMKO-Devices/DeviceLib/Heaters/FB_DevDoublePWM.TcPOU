@@ -61,7 +61,7 @@ IF tDutyCycle > T#0S AND tPeriodLength > T#0S THEN // switch PWM controller up w
 	ExecPWMCycle(); // 
 END_IF 
 
-SetOutputs();]]></ST>
+ExecSetOutputs();]]></ST>
     </Implementation>
     <Folder Name="Private" Id="{8f1901c9-6ed3-0e55-22ef-5b4692e73382}" />
     <Method Name="CalcCycleTimes" Id="{c560b553-2e91-0b3f-2513-3eb8c1b8590a}" FolderPath="Private\">
@@ -175,6 +175,48 @@ tonOutputB	(IN := bCmdChanelBOn, PT := tDutyCycle);
 tonIdle 	(IN := nPWMStep = 2	, PT := tIdleTime);]]></ST>
       </Implementation>
     </Method>
+    <Method Name="ExecSetOutputs" Id="{a756e636-5c44-0f4e-25a7-67cef032dabc}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PRIVATE ExecSetOutputs : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+// Set main output
+qbOutputMain := (bEnable OR bManual) AND bSafetyOk AND NOT bCmdHold ;
+
+// Set outputs
+qbOutputA := bCmdChanelAOn AND NOT tofOutputB.Q AND NOT tonBurnTimeA.Q;
+qbOutputB := bCmdChanelBOn AND NOT tofOutputA.Q AND NOT tonBurnTimeB.Q;
+
+// Call timers for overlap prevention
+tofOutputA(IN := qbOutputA);
+tofOutputB(IN := qbOutputB);
+
+// reset commands
+bCmdChanelAOn := FALSE ;
+bCmdChanelBOn := FALSE ;
+
+tonBurnTimeA ( IN := bCmdChanelAOn, PT := LREAL_TO_TIME( stMaxTimeOn.fValue));
+tonBurnTimeB ( IN := bCmdChanelBOn, PT := LREAL_TO_TIME( stMaxTimeOn.fValue));
+
+IF tonBurnTimeA.Q THEN 
+	stFault.Active 			:= TRUE ;
+	stFault.Discription 	:= 'Heater A burn timeout';
+	stFault.MessageNumber 	:= E_MessageNumbers.CF_MoveToSlow ;
+	stFault.FaultType		:= E_FaultTypes.CF;
+	qbOutputA 				:= FALSE ;
+ELSIF tonBurnTimeB.Q THEN 
+	stFault.Active 			:= TRUE ;
+	stFault.Discription 	:= 'Heater B burn timeout';
+	stFault.MessageNumber 	:= E_MessageNumbers.CF_MoveToSlow ;
+	stFault.FaultType		:= E_FaultTypes.CF;
+	qbOutputB 				:= FALSE ;
+END_IF
+
+bCmdHold := FALSE ;]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="Init" Id="{398f5054-4030-04cb-100b-1777db0e2325}">
       <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
 VAR_INPUT
@@ -239,48 +281,6 @@ END_VAR
 // ====== Set init status bit =======
 	bInitOk := TRUE ;
 ]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="SetOutputs" Id="{a756e636-5c44-0f4e-25a7-67cef032dabc}" FolderPath="Private\">
-      <Declaration><![CDATA[METHOD PRIVATE SetOutputs : BOOL
-VAR_INPUT
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[
-// Set main output
-qbOutputMain := (bEnable OR bManual) AND bSafetyOk AND NOT bCmdHold ;
-
-// Set outputs
-qbOutputA := bCmdChanelAOn AND NOT tofOutputB.Q AND NOT tonBurnTimeA.Q;
-qbOutputB := bCmdChanelBOn AND NOT tofOutputA.Q AND NOT tonBurnTimeB.Q;
-
-// Call timers for overlap prevention
-tofOutputA(IN := qbOutputA);
-tofOutputB(IN := qbOutputB);
-
-// reset commands
-bCmdChanelAOn := FALSE ;
-bCmdChanelBOn := FALSE ;
-
-tonBurnTimeA ( IN := bCmdChanelAOn, PT := LREAL_TO_TIME( stMaxTimeOn.fValue));
-tonBurnTimeB ( IN := bCmdChanelBOn, PT := LREAL_TO_TIME( stMaxTimeOn.fValue));
-
-IF tonBurnTimeA.Q THEN 
-	stFault.Active 			:= TRUE ;
-	stFault.Discription 	:= 'Heater A burn timeout';
-	stFault.MessageNumber 	:= E_MessageNumbers.CF_MoveToSlow ;
-	stFault.FaultType		:= E_FaultTypes.CF;
-	qbOutputA 				:= FALSE ;
-ELSIF tonBurnTimeB.Q THEN 
-	stFault.Active 			:= TRUE ;
-	stFault.Discription 	:= 'Heater B burn timeout';
-	stFault.MessageNumber 	:= E_MessageNumbers.CF_MoveToSlow ;
-	stFault.FaultType		:= E_FaultTypes.CF;
-	qbOutputB 				:= FALSE ;
-END_IF
-
-bCmdHold := FALSE ;]]></ST>
       </Implementation>
     </Method>
   </POU>

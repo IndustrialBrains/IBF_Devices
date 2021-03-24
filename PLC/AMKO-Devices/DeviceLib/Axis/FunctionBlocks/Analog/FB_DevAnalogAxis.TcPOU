@@ -26,7 +26,8 @@ VAR // Internal commands
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[IF bInitOk THEN 
-	SetOutputs() ;
+	ExecSetOutputs() ;
+	bDriveOk	:= fbiEnabled.bFcoInputActive ;
 END_IF]]></ST>
     </Implementation>
     <Folder Name="Commands" Id="{25bd60d6-a0c4-006b-1e1e-40f55b890b42}" />
@@ -92,6 +93,60 @@ bIsSafe := fbqReset.CmdSafeStop() 	AND bIsSafe ;
 CmdSafeStop := bIsSafe;]]></ST>
       </Implementation>
     </Method>
+    <Method Name="ExecSetOutputs" Id="{73c3f618-cb9e-0650-0e12-802c6dbad778}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PRIVATE ExecSetOutputs : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ====== Check safety and enable ======
+IF bIsSafe 
+AND fbiEnabled.bFcoInputActive 
+AND (bEnable OR bManual) THEN 
+	;
+ELSE
+	fCmdVelocity 	:= 0;
+	bCmdRunCW		:= FALSE;
+	bCmdRunCCW		:= FALSE;
+END_IF 
+
+// ====== Set outputs =======
+	fbVelocity	(	bEmbeded 	:= TRUE,
+					bSafetyOk	:= bSafetyOk,
+					bEnable		:= bEnable,
+					fCmdValue	:= fCmdVelocity, 
+					refFbFault	:= refFbFault);
+				
+	fbqRun		(	bEmbeded 	:= TRUE,
+					bSafetyOk	:= bSafetyOk,
+					bEnable		:= bEnable,
+					bCmdOn		:= bCmdRunCW OR bCmdRunCCW,
+					refFbFault	:= refFbFault);
+				
+	fbqReverse	(	bEmbeded 	:= TRUE,
+					bSafetyOk	:= bSafetyOk,
+					bEnable		:= bEnable,
+					bCmdOn		:= bCmdRunCCW,
+					refFbFault	:= refFbFault);
+
+	fbqRun		(	bEmbeded 	:= TRUE,
+					bSafetyOk	:= bSafetyOk,
+					bEnable		:= bEnable,
+					bCmdOn		:= bCmdReset,
+					refFbFault	:= refFbFault);
+
+// ===== reset input commands =====
+	fCmdVelocity 	:= 0;
+	bCmdRunCW		:= FALSE;
+	bCmdRunCCW		:= FALSE;
+	bCmdManual		:= false;
+// ===== set feedback =====
+
+bMovingCW		:= fbqRun.bOutputState AND NOT fbqReverse.bOutputState;
+bMovingCCW		:= fbqRun.bOutputState AND fbqReverse.bOutputState;
+fActVelocity	:= fbVelocity.fOutputValue ;]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="Init" Id="{1d9ecc1b-c37a-0e07-3bc6-88c35083f504}" FolderPath="Commands\">
       <Declaration><![CDATA[METHOD Init : BOOL
 VAR_INPUT
@@ -131,57 +186,6 @@ bInitOk	:= 	fbqReverse.Init	( 	nId				:= 3,
 bInitOk	:= 	fbiEnabled.Init	( 	nId				:= 4,
 								nParentId		:= nLocationId);
 ]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="SetOutputs" Id="{73c3f618-cb9e-0650-0e12-802c6dbad778}" FolderPath="Private\">
-      <Declaration><![CDATA[METHOD PRIVATE SetOutputs : BOOL
-VAR_INPUT
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[// ====== Check safety and enable ======
-IF bIsSafe AND fbiEnabled.bFcoInputActive AND bEnable THEN 
-	;
-ELSE
-	fCmdVelocity 	:= 0;
-	bCmdRunCW		:= FALSE;
-	bCmdRunCCW		:= FALSE;
-END_IF 
-
-// ====== Set outputs =======
-	fbVelocity	(	bEmbeded 	:= TRUE,
-					bSafetyOk	:= bSafetyOk,
-					bEnable		:= bEnable,
-					fCmdValue	:= fCmdVelocity, 
-					refFbFault	:= refFbFault);
-				
-	fbqRun		(	bEmbeded 	:= TRUE,
-					bSafetyOk	:= bSafetyOk,
-					bEnable		:= bEnable,
-					bCmdOn		:= bCmdRunCW OR bCmdRunCCW,
-					refFbFault	:= refFbFault);
-				
-	fbqReverse	(	bEmbeded 	:= TRUE,
-					bSafetyOk	:= bSafetyOk,
-					bEnable		:= bEnable,
-					bCmdOn		:= bCmdRunCCW,
-					refFbFault	:= refFbFault);
-
-	fbqRun		(	bEmbeded 	:= TRUE,
-					bSafetyOk	:= bSafetyOk,
-					bEnable		:= bEnable,
-					bCmdOn		:= bCmdReset,
-					refFbFault	:= refFbFault);
-
-// ===== reset input commands =====
-	fCmdVelocity 	:= 0;
-	bCmdRunCW		:= FALSE;
-	bCmdRunCCW		:= FALSE;
-// ===== set feedback =====
-
-bMovingCW		:= fbqRun.bOutputState AND NOT fbqReverse.bOutputState;
-bMovingCCW		:= fbqRun.bOutputState AND fbqReverse.bOutputState;
-fActVelocity	:= fbVelocity.fOutputValue ;]]></ST>
       </Implementation>
     </Method>
   </POU>
