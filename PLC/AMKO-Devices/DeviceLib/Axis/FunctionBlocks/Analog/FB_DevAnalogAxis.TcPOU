@@ -25,7 +25,9 @@ VAR // Internal commands
 	bCmdReset		: BOOL ;	 
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[IF bInitOk THEN 
+      <ST><![CDATA[SUPER^(refFbFault := refFbFault);
+
+IF bInitOk THEN 
 	ExecSetOutputs() ;
 	bDriveOk	:= fbiEnabled.bFcoInputActive ;
 END_IF]]></ST>
@@ -164,27 +166,32 @@ END_VAR
 	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Axis);
 
 // ====== Set manual device type ======
-	eDevType := E_Devices.Axis ;	
+	eDevType := E_Devices.AnalogAxis ;	
 
 // ====== initialize components =====
 bInitOk := TRUE ;
 
 bInitOk := 	fbVelocity.Init	( 	nId 			:= 0,
 								nParentId		:= nLocationId,
-								benableNegative	:= FALSE );
+								benableNegative	:= FALSE )
+								AND bInitOk;
 			fbVelocity.SetScaling	(fMaxValue 		:= fMaxVelocity);
 								
 bInitOk	:= 	fbqRun.Init		( 	nId				:= 1,
-								nParentId		:= nLocationId);
+								nParentId		:= nLocationId)
+								AND bInitOk;
 
 bInitOk	:= 	fbqReset.Init	( 	nId				:= 2,
-								nParentId		:= nLocationId);
+								nParentId		:= nLocationId)
+								AND bInitOk;
 
 bInitOk	:= 	fbqReverse.Init	( 	nId				:= 3,
-								nParentId		:= nLocationId);
+								nParentId		:= nLocationId)
+								AND bInitOk;
 
 bInitOk	:= 	fbiEnabled.Init	( 	nId				:= 4,
-								nParentId		:= nLocationId);
+								nParentId		:= nLocationId)
+								AND bInitOk;
 ]]></ST>
       </Implementation>
     </Method>

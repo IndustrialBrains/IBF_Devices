@@ -61,7 +61,8 @@ END_VAR
 	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.DiOutput);
 
 // ====== Set feedback ======
-	bInitOk := true ;]]></ST>
+	bInitOk := TRUE ;
+	Init	:= true ;]]></ST>
       </Implementation>
     </Method>
   </POU>

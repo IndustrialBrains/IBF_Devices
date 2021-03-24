@@ -113,7 +113,7 @@ CASE arDeviceArray[nCmdLookupindex].pFunction^.eDevType OF
 	E_Devices.Encoder :
 		pDevEncoder			:= arDeviceArray[nCmdLookupindex].pFunction ;
 	E_Devices.AnalogAxis:
-		pDevEncoder			:= arDeviceArray[nCmdLookupindex].pFunction ;
+		pDevAnalogAxis		:= arDeviceArray[nCmdLookupindex].pFunction ;
 	ELSE
 		;
 END_CASE

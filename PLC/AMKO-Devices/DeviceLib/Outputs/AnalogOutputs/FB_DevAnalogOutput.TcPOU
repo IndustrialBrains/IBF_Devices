@@ -71,15 +71,17 @@ END_VAR
         <ST><![CDATA[// ====== Calculate device id =====
 	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.AnOutput);
 
-// ====== Set feedback ======
-	bInitOk := TRUE ;
 	
 // ====== set minimum value ========
 	IF benableNegative THEN 
 		nLimitMin := -32767;
 	ELSE
 		nLimitMin := 0 ;
-	END_IF]]></ST>
+	END_IF
+	
+// ====== Set feedback ======
+	bInitOk := TRUE ;
+	Init 	:= TRUE ;]]></ST>
       </Implementation>
     </Method>
   </POU>
