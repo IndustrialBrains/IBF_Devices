@@ -112,6 +112,8 @@ CASE arDeviceArray[nCmdLookupindex].pFunction^.eDevType OF
 		pDevDoublePWM		:= arDeviceArray[nCmdLookupindex].pFunction ;
 	E_Devices.Encoder :
 		pDevEncoder			:= arDeviceArray[nCmdLookupindex].pFunction ;
+	E_Devices.AnalogAxis:
+		pDevEncoder			:= arDeviceArray[nCmdLookupindex].pFunction ;
 	ELSE
 		;
 END_CASE

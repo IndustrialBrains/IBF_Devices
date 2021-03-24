@@ -159,6 +159,9 @@
     <Compile Include="Axis\FunctionBlocks\Analog\FB_DevAnalogAxis.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Axis\FunctionBlocks\Analog\ST_ManualAnalogAxisCtrl.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Axis\FunctionBlocks\ServoHybrid\FB_DevBasicACAxis.TcPOU">
       <SubType>Code</SubType>
     </Compile>

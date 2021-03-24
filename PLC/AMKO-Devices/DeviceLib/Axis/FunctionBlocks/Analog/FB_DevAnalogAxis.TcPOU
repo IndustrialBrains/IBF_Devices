@@ -3,8 +3,13 @@
   <POU Name="FB_DevAnalogAxis" Id="{2d577320-0726-040c-269d-52c0e83d50e7}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevAnalogAxis EXTENDS FB_DevBase
 VAR_INPUT
+	stManualCtrl 	: ST_ManualAnalogAxisCtrl ; // Manual control
 END_VAR
 VAR_OUTPUT
+	bDriveOk		: BOOL ; // Drive is ok
+	bMovingCW		: BOOL ; // Move CW output is active
+	bMovingCCW		: BOOL ; // Move CCW output is active
+	fActVelocity	: LREAL; // Command velocity of motor
 END_VAR
 VAR // internal functions 
 	fbVelocity		: FB_DevAnalogOutputScaled 	;
@@ -32,7 +37,15 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[]]></ST>
+        <ST><![CDATA[bCmdManual := TRUE ;
+
+// Execute Manual commands
+	IF stManualCtrl.bCmdRunCW THEN 
+		CmdRunCW(fCmdVelocity := stManualCtrl.fCmdVelocity);
+	ELSIF stManualCtrl.bCmdRunCCW THEN 
+		CmdRunCCW(fCmdVelocity := stManualCtrl.fCmdVelocity);
+	END_IF
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdRunCCW" Id="{e92c1c28-51a1-0de5-0174-155a52f08ed3}" FolderPath="Commands\">
@@ -42,9 +55,11 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[bCmdRunCCW := TRUE ;
+        <ST><![CDATA[bCmdRunCCW			:= TRUE ;
+THIS^.fCmdVelocity 	:= fCmdVelocity ; 
 
-CmdRunCCW := fbqRun.bOutputState AND fbqReverse.bOutputState ;]]></ST>
+CmdRunCCW 	:= bMovingCW ;
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdRunCW" Id="{e890e9f0-dd77-0270-3233-14c16580ad18}" FolderPath="Commands\">
@@ -55,8 +70,9 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[bCmdRunCW := TRUE ;
+THIS^.fCmdVelocity 	:= fCmdVelocity ;
 
-CmdRunCCW := fbqRun.bOutputState AND NOT fbqReverse.bOutputState ;
+CmdRunCW 	:= bMovingCW ;
 ]]></ST>
       </Implementation>
     </Method>
@@ -161,7 +177,11 @@ END_IF
 	fCmdVelocity 	:= 0;
 	bCmdRunCW		:= FALSE;
 	bCmdRunCCW		:= FALSE;
-]]></ST>
+// ===== set feedback =====
+
+bMovingCW		:= fbqRun.bOutputState AND NOT fbqReverse.bOutputState;
+bMovingCCW		:= fbqRun.bOutputState AND fbqReverse.bOutputState;
+fActVelocity	:= fbVelocity.fOutputValue ;]]></ST>
       </Implementation>
     </Method>
   </POU>

@@ -118,7 +118,8 @@ VAR_INPUT
 	bIcfSimulationMode	: BOOL := FALSE ; // Simulation mode is active [default set to False] Used for testing without hardware present 
 	bIcfModuloAxis		: BOOL := FALSE ; // Show axis position as modulo
 	bIcfSTOPresent		: BOOL := FALSE ; // Axis safe torque off is present	
-	
+	bIcfNCHomeSensor	: BOOL := FALSE ; // Homing sensor is inverted (NC)	
+
 	// Config Values 
 	mcHomingMode 		: MC_HomingMode := MC_HomingMode.MC_DefaultHoming; 
 	fHomePosition		: LREAL := 0 	; // set position at homing
