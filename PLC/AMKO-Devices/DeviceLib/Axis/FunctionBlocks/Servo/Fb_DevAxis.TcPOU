@@ -47,6 +47,7 @@ VAR // Axis configuration
 		bIcfSimulationMode	: BOOL := FALSE ; // Simulation mode is active [default set to False] 
 		bIcfModuloAxis		: BOOL := FALSE ; // Show axis position as modulo
 		bIcfSTOPresent		: BOOL := FALSE ; // Axis Safe torque off is present
+		bIcfNCHomeSensor	: BOOL := FALSE ; // Homing sensor is inverted (NC)	
 	// ===== Internal motion values ======
 		fHomePosition		: LREAL := 0 ; // set position at homing
 	// Command Modes
@@ -873,10 +874,15 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// ==== execute homing function =====
+	IF bIcfNCHomeSensor THEN 
+		fbmchome.bCalibrationCam	:= NOT IAxisHome;
+	ELSE
+		fbmchome.bCalibrationCam	:= IAxisHome;
+	END_IF		
+		
 	fbMcHome(	Axis			:= AxisRef,
 				Execute			:= bExec_Home AND bDelayedEnable,
-				HomingMode		:= mcHomingMode,
-				bCalibrationCam	:= IAxisHome ); 
+				HomingMode		:= mcHomingMode ); 
 			
 // Reset exec command 
 	bExec_Home 	:= FALSE ;
@@ -1268,7 +1274,8 @@ VAR_INPUT
 	bIcfAlwaysEnable	: BOOL := FALSE ; // 1 = Axis always enabled, 0 = Axis disabled at Idle 
 	bIcfSimulationMode	: BOOL := FALSE ; // Simulation mode is active [default set to False] Used for testing without hardware present 
 	bIcfModuloAxis		: BOOL := FALSE ; // Show axis position as modulo
-	bIcfSTOPresent		: BOOL := FALSE ; // Axis safe torque off is present	
+	bIcfSTOPresent		: BOOL := FALSE ; // Axis safe torque off is present
+	bIcfNCHomeSensor	: BOOL := FALSE ; // Homing sensor is inverted (NC)	
 	// Config Values 
 	mcHomingMode 		: MC_HomingMode := MC_HomingMode.MC_DefaultHoming; 
 	fHomePosition		: LREAL := 0 	; // set position at homing
@@ -1345,7 +1352,7 @@ END_VAR]]></Declaration>
 		THIS^.bIcfSimulationMode	:= bIcfSimulationMode 	; // Simulation mode is active [default set to False] 
 		THIS^.bIcfModuloAxis		:= bIcfModuloAxis		; // show axis position as modulo
 		THIS^.bIcfSTOPresent		:= bIcfSTOPresent		; // Axis has safe torque off function
-
+		THIS^.bIcfNCHomeSensor		:= bIcfNCHomeSensor		; // Axis homing sensor is NC	
 	// ***** config homing Mode ***** 
  		THIS^.mcHomingMode 			:= mcHomingMode ; // set homing mode
 		THIS^.fHomePosition			:= fHomePosition;

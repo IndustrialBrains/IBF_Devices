@@ -7,15 +7,62 @@ END_VAR
 VAR_OUTPUT
 END_VAR
 VAR
-	fbAnalogOutput	: FB_DevAnalogOutputScaled 	;
-	fbRun			: FB_DevDigitalOutput		;
-	fbReset			: FB_DevDigitalOutput		;
-	fbReverse		: FB_DevDigitalOutput		;
+	fbVelocity		: FB_DevAnalogOutputScaled 	;
+	fbqRun			: FB_DevDigitalOutput		;
+	fbqReset		: FB_DevDigitalOutput		;
+	fbqReverse		: FB_DevDigitalOutput		;
+	fbiEnabled		: Fb_DevDigitalInput		;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
+    <Folder Name="Commands" Id="{25bd60d6-a0c4-006b-1e1e-40f55b890b42}" />
+    <Method Name="CmdManual" Id="{d526230f-e04e-08a3-0a52-d542f08f92a4}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdManual : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdReset" Id="{54202237-fc19-0b1f-1205-bd2b59638451}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdReset : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdRunCCW" Id="{e92c1c28-51a1-0de5-0174-155a52f08ed3}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdRunCCW : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdRunCW" Id="{e890e9f0-dd77-0270-3233-14c16580ad18}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdRunCW : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdSafeStop" Id="{c1b9e61f-17d6-00f9-1428-4bb1000131d5}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdSafeStop : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="Init" Id="{1d9ecc1b-c37a-0e07-3bc6-88c35083f504}">
       <Declaration><![CDATA[METHOD Init : BOOL
 VAR_INPUT
@@ -35,6 +82,25 @@ END_VAR
 
 // ====== Set manual device type ======
 	eDevType := E_Devices.Axis ;	
+
+// ====== initialize components =====
+bInitOk := TRUE ;
+
+bInitOk := fbVelocity.Init	( 	nId 			:= 0,
+								nParentId		:= nLocationId,
+								benableNegative	:= FALSE );
+								
+bInitOk	:= fbqRun.Init		( 	nId				:= 1,
+								nParentId		:= nLocationId);
+
+bInitOk	:= fbqReset.Init	( 	nId				:= 2,
+								nParentId		:= nLocationId);
+
+bInitOk	:= fbqReverse.Init	( 	nId				:= 3,
+								nParentId		:= nLocationId);
+
+bInitOk	:= fbiEnabled.Init	( 	nId				:= 4,
+								nParentId		:= nLocationId);
 ]]></ST>
       </Implementation>
     </Method>
