@@ -29,6 +29,7 @@ VAR
 	pDevPWMController	: POINTER TO FB_DevPWMGenerator			; // Device pointer to PWM controller
 	pDevDoublePWM		: POINTER TO FB_DevDoublePWM			; // Device pointer to Double PWM controller
 	pDevEncoder			: POINTER TO FB_EncoderBase				; // Device Pointer to encoder Base
+	pDevAnalogAxis		: POINTER TO FB_DevAnalogAxis			; // Device pointer to analog axis control
 	
 	fbNodevice			: FB_DevBase ;
 	stNoDevice			: UDT_DeviceID := (sName := 'No device', sType := TO_STRING(E_Devices.Undefined), pFunction := ADR(fbNodevice)); 
@@ -44,7 +45,6 @@ IF bManualActive THEN
 	ExecSelectDevice();
 END_IF
 
-// Make sure compiler does not skip unused variables
 ]]></ST>
     </Implementation>
     <Folder Name="Private" Id="{aa1be144-3e85-00ba-24ed-50747e4a9031}" />

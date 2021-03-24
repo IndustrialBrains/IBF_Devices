@@ -40,7 +40,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// Set Output to physical device
-IF bEnable OR bCmdManual THEN 
+IF bIsSafe AND (bEnable OR bCmdManual) THEN 
 	qbOutput := bCmdOn ; 
 ELSE 
 	qbOutput S= FALSE ; 

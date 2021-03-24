@@ -47,11 +47,12 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// Set Output to physical device
-IF bEnable OR bCmdManual THEN 
+IF bSafetyOk AND (bEnable OR bCmdManual) THEN 
 	qnHwOut := LREAL_TO_INT(fCmdValue) ; 
 	qnHwOut := LIMIT(nLimitMin, qnHwOut, nLimitMax) ; 
 ELSE 
-	fCmdValue := 0 ; 
+	qnHwOut 	:= 0;
+	fCmdValue 	:= 0 ; 
 END_IF
 
 ]]></ST>
