@@ -68,7 +68,7 @@ END_VAR
 
 bCmdReset		:= TRUE ;
 
-CmdReset		:= fbiEnabled.bFcoInputActive ;]]></ST>
+CmdReset		:= TRUE ;]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdRunCCW" Id="{e92c1c28-51a1-0de5-0174-155a52f08ed3}" FolderPath="Commands\">

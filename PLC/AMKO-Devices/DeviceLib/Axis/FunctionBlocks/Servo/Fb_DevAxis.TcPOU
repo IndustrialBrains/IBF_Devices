@@ -19,6 +19,7 @@ VAR_OUTPUT
 		bHomed			: BOOL 	:= FALSE; 
 		bError 			: BOOL 	:= FALSE;
 		bStopped		: BOOL 	:= FALSE;
+		bResetDone		: BOOL 	:= FALSE;
 		bGearedAsSlave	: BOOL 	:= FALSE;
 		bVelocityLimited: BOOL 	:= FALSE;  
 		bIdle			: BOOL 	:= FALSE;
@@ -118,6 +119,7 @@ VAR	// =============== Motion status functions ================
 	// ===== Internal variables =======
 		fAcceleration	: LREAL := 0 ; // Acceleration used for functions 
 		fDeceleration	: LREAL := 0 ; // Deceleration used for functions
+		reCmdReset		: R_TRIG ; // Rising edge on reset command
 END_VAR
 VAR
 	// ===== Loop variables =====
@@ -631,9 +633,13 @@ END_VAR
         <ST><![CDATA[// Set reset axis to true 				
 	bExec_Reset 	:= TRUE ; 
 	bInternalEnable	:= TRUE ;
+
+// reset internal reset done bit
+	reCmdReset(CLK 	:= bExec_Reset);
+	bResetDone		R= reCmdReset.Q ;
 	
 // Set feedback output 
-	CmdReset := fbMcReset.Done ; ]]></ST>
+	CmdReset := bResetDone ; ]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdSafeSpeed" Id="{ddc13036-fa7e-46f4-be16-22a24c1d346b}" FolderPath="Command Methods\">
@@ -1149,6 +1155,7 @@ END_IF
 					
 // ===== reset command =====
 	bExec_Reset := FALSE ;
+	bResetDone 	S= fbMcReset.Done ;
 	
 // ===== reset internal fault bits and stop bits =====
 	bError 			:= FALSE ; 
