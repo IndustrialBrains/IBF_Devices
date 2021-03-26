@@ -58,6 +58,19 @@ END_VAR
 ]]></ST>
       </Implementation>
     </Method>
+    <Method Name="CmdReset" Id="{69edc11b-9665-0aa5-3d5e-a0ff9e474fd0}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdReset : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bErrorActive 	:= FALSE;
+
+bCmdReset		:= TRUE ;
+
+CmdReset		:= fbiEnabled.bFcoInputActive ;]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="CmdRunCCW" Id="{e92c1c28-51a1-0de5-0174-155a52f08ed3}" FolderPath="Commands\">
       <Declaration><![CDATA[METHOD PUBLIC CmdRunCCW : BOOL
 VAR_INPUT
@@ -148,7 +161,8 @@ END_IF
 	fCmdVelocity 	:= 0;
 	bCmdRunCW		:= FALSE;
 	bCmdRunCCW		:= FALSE;
-	bCmdManual		:= false;
+	bCmdManual		:= FALSE;
+	bCmdReset		:= FALSE;
 	bInternalEnable := FALSE;
 // ===== set feedback =====
 
