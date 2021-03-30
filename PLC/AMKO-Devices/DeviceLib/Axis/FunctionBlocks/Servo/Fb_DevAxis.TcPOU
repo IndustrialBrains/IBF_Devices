@@ -375,6 +375,17 @@ bBlockedCommand := fbMcHalt.Active ;
 	CmdJog := fbMcJog.Active ;]]></ST>
       </Implementation>
     </Method>
+    <Method Name="CmdKeepEnabled" Id="{6433043c-c7fa-0d6f-0a7e-fc542bc7a1ca}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdKeepEnabled : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Keep internal enable on while command is active
+bInternalEnable			:= TRUE ;
+]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="CmdLimitVelocity" Id="{5d066d54-5fea-4b4f-abf4-5d71884c951d}" FolderPath="Command Methods\">
       <Declaration><![CDATA[METHOD PUBLIC CmdLimitVelocity : BOOL // limit axis maximum velocity, stays active as long as command is called. 
 VAR_INPUT
