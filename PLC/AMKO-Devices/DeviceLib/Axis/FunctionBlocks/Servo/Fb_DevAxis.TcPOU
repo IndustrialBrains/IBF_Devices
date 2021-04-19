@@ -38,6 +38,9 @@ VAR_OUTPUT
 		tDisableDelay	: TIME 	:= T#500MS  ;
 	// ==== Axis data ====
 		fEncoderTurnoverValue	: LREAL ;   
+	// ==== Reset Feedback ======
+		feSOEResetBusy			: F_TRIG ; // SOE reset bussy triger
+		
 END_VAR
 VAR // Axis configuration 
 	// ===== HW Config Bits =====
@@ -1161,11 +1164,13 @@ END_IF
 					Timeout := T#10S		,
 					Axis	:= AxisRef		);
 	
-	fbMcReset	( 	Execute	:= bexec_reset AND NOT fbSoeReset.Busy,
+	feSOEResetBusy( CLK := fbSoeReset.Busy);
+	
+	fbMcReset	( 	Execute	:= feSOEResetBusy.Q OR (bIcfSimulationMode AND bExec_Reset),
 					Axis	:= AxisRef ); 
 					
 // ===== reset command =====
-	bExec_Reset := FALSE ;
+	bExec_Reset R= fbMcReset.Busy ;
 	bResetDone 	S= fbMcReset.Done ;
 	
 // ===== reset internal fault bits and stop bits =====
@@ -1191,17 +1196,24 @@ END_VAR
       <Implementation>
         <ST><![CDATA[// ==== Stop when safety is not ok =====
 	bCmdSafeStop S= NOT bSafetyOk ;
+
+// ===== Safe torque off function =====
+	IF bIcfSTOPresent THEN 
+		bSTOOK := IAxisSTOOK ;
+	ELSE 
+		bSTOOK := true ;
+	END_IF
 	
 // ==== Safe operation functions (overrule all other motion functions) =====
 	IF NOT AxisRef.Status.Coupled THEN 
 		fbMcStop( 	Axis 			:= AxisRef		,
-					Execute 		:= bCmdSafeStop	,
+					Execute 		:= bCmdSafeStop AND bSTOOK	,
 					Deceleration	:= fMaxDec		);
 	END_IF
 	
 	// Reset axis command			
-	bCmdSafeStop 	R= fbMcStop.Done OR AxisRef.Status.HasBeenStopped ;
-	bStopped		:= AxisRef.Status.HasBeenStopped ;
+	bCmdSafeStop 	R= fbMcStop.Done OR AxisRef.Status.HasBeenStopped OR NOT bSTOOK ;
+	bStopped		:= AxisRef.Status.HasBeenStopped OR NOT bSTOOK ;
 
 // Safestop fault handling 
 	IF fbMcStop.Error THEN 
@@ -1226,12 +1238,7 @@ END_VAR
 // ===== Dev is safe feedback =====
 bIsSafe := AxisRef.Status.HasBeenStopped OR AxisRef.Status.Disabled  ;
 
-// ===== Safe torque off function =====
-	IF bIcfSTOPresent THEN 
-		bSTOOK := IAxisSTOOK ;
-	ELSE 
-		bSTOOK := true ;
-	END_IF]]></ST>
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="ExecSetPosition" Id="{42f95ac0-57d0-06e7-037d-d914ca0d57d6}" FolderPath="Private\Organization\">
