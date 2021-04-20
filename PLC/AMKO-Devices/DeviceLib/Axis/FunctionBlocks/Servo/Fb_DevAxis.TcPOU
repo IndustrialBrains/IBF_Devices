@@ -715,6 +715,8 @@ ELSIF NOT bEnable AND AxisRef.Status.Moving THEN
 	CmdHalt(fDeceleration := fCmdDecc, mcBuffermode := MC_BufferMode.MC_Aborting);
 ELSIF NOT bSafetyOk AND bStopped THEN 
 	bCmdEnableAxis := FALSE ;
+ELSIF bExec_Reset THEN 
+	bCmdEnableAxis := FALSE ;
 ELSE 
 	bCmdEnableAxis	:= bEnable AND bSTOOK  ;
 END_IF
@@ -723,7 +725,7 @@ END_IF
 	bInternalEnable S= AxisRef.Status.HasJob;
 	bInternalEnable	S= bIcfAlwaysEnable ; // always enable axis if configured
 	bInternalEnable	S= AxisRef.Status.Coupled ;
-	
+
 // ===== Axis disable timer after last command =====
 	TofIntAxisEnable (	IN:= bInternalEnable, PT := tDisableDelay);
 
@@ -1151,10 +1153,9 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF  AxisRef.Status.Moving AND bExec_Reset THEN // If the axis is still moving execute safe stop first
-	CmdSafeStop();
-	RETURN;
-ELSIF AxisRef.Status.Coupled THEN 
+        <ST><![CDATA[//IF  AxisRef.Status.Moving AND bExec_Reset THEN // If the axis is still moving execute safe stop first
+//	RETURN;
+IF AxisRef.Status.Coupled THEN 
 	RETURN;
 END_IF
 
@@ -1162,15 +1163,15 @@ END_IF
 	fbMcReset	( 	Execute	:= bExec_Reset,
 					Axis	:= AxisRef ); 
 
-// ===== Reset drive if fault is still active =====
+(*// ===== Reset drive if fault is still active =====
 	fbSoeReset ( 	Execute := fbMcReset.Done AND AxisRef.Status.Error AND NOT bIcfSimulationMode, // No physical drive reset necesarry when not connected 
 					Timeout := T#10S		,
 					Axis	:= AxisRef		);
-		
+*)		
 // ===== reset command =====
 	bError 		:= AxisRef.Status.Error ; 
-	bExec_Reset R= fbMcReset.Busy ;
-	bResetDone 	S= fbMcReset.Done AND AxisRef.Status.Error ;
+	bExec_Reset	R= fbMcReset.Done  ;
+	bResetDone 	S= fbMcReset.Done AND NOT AxisRef.Status.Error ;
 	
 // Reset fault handling 
 	IF fbSoeReset.Error OR fbMcReset.Error THEN 
@@ -1203,7 +1204,7 @@ END_VAR
 // ==== Safe operation functions (overrule all other motion functions) =====
 	IF NOT AxisRef.Status.Coupled THEN 
 		fbMcStop( 	Axis 			:= AxisRef		,
-					Execute 		:= bCmdSafeStop AND bSTOOK	,
+					Execute 		:= bCmdSafeStop AND bSTOOK AND NOT bExec_Reset,
 					Deceleration	:= fMaxDec		);
 	END_IF
 	
