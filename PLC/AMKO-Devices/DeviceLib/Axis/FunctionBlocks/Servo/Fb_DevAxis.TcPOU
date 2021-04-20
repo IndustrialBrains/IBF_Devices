@@ -148,9 +148,8 @@ END_IF
 // ==== Execute organizational functions =====
 	CallOrganizationFunctions();
 // ==== execute motion functions =====
-	IF bSTOOK THEN
-		CallMotionFunctions();
-	end_if]]></ST>
+	CallMotionFunctions();
+]]></ST>
     </Implementation>
     <Folder Name="Command Methods" Id="{e50539d8-81cc-4181-8633-d48ea6a3afe6}" />
     <Folder Name="Private" Id="{5a5a8788-fda6-4189-8936-e923757baeb9}">
