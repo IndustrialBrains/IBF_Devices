@@ -706,16 +706,12 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// ===== Set axis enable ======
-IF bCmdManual AND bSafetyOk THEN 
+IF NOT bSafetyOk THEN 
+	bCmdEnableAxis := FALSE ;
+ELSIF bCmdManual AND bSafetyOk THEN 
 	bCmdEnableAxis 	:= TRUE ;
 	bInternalEnable S= bCmdManual ;
 	bCmdManual 		:= FALSE ;
-ELSIF NOT bEnable AND AxisRef.Status.Moving THEN
-	CmdHalt(fDeceleration := fCmdDecc, mcBuffermode := MC_BufferMode.MC_Aborting);
-ELSIF NOT bSafetyOk AND bStopped THEN 
-	bCmdEnableAxis := FALSE ;
-ELSIF bExec_Reset THEN 
-	bCmdEnableAxis := FALSE ;
 ELSE 
 	bCmdEnableAxis	:= bEnable AND bSTOOK  ;
 END_IF
@@ -728,9 +724,6 @@ END_IF
 // ===== Axis disable timer after last command =====
 	TofIntAxisEnable (	IN:= bInternalEnable, PT := tDisableDelay);
 
-// ===== check if parameter write is not busy =====
-//	bCmdEnableAxis R= bExec_ParWritePers OR fbMcWriteParameter.Busy;
-	
 // ===== Enable drive =====
 	fbMcPower(	Axis			:= AxisRef , 
 				Enable			:= bCmdEnableAxis AND TofIntAxisEnable.Q, 
@@ -1162,11 +1155,6 @@ END_IF
 	fbMcReset	( 	Execute	:= bExec_Reset,
 					Axis	:= AxisRef ); 
 
-(*// ===== Reset drive if fault is still active =====
-	fbSoeReset ( 	Execute := fbMcReset.Done AND AxisRef.Status.Error AND NOT bIcfSimulationMode, // No physical drive reset necesarry when not connected 
-					Timeout := T#10S		,
-					Axis	:= AxisRef		);
-*)		
 // ===== reset command =====
 	bError 		:= AxisRef.Status.Error ; 
 	bExec_Reset	R= fbMcReset.Done  ;
