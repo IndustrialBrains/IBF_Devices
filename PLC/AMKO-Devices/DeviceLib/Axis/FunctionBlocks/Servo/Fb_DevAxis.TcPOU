@@ -38,8 +38,6 @@ VAR_OUTPUT
 		tDisableDelay	: TIME 	:= T#500MS  ;
 	// ==== Axis data ====
 		fEncoderTurnoverValue	: LREAL ;   
-	// ==== Reset Feedback ======
-		feSOEResetBusy			: F_TRIG ; // SOE reset bussy triger
 		
 END_VAR
 VAR // Axis configuration 
@@ -1160,22 +1158,19 @@ ELSIF AxisRef.Status.Coupled THEN
 	RETURN;
 END_IF
 
-// ===== Reset axis, drive and axis functions =====
-	fbSoeReset ( 	Execute := bExec_Reset AND NOT fbMcReset.Busy AND NOT bIcfSimulationMode, // No physical drive reset necesarry when not connected 
+// ===== reset axis ========
+	fbMcReset	( 	Execute	:= bExec_Reset,
+					Axis	:= AxisRef ); 
+
+// ===== Reset drive if fault is still active =====
+	fbSoeReset ( 	Execute := fbMcReset.Done AND AxisRef.Status.Error AND NOT bIcfSimulationMode, // No physical drive reset necesarry when not connected 
 					Timeout := T#10S		,
 					Axis	:= AxisRef		);
-	
-	feSOEResetBusy( CLK := fbSoeReset.Busy);
-	
-	fbMcReset	( 	Execute	:= feSOEResetBusy.Q OR (bIcfSimulationMode AND bExec_Reset),
-					Axis	:= AxisRef ); 
-					
+		
 // ===== reset command =====
+	bError 		:= AxisRef.Status.Error ; 
 	bExec_Reset R= fbMcReset.Busy ;
-	bResetDone 	S= fbMcReset.Done ;
-	
-// ===== reset internal fault bits and stop bits =====
-	bError 			:= FALSE ; 
+	bResetDone 	S= fbMcReset.Done AND AxisRef.Status.Error ;
 	
 // Reset fault handling 
 	IF fbSoeReset.Error OR fbMcReset.Error THEN 
