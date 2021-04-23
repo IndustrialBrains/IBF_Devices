@@ -18,7 +18,7 @@
     <Company>AMKO-Engineering</Company>
     <Released>false</Released>
     <Title>Device_Library</Title>
-    <ProjectVersion>1.3.0.0</ProjectVersion>
+    <ProjectVersion>1.3.2.5</ProjectVersion>
     <Description>Device library of AMKO-Engineering.</Description>
     <Author>AMKO-Engineering</Author>
     <CompilerDefines>InclSerialCom := 'true'</CompilerDefines>
@@ -95,10 +95,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Actuators\Cylinder\DataTypes\ManualControls" />
-    <Folder Include="Actuators\Cylinder\MLTFunctions" />
     <Folder Include="Axis" />
     <Folder Include="Axis\DataTypes" />
     <Folder Include="Axis\FunctionBlocks" />
+    <Folder Include="Axis\FunctionBlocks\Analog" />
+    <Folder Include="Axis\FunctionBlocks\ServoHybrid" />
+    <Folder Include="Axis\FunctionBlocks\Servo" />
     <Folder Include="Axis\Interface" />
     <Folder Include="Buttons" />
     <Folder Include="Buttons\DataTypes" />
@@ -145,9 +147,6 @@
     <Compile Include="Actuators\Cylinder\Functions\Fb_DevCylWithFbk.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Actuators\Cylinder\MLTFunctions\Fb_DevSupportCyl.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Axis\DataTypes\E_AxisCmd.TcTLEO">
       <SubType>Code</SubType>
     </Compile>
@@ -157,13 +156,19 @@
     <Compile Include="Axis\DataTypes\UDT_AxVal.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Axis\FunctionBlocks\FB_DevBasicACAxis.TcPOU">
+    <Compile Include="Axis\FunctionBlocks\Analog\FB_DevAnalogAxis.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Axis\FunctionBlocks\Fb_DevAxis.TcPOU">
+    <Compile Include="Axis\FunctionBlocks\Analog\ST_ManualAnalogAxisCtrl.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Axis\FunctionBlocks\FB_DevHybridAc.TcPOU">
+    <Compile Include="Axis\FunctionBlocks\ServoHybrid\FB_DevBasicACAxis.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Axis\FunctionBlocks\ServoHybrid\FB_DevHybridAc.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Axis\FunctionBlocks\Servo\Fb_DevAxis.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Axis\FunctionBlocks\UDT_ManualAxisCtrl.TcDUT">
@@ -268,9 +273,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <PlaceholderReference Include="HMI_Library">
-      <DefaultResolution>HMI_Library, * (AMKO-Engineering)</DefaultResolution>
-      <Namespace>HMI_Library</Namespace>
+    <PlaceholderReference Include="Tc2_Math">
+      <DefaultResolution>Tc2_Math, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_Math</Namespace>
     </PlaceholderReference>
     <PlaceholderReference Include="Tc2_MC2">
       <DefaultResolution>Tc2_MC2, * (Beckhoff Automation GmbH)</DefaultResolution>
@@ -290,81 +295,6 @@
     </PlaceholderReference>
   </ItemGroup>
   <ItemGroup>
-    <PlaceholderResolution Include="CAA Memory">
-      <Resolution>CAA Memory, * (CAA Technical Workgroup)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="CmpApp">
-      <Resolution>CmpApp, * (System)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="CmpBitmapPool">
-      <Resolution>CmpBitmapPool, * (System)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="CmpEventMgr">
-      <Resolution>CmpEventMgr, * (System)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="CmpLog">
-      <Resolution>CmpLog, * (System)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="Component Manager">
-      <Resolution>Component Manager, * (System)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="Device_Library">
-      <Resolution>Device_Library, * (AMKO-Engineering)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="HMI_Library">
-      <Resolution>HMI_Library, * (AMKO-Engineering)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="Standard">
-      <Resolution>Tc2_Standard, * (Beckhoff Automation GmbH)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="Standard64">
-      <Resolution>Tc2_Standard, * (Beckhoff Automation GmbH)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="StringUtils">
-      <Resolution>StringUtils, * (System)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="SysDir">
-      <Resolution>SysDir, * (System)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="SysFile">
-      <Resolution>SysFile, * (System)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="SysMem">
-      <Resolution>SysMem, * (System)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="SysSem">
-      <Resolution>SysSem, * (System)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="System_Library">
-      <Resolution>System_Library, * (AMKO-Engineering)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="System_VisuElemMeter">
-      <Resolution>VisuElemMeter, * (System)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="System_VisuElems">
-      <Resolution>VisuElems, * (System)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="System_VisuElemsSpecialControls">
-      <Resolution>VisuElemsSpecialControls, * (System)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="System_VisuElemsWinControls">
-      <Resolution>VisuElemsWinControls, * (System)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="System_VisuElemTextEditor">
-      <Resolution>VisuElemTextEditor, * (System)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="system_visuinputs">
-      <Resolution>visuinputs, * (system)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="System_VisuNativeControl">
-      <Resolution>VisuNativeControl, * (System)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="SysTimeCore">
-      <Resolution>SysTimeCore, * (System)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="SysTimeRtc">
-      <Resolution>SysTimeRtc, * (System)</Resolution>
-    </PlaceholderResolution>
     <PlaceholderResolution Include="Tc2_Drive">
       <Resolution>Tc2_Drive, * (Beckhoff Automation GmbH)</Resolution>
     </PlaceholderResolution>
@@ -398,17 +328,16 @@
     <PlaceholderResolution Include="Utilities_Library">
       <Resolution>Utilities_Library, * (AMKO-Engineering)</Resolution>
     </PlaceholderResolution>
-    <PlaceholderResolution Include="VisuDialogs">
-      <Resolution>VisuDialogs, * (System)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="VisuUserManagement">
-      <Resolution>VisuUserMgmt, * (System)</Resolution>
-    </PlaceholderResolution>
   </ItemGroup>
   <ItemGroup>
     <None Include="DeviceLib.tmc">
       <SubType>Content</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <SubObject Include="Fb_DevAxis.ExecWriteParameter">
+      <ExcludeFromBuild>true</ExcludeFromBuild>
+    </SubObject>
   </ItemGroup>
   <ProjectExtensions>
     <PlcProjectOptions>

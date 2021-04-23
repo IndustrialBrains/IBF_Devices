@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_DevBasicACAxis" Id="{399212fc-3ad5-0237-1986-954c33e143fb}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevBasicACAxis EXTENDS FB_DevBase
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC FB_DevBasicACAxis EXTENDS FB_DevBase
 VAR_INPUT
 	// ===== General Function input =====
 		fCmdAcc			: LREAL := 15000;
@@ -356,7 +357,7 @@ END_VAR
 bCmdSafeStop := TRUE ; 
 
 // Set feedback output 
-CmdSafeStop := bDevIsSafe OR NOT bInitOk;]]></ST>
+CmdSafeStop := bIsSafe OR NOT bInitOk;]]></ST>
       </Implementation>
     </Method>
     <Method Name="ExecEnable" Id="{090a0249-1749-0de7-24c6-e8a259604e68}" FolderPath="Private\Motion\">
@@ -400,7 +401,6 @@ IF fbMcPower.Error THEN
 	stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 	stFault.Discription		:= CONCAT('Enable Fault ', UDINT_TO_STRING(fbMcPower.ErrorID));				;
 	stFault.FaultType		:= E_FaultTypes.FF				;
-	refFbFault.CmdAddFault( stFault );
 END_IF
 ]]></ST>
       </Implementation>
@@ -426,7 +426,6 @@ fbMcHalt (	Axis 		:= AxisRef,
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Halt Fault ', UDINT_TO_STRING(fbMcHalt.ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
-		refFbFault.CmdAddFault( stFault );
 	END_IF
 ]]></ST>
       </Implementation>
@@ -454,7 +453,6 @@ END_VAR
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Homing Fault ', UDINT_TO_STRING(fbMcHome.ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
-		refFbFault.CmdAddFault( stFault );
 	END_IF
 ]]></ST>
       </Implementation>
@@ -485,7 +483,6 @@ END_VAR
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Jog Fault ', UDINT_TO_STRING(fbMcJog.ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
-		refFbFault.CmdAddFault( stFault );
 	END_IF
 ]]></ST>
       </Implementation>
@@ -522,7 +519,6 @@ FOR i := 0 TO 1 DO
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Move absolute Fault ', UDINT_TO_STRING(fbMcMoveAbsolute[i].ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
-		refFbFault.CmdAddFault( stFault );
 	END_IF
 END_FOR 
 ]]></ST>
@@ -560,7 +556,6 @@ FOR i := 0 TO 1 DO
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Move relative Fault ', UDINT_TO_STRING(fbMCMoveRelative[i].ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF			;
-		refFbFault.CmdAddFault( stFault );
 	END_IF
 END_FOR]]></ST>
       </Implementation>
@@ -589,7 +584,6 @@ IF fbMcHalt.Error THEN
 	stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 	stFault.Discription		:= CONCAT('Move velocity Fault ', UDINT_TO_STRING(fbMcMoveVelocity.ErrorID));				;
 	stFault.FaultType		:= E_FaultTypes.FF				;
-	refFbFault.CmdAddFault( stFault );
 END_IF
 ]]></ST>
       </Implementation>
@@ -625,7 +619,6 @@ END_IF
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Reset Fault ', UDINT_TO_STRING(fbMcReset.ErrorID))			;
 		stFault.FaultType		:= E_FaultTypes.FF				;
-		refFbFault.CmdAddFault( stFault );
 	END_IF
 ]]></ST>
       </Implementation>
@@ -654,19 +647,19 @@ END_VAR
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Discription		:= CONCAT('Safe stop axis fault ', UDINT_TO_STRING(fbMcStop.ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
-		refFbFault.CmdAddFault( stFault );
 	END_IF
 
 // ===== Dev is safe feedback =====
-bDevIsSafe := NOT bCmdEnableAxis  ;
+bIsSafe := NOT bCmdEnableAxis  ;
 ]]></ST>
       </Implementation>
     </Method>
     <Method Name="Init" Id="{d9ee605e-1b43-0849-35b2-d86a67775109}" FolderPath="Commands\">
       <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
 VAR_INPUT
-	// Axis message Data 
-	nDevNumber	: UDINT		:= 0	; // Axis number 
+	// Message location data
+	nId			: UDINT ; // Identification number of object
+	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
 	// Config Bits
 	bIcfCmdVelocityRpm	: BOOL := FALSE ; // input speeds in Rpm
 	bIcfEnableForward 	: BOOL := TRUE 	; // Enable forward motion
@@ -685,28 +678,27 @@ VAR
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[// Calculate device number
-	THIS^.nDevNumber := nDevNumber ;
-	SUPER^.CalcDeviceId();
+	ExecIdentifyDevice(nId,nParentId,E_ComponentTypes.Axis);
 
 // ===== Message data set =====
 	stFault.ComponentType		:= E_ComponentTypes.Axis ;
 	
 // ===== Write parameters =====
-	stMParMaxAcc.nNumber		:= nDevId + 1;
-	stMParMaxAcc.sDiscription 	:= CONCAT(STR1 := sDevName, STR2:= ' hardware maximum accaleration (0 = HWMaximum)'); 
-	stMParMaxAcc.sName			:= CONCAT(STR1 := sDevName, STR2:= 'HardMaxAceleration');
+	stMParMaxAcc.nNumber		:= nLocationId + 1;
+	stMParMaxAcc.sDiscription 	:= CONCAT(STR1 := sName, STR2:= ' hardware maximum accaleration (0 = HWMaximum)'); 
+	stMParMaxAcc.sName			:= CONCAT(STR1 := sName, STR2:= 'Hard max aceleration');
 	stMParMaxAcc.sType			:= 'MPar';
 	stMParMaxAcc.sUnit			:= 'Units/Sec^2';
 	
-	stMParMaxDec.nNumber		:= nDevId + 2;
-	stMParMaxDec.sDiscription 	:= CONCAT(STR1 := sDevName, STR2:= ' hardware maximum deceleration(0 = HWMaximum)'); 
-	stMParMaxDec.sName			:= CONCAT(STR1 := sDevName, STR2:= 'HardMaxDeceleration');
+	stMParMaxDec.nNumber		:= nLocationId + 2;
+	stMParMaxDec.sDiscription 	:= CONCAT(STR1 := sName, STR2:= ' hardware maximum deceleration(0 = HWMaximum)'); 
+	stMParMaxDec.sName			:= CONCAT(STR1 := sName, STR2:= 'Hard max deceleration');
 	stMParMaxDec.sType			:= 'MPar';
 	stMParMaxDec.sUnit			:= 'Units/Sec^2';
 	
-	stMparMaxVelo.nNumber		:= nDevId + 3;
-	stMparMaxVelo.sDiscription 	:= CONCAT(STR1 := sDevName, STR2:= ' hardware maximum velocity'); 
-	stMparMaxVelo.sName			:= CONCAT(STR1 := sDevName, STR2:= 'HardMaxVelocity');
+	stMparMaxVelo.nNumber		:= nLocationId + 3;
+	stMparMaxVelo.sDiscription 	:= CONCAT(STR1 := sName, STR2:= ' hardware maximum velocity'); 
+	stMparMaxVelo.sName			:= CONCAT(STR1 := sName, STR2:= 'Hard max velocity');
 	stMparMaxVelo.sType			:= 'MPar';
 	stMparMaxVelo.sUnit			:= 'Units/Sec';
 
@@ -748,255 +740,5 @@ END_VAR]]></Declaration>
 	]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_DevBasicACAxis">
-      <LineId Id="38" Count="15" />
-      <LineId Id="9" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBasicACAxis.CallMotionFunctions">
-      <LineId Id="6" Count="14" />
-      <LineId Id="22" Count="0" />
-      <LineId Id="30" Count="0" />
-      <LineId Id="33" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBasicACAxis.CmdHalt">
-      <LineId Id="9" Count="1" />
-      <LineId Id="23" Count="0" />
-      <LineId Id="11" Count="2" />
-      <LineId Id="15" Count="2" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBasicACAxis.CmdHome">
-      <LineId Id="5" Count="0" />
-      <LineId Id="7" Count="0" />
-      <LineId Id="24" Count="1" />
-      <LineId Id="15" Count="0" />
-      <LineId Id="14" Count="0" />
-      <LineId Id="17" Count="0" />
-      <LineId Id="8" Count="0" />
-      <LineId Id="6" Count="0" />
-      <LineId Id="9" Count="1" />
-    </LineIds>
-    <LineIds Name="FB_DevBasicACAxis.CmdJog">
-      <LineId Id="34" Count="3" />
-      <LineId Id="32" Count="0" />
-      <LineId Id="9" Count="0" />
-      <LineId Id="38" Count="0" />
-      <LineId Id="19" Count="0" />
-      <LineId Id="10" Count="0" />
-      <LineId Id="41" Count="0" />
-      <LineId Id="45" Count="0" />
-      <LineId Id="11" Count="2" />
-      <LineId Id="20" Count="0" />
-      <LineId Id="22" Count="0" />
-      <LineId Id="16" Count="1" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBasicACAxis.CmdManual">
-      <LineId Id="21" Count="1" />
-      <LineId Id="20" Count="0" />
-      <LineId Id="18" Count="0" />
-      <LineId Id="40" Count="2" />
-      <LineId Id="39" Count="0" />
-      <LineId Id="37" Count="0" />
-      <LineId Id="27" Count="0" />
-      <LineId Id="36" Count="0" />
-      <LineId Id="61" Count="2" />
-      <LineId Id="43" Count="1" />
-      <LineId Id="64" Count="1" />
-      <LineId Id="70" Count="1" />
-      <LineId Id="45" Count="1" />
-      <LineId Id="66" Count="0" />
-      <LineId Id="29" Count="0" />
-      <LineId Id="48" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBasicACAxis.CmdMoveAbs">
-      <LineId Id="96" Count="0" />
-      <LineId Id="93" Count="2" />
-      <LineId Id="92" Count="0" />
-      <LineId Id="137" Count="11" />
-      <LineId Id="114" Count="0" />
-      <LineId Id="90" Count="0" />
-      <LineId Id="113" Count="0" />
-      <LineId Id="107" Count="1" />
-      <LineId Id="110" Count="0" />
-      <LineId Id="112" Count="0" />
-      <LineId Id="109" Count="0" />
-      <LineId Id="25" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBasicACAxis.CmdMoveRelative">
-      <LineId Id="53" Count="0" />
-      <LineId Id="49" Count="2" />
-      <LineId Id="79" Count="0" />
-      <LineId Id="6" Count="0" />
-      <LineId Id="54" Count="0" />
-      <LineId Id="8" Count="0" />
-      <LineId Id="32" Count="2" />
-      <LineId Id="9" Count="1" />
-      <LineId Id="36" Count="2" />
-      <LineId Id="11" Count="0" />
-      <LineId Id="45" Count="1" />
-      <LineId Id="103" Count="0" />
-      <LineId Id="64" Count="5" />
-      <LineId Id="16" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBasicACAxis.CmdMoveVelocity">
-      <LineId Id="27" Count="3" />
-      <LineId Id="26" Count="0" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="10" Count="0" />
-      <LineId Id="25" Count="0" />
-      <LineId Id="12" Count="0" />
-      <LineId Id="11" Count="0" />
-      <LineId Id="13" Count="2" />
-      <LineId Id="17" Count="0" />
-      <LineId Id="16" Count="0" />
-      <LineId Id="18" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBasicACAxis.CmdReset">
-      <LineId Id="16" Count="1" />
-      <LineId Id="23" Count="0" />
-      <LineId Id="18" Count="1" />
-      <LineId Id="12" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBasicACAxis.CmdSafeStop">
-      <LineId Id="5" Count="1" />
-      <LineId Id="9" Count="0" />
-      <LineId Id="8" Count="0" />
-      <LineId Id="7" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBasicACAxis.ExecEnable">
-      <LineId Id="44" Count="0" />
-      <LineId Id="47" Count="0" />
-      <LineId Id="54" Count="0" />
-      <LineId Id="50" Count="0" />
-      <LineId Id="52" Count="0" />
-      <LineId Id="58" Count="0" />
-      <LineId Id="49" Count="0" />
-      <LineId Id="45" Count="0" />
-      <LineId Id="70" Count="0" />
-      <LineId Id="8" Count="0" />
-      <LineId Id="10" Count="12" />
-      <LineId Id="62" Count="0" />
-      <LineId Id="24" Count="0" />
-      <LineId Id="63" Count="0" />
-      <LineId Id="66" Count="0" />
-      <LineId Id="65" Count="0" />
-      <LineId Id="64" Count="0" />
-      <LineId Id="25" Count="4" />
-      <LineId Id="38" Count="1" />
-      <LineId Id="34" Count="0" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBasicACAxis.ExecHalt">
-      <LineId Id="6" Count="5" />
-      <LineId Id="37" Count="0" />
-      <LineId Id="12" Count="6" />
-      <LineId Id="32" Count="1" />
-      <LineId Id="23" Count="0" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBasicACAxis.ExecHome">
-      <LineId Id="6" Count="3" />
-      <LineId Id="11" Count="3" />
-      <LineId Id="40" Count="0" />
-      <LineId Id="15" Count="6" />
-      <LineId Id="35" Count="1" />
-      <LineId Id="26" Count="0" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBasicACAxis.ExecJog">
-      <LineId Id="6" Count="0" />
-      <LineId Id="11" Count="9" />
-      <LineId Id="52" Count="0" />
-      <LineId Id="21" Count="6" />
-      <LineId Id="47" Count="1" />
-      <LineId Id="32" Count="0" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBasicACAxis.ExecMoveAbsolute">
-      <LineId Id="6" Count="1" />
-      <LineId Id="12" Count="6" />
-      <LineId Id="66" Count="0" />
-      <LineId Id="41" Count="0" />
-      <LineId Id="43" Count="4" />
-      <LineId Id="42" Count="0" />
-      <LineId Id="20" Count="5" />
-      <LineId Id="59" Count="1" />
-      <LineId Id="30" Count="1" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBasicACAxis.ExecMoveRelative">
-      <LineId Id="6" Count="1" />
-      <LineId Id="12" Count="6" />
-      <LineId Id="62" Count="0" />
-      <LineId Id="41" Count="5" />
-      <LineId Id="19" Count="7" />
-      <LineId Id="56" Count="0" />
-      <LineId Id="30" Count="0" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBasicACAxis.ExecMoveVelocity">
-      <LineId Id="6" Count="0" />
-      <LineId Id="11" Count="7" />
-      <LineId Id="58" Count="0" />
-      <LineId Id="19" Count="0" />
-      <LineId Id="45" Count="6" />
-      <LineId Id="53" Count="1" />
-      <LineId Id="20" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBasicACAxis.ExecReset">
-      <LineId Id="58" Count="0" />
-      <LineId Id="60" Count="0" />
-      <LineId Id="64" Count="0" />
-      <LineId Id="61" Count="0" />
-      <LineId Id="68" Count="0" />
-      <LineId Id="41" Count="0" />
-      <LineId Id="11" Count="7" />
-      <LineId Id="37" Count="1" />
-      <LineId Id="40" Count="0" />
-      <LineId Id="22" Count="6" />
-      <LineId Id="52" Count="1" />
-      <LineId Id="33" Count="0" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBasicACAxis.ExecSafeFunctions">
-      <LineId Id="54" Count="0" />
-      <LineId Id="56" Count="0" />
-      <LineId Id="55" Count="0" />
-      <LineId Id="6" Count="6" />
-      <LineId Id="50" Count="0" />
-      <LineId Id="17" Count="6" />
-      <LineId Id="41" Count="0" />
-      <LineId Id="27" Count="0" />
-      <LineId Id="47" Count="2" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevBasicACAxis.Init">
-      <LineId Id="156" Count="2" />
-      <LineId Id="155" Count="0" />
-      <LineId Id="27" Count="1" />
-      <LineId Id="102" Count="1" />
-      <LineId Id="120" Count="0" />
-      <LineId Id="104" Count="4" />
-      <LineId Id="121" Count="0" />
-      <LineId Id="109" Count="3" />
-      <LineId Id="29" Count="0" />
-      <LineId Id="122" Count="0" />
-      <LineId Id="115" Count="3" />
-      <LineId Id="123" Count="0" />
-      <LineId Id="114" Count="0" />
-      <LineId Id="124" Count="1" />
-      <LineId Id="133" Count="0" />
-      <LineId Id="113" Count="0" />
-      <LineId Id="127" Count="1" />
-      <LineId Id="126" Count="0" />
-      <LineId Id="132" Count="0" />
-      <LineId Id="63" Count="1" />
-      <LineId Id="73" Count="9" />
-      <LineId Id="84" Count="1" />
-      <LineId Id="88" Count="10" />
-      <LineId Id="100" Count="0" />
-      <LineId Id="26" Count="0" />
-    </LineIds>
   </POU>
 </TcPlcObject>

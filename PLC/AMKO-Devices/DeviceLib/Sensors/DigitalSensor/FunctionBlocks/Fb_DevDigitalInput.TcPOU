@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="Fb_DevDigitalInput" Id="{611498ce-bd86-46dc-9066-1bac29019612}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC Fb_DevDigitalInput EXTENDS FB_DevBase 
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC Fb_DevDigitalInput EXTENDS FB_DevBase 
 VAR_INPUT
 	tDelay			: TIME 	:= T#1S	;// Time before delayed signal becomes active 
 	bCmdSimulate	: BOOL 	:= FALSE ;// Simulate sensor Input 
@@ -21,10 +22,10 @@ IF eDevType = E_Devices.Undefined THEN
 END_IF
 
 // Call base function
-SUPER^();
+SUPER^(refFbFault := refFbFault);
 
 // ***** Direct input when enabled *****
-IF bEnable THEN 
+IF bEnable OR bCmdManual THEN 
 	IF bCmdSimulate  THEN 
 		bFcoInputActive := bSimState ;
 		bCmdSimulate	:= FALSE ;  
@@ -36,15 +37,22 @@ ELSE
 END_IF
 ]]></ST>
     </Implementation>
-    <LineIds Name="Fb_DevDigitalInput">
-      <LineId Id="222" Count="0" />
-      <LineId Id="239" Count="0" />
-      <LineId Id="223" Count="1" />
-      <LineId Id="240" Count="0" />
-      <LineId Id="225" Count="1" />
-      <LineId Id="221" Count="0" />
-      <LineId Id="195" Count="10" />
-      <LineId Id="86" Count="0" />
-    </LineIds>
+    <Method Name="Init" Id="{a23a738b-81f2-0d03-0b16-a913f5bc6c96}">
+      <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
+VAR_INPUT
+	// Location data for messages  
+	nId			: UDINT ; // Identification number of object
+	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ====== Calculate device id =====
+	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.DiInput);
+
+// ====== Set feedback ======
+	bInitOk := TRUE ;
+	Init	:= true ;]]></ST>
+      </Implementation>
+    </Method>
   </POU>
 </TcPlcObject>

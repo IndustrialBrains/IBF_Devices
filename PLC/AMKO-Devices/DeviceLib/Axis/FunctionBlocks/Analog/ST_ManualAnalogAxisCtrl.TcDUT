@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+  <DUT Name="ST_ManualAnalogAxisCtrl" Id="{a0675b15-8e0a-0e05-2d56-c1eb0c67c1b7}">
+    <Declaration><![CDATA[TYPE ST_ManualAnalogAxisCtrl :
+STRUCT
+	bCmdRunCW	: BOOL ;
+	bCmdRunCCW	: BOOL ;
+	fCmdVelocity: LREAL ; 
+	
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

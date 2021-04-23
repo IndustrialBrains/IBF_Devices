@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_DevAnalogOutputScaled" Id="{cee2a2e1-53c0-06ca-05d4-b81b54c58bf7}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_DevAnalogOutputScaled EXTENDS FB_DevAnalogOutput
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK FB_DevAnalogOutputScaled EXTENDS FB_DevAnalogOutput
 VAR_INPUT
 END_VAR
 VAR_OUTPUT
@@ -11,7 +12,8 @@ VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[SUPER^();]]></ST>
+      <ST><![CDATA[SUPER^(refFbFault := refFbFault);
+]]></ST>
     </Implementation>
     <Folder Name="Private" Id="{a7d14726-308c-0bae-117e-f71220c1140f}" />
     <Method Name="ExecSetFeedback" Id="{7f9de231-28d3-031f-0eef-faacde071dce}" FolderPath="Private\">
@@ -31,11 +33,12 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// Set Output to physical device
-IF bEnable OR bCmdManual THEN 
+IF bSafetyOk AND (bEnable OR bCmdManual) THEN 
 	qnHwOut := LREAL_TO_INT(fCmdValue * fGainFactor) ;
 	qnHwOut := LIMIT(nLimitMin, qnHwOut, nLimitMax) ; 
 ELSE 
-	fCmdValue := 0 ; 
+	qnHwOut		:= 0;
+	fCmdValue 	:= 0 ; 
 END_IF
 
 ]]></ST>
@@ -54,22 +57,5 @@ fGainFactor := nLimitMax / fMaxValue ;
 ]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_DevAnalogOutputScaled">
-      <LineId Id="16" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevAnalogOutputScaled.ExecSetFeedback">
-      <LineId Id="7" Count="0" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevAnalogOutputScaled.ExecSetOutput">
-      <LineId Id="12" Count="1" />
-      <LineId Id="22" Count="0" />
-      <LineId Id="14" Count="4" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevAnalogOutputScaled.SetScaling">
-      <LineId Id="56" Count="2" />
-      <LineId Id="11" Count="0" />
-    </LineIds>
   </POU>
 </TcPlcObject>

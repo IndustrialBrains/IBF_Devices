@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_DevHDAnalogInputScaled" Id="{1d5348c2-1ecf-04c7-34d9-8f2fb7f7f54c}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevHDAnalogInputScaled EXTENDS FB_DevHDAnalogInput
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC FB_DevHDAnalogInputScaled EXTENDS FB_DevHDAnalogInput
 VAR_INPUT
 END_VAR
 VAR_OUTPUT
@@ -12,7 +13,8 @@ VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[SUPER^();]]></ST>
+      <ST><![CDATA[SUPER^(refFbFault := refFbFault);
+]]></ST>
     </Implementation>
     <Method Name="ExecSetFeedback" Id="{ba1246d6-0b89-032f-1cee-0b644ffdc5ff}">
       <Declaration><![CDATA[METHOD ExecSetFeedback : BOOL
@@ -52,29 +54,5 @@ nOfset := LREAL_TO_DINT(fOfset * fGainFactor) ;
 SetScaling := TRUE ;]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_DevHDAnalogInputScaled">
-      <LineId Id="9" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevHDAnalogInputScaled.ExecSetFeedback">
-      <LineId Id="14" Count="0" />
-      <LineId Id="6" Count="0" />
-      <LineId Id="21" Count="0" />
-      <LineId Id="8" Count="0" />
-      <LineId Id="22" Count="0" />
-      <LineId Id="10" Count="0" />
-      <LineId Id="19" Count="1" />
-      <LineId Id="18" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevHDAnalogInputScaled.SetScaling">
-      <LineId Id="56" Count="0" />
-      <LineId Id="67" Count="1" />
-      <LineId Id="70" Count="0" />
-      <LineId Id="72" Count="0" />
-      <LineId Id="69" Count="0" />
-      <LineId Id="75" Count="0" />
-      <LineId Id="74" Count="0" />
-      <LineId Id="73" Count="0" />
-      <LineId Id="11" Count="0" />
-    </LineIds>
   </POU>
 </TcPlcObject>

@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_DevAnalogInAutoCalibrate" Id="{52f8b1c3-b2bf-0db6-00eb-320245a39b92}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevAnalogInAutoCalibrate EXTENDS FB_DevAnalogInputScaled
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC FB_DevAnalogInAutoCalibrate EXTENDS FB_DevAnalogInputScaled
 VAR_INPUT
 END_VAR
 VAR_OUTPUT
@@ -10,7 +11,8 @@ VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[SUPER^();]]></ST>
+      <ST><![CDATA[SUPER^(refFbFault := refFbFault);
+]]></ST>
     </Implementation>
     <Method Name="CmdCalibrateNull" Id="{dc1e7d0d-643f-0785-3788-917d8619bf0a}">
       <Declaration><![CDATA[METHOD PUBLIC CmdCalibrateNull : BOOL
@@ -33,15 +35,5 @@ END_VAR
 fGainFactor := INT_TO_LREAL(inHwInput + nOfset) / fCalibrationValue ; ]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_DevAnalogInAutoCalibrate">
-      <LineId Id="9" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevAnalogInAutoCalibrate.CmdCalibrateNull">
-      <LineId Id="5" Count="1" />
-    </LineIds>
-    <LineIds Name="FB_DevAnalogInAutoCalibrate.CmdCalilbrateValue">
-      <LineId Id="5" Count="0" />
-      <LineId Id="11" Count="0" />
-    </LineIds>
   </POU>
 </TcPlcObject>

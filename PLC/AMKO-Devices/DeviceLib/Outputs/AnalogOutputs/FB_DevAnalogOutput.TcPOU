@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_DevAnalogOutput" Id="{c04f47fb-753a-07c6-1304-4d37cf041c4c}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevAnalogOutput EXTENDS FB_DevBase 
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC FB_DevAnalogOutput EXTENDS FB_DevBase 
 VAR_INPUT
 	fCmdValue		: LREAL := 0 ;
 END_VAR
@@ -21,7 +22,8 @@ IF eDevType = E_Devices.Undefined THEN
 END_IF
 
 // Call base function
-SUPER^();
+SUPER^(refFbFault := refFbFault);
+
 
 // Call private functions
 ExecSetOutput();
@@ -45,31 +47,42 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// Set Output to physical device
-IF bEnable OR bCmdManual THEN 
+IF bSafetyOk AND (bEnable OR bCmdManual) THEN 
 	qnHwOut := LREAL_TO_INT(fCmdValue) ; 
 	qnHwOut := LIMIT(nLimitMin, qnHwOut, nLimitMax) ; 
 ELSE 
-	fCmdValue := 0 ; 
+	qnHwOut 	:= 0;
+	fCmdValue 	:= 0 ; 
 END_IF
 
 ]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_DevAnalogOutput">
-      <LineId Id="95" Count="3" />
-      <LineId Id="80" Count="0" />
-      <LineId Id="13" Count="4" />
-      <LineId Id="9" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevAnalogOutput.ExecSetFeedback">
-      <LineId Id="7" Count="0" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevAnalogOutput.ExecSetOutput">
-      <LineId Id="12" Count="2" />
-      <LineId Id="22" Count="0" />
-      <LineId Id="15" Count="3" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
+    <Method Name="Init" Id="{1a41a7d1-7672-0eb4-3599-5ba82b2fb750}">
+      <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
+VAR_INPUT
+	// Location data for messages  
+	nId				: UDINT; // Identification number of object
+	nParentId		: UDINT; // Id of higher level If aplicable (0 = no parent)
+	benableNegative	: BOOL ; // Enable negative values
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ====== Calculate device id =====
+	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.AnOutput);
+
+	
+// ====== set minimum value ========
+	IF benableNegative THEN 
+		nLimitMin := -32767;
+	ELSE
+		nLimitMin := 0 ;
+	END_IF
+	
+// ====== Set feedback ======
+	bInitOk := TRUE ;
+	Init 	:= TRUE ;]]></ST>
+      </Implementation>
+    </Method>
   </POU>
 </TcPlcObject>

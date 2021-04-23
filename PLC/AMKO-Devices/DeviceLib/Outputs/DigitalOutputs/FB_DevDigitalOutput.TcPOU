@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_DevDigitalOutput" Id="{88d6c6d5-b226-0e14-13a4-cf37841a6f20}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevDigitalOutput EXTENDS FB_DevBase
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC FB_DevDigitalOutput EXTENDS FB_DevBase
 VAR_INPUT
 	bCmdOn			: BOOL ; // command output status
 END_VAR
@@ -14,7 +15,8 @@ END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[// Call base function
-SUPER^();
+SUPER^(refFbFault := refFbFault);
+
 
 // Call private functions
 ExecSetOutput();
@@ -38,7 +40,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// Set Output to physical device
-IF bEnable OR bCmdManual THEN 
+IF bSafetyOk AND (bEnable OR bCmdManual) THEN 
 	qbOutput := bCmdOn ; 
 ELSE 
 	qbOutput S= FALSE ; 
@@ -46,21 +48,22 @@ END_IF
 ]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_DevDigitalOutput">
-      <LineId Id="23" Count="0" />
-      <LineId Id="34" Count="0" />
-      <LineId Id="37" Count="0" />
-      <LineId Id="36" Count="0" />
-      <LineId Id="42" Count="0" />
-      <LineId Id="39" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevDigitalOutput.ExecSetFeedback">
-      <LineId Id="7" Count="0" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_DevDigitalOutput.ExecSetOutput">
-      <LineId Id="12" Count="5" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
+    <Method Name="Init" Id="{ef1011e1-65a5-0950-2f24-8f4c79c4e032}">
+      <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
+VAR_INPUT
+	// Location data for messages  
+	nId			: UDINT ; // Identification number of object
+	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ====== Calculate device id =====
+	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.DiOutput);
+
+// ====== Set feedback ======
+	bInitOk := TRUE ;
+	Init	:= true ;]]></ST>
+      </Implementation>
+    </Method>
   </POU>
 </TcPlcObject>

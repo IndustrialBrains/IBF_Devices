@@ -1,21 +1,31 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.3">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_EncoderInput" Id="{0f518a76-74dc-4426-927f-5208a6bc0566}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_EncoderInput EXTENDS FB_EncoderBase
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK FB_EncoderInput EXTENDS FB_EncoderBase
 VAR_INPUT
 END_VAR
 VAR_OUTPUT
 END_VAR
 VAR
-	iEncoderSignal AT%I*: UDINT ;
+	iCounterValue 	AT%I*	: UDINT ;
+	iDataError		AT%I*	: BOOL  ;	
+	iFrameError		AT%I*	: BOOL  ;
+	iPowerFailure	AT%I*	: BOOL  ; 
+	iSyncError		AT%I*	: BOOL  ;
 	
 	nScaledValue		: LREAL ; // Only scaled value for internal use
 	nValueWithOffset	: LREAL ; // scaled value with added offset
+	fOldPos				: LREAL ; // Old position
+	
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[// ====== Scale Output value ======
-	nScaledValue := UDINT_TO_LREAL(iEncoderSignal) * nCfgUnitsPerPulse ;
+      <ST><![CDATA[// ====== Check device status ======
+	CheckBoxStatus();
+
+// ====== Scale Output value ======
+	nScaledValue := UDINT_TO_LREAL(iCounterValue) / fPulsesPerUnit ;
 
 // ====== Invert ======
 	IF bIcfInverted THEN 
@@ -23,13 +33,48 @@ END_VAR
 	END_IF
 	
 // ====== Add offset ======= 
-	nValueWithOffset := nScaledValue + nCfgOffset ;
-
+	nValueWithOffset := nScaledValue + fOffset ;
+	
+// ====== Caclulate velocity =====
+	IF Sys_Variables.Pulse100ms THEN 
+		nVelocity 	:= (nOutPosition - fOldPos) * 10 ;
+		fOldPos		:= nOutPosition;
+	END_IF
+	
 // ====== Set Outputs =======
 	nOutPosition 	:= nValueWithOffset ;
-	nOutRaw			:= iEncoderSignal	; 	
+	nOutRaw			:= iCounterValue	; 	
 ]]></ST>
     </Implementation>
+    <Method Name="CheckBoxStatus" Id="{955108e9-c9df-0ec1-0ba8-cf8484910c33}">
+      <Declaration><![CDATA[METHOD PRIVATE CheckBoxStatus : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF iDataError THEN 
+	stFault.Active 			:= TRUE ;
+	stFault.Discription		:= CONCAT(sName, ' Encoder Data error');
+	stFault.MessageNumber	:= E_MessageNumbers.FF_ComunicationFault;
+	stFault.FaultType		:= E_FaultTypes.FF;
+ELSIF iFrameError THEN 
+	stFault.Active 			:= TRUE ;
+	stFault.Discription		:= CONCAT(sName, ' Encoder frame error');
+	stFault.MessageNumber	:= E_MessageNumbers.FF_ComunicationFault;
+	stFault.FaultType		:= E_FaultTypes.FF;
+ELSIF iPowerFailure THEN 
+	stFault.Active 			:= TRUE ;
+	stFault.Discription		:= CONCAT(sName, ' Encoder Power failure');
+	stFault.MessageNumber	:= E_MessageNumbers.FF_ComunicationFault;
+	stFault.FaultType		:= E_FaultTypes.FF;
+ELSIF iSyncError THEN 
+	stFault.Active 			:= TRUE ;
+	stFault.Discription		:= CONCAT(sName, ' Encoder synchronisation error');
+	stFault.MessageNumber	:= E_MessageNumbers.FF_ComunicationFault;
+	stFault.FaultType		:= E_FaultTypes.FF;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="FastTask" Id="{2447dce7-4abc-4c3e-b487-bf649a6d099a}">
       <Declaration><![CDATA[METHOD PUBLIC FastTask : BOOL
 VAR_INPUT
@@ -39,21 +84,5 @@ END_VAR
         <ST><![CDATA[]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_EncoderInput">
-      <LineId Id="9" Count="0" />
-      <LineId Id="24" Count="0" />
-      <LineId Id="35" Count="0" />
-      <LineId Id="34" Count="0" />
-      <LineId Id="36" Count="2" />
-      <LineId Id="25" Count="2" />
-      <LineId Id="31" Count="0" />
-      <LineId Id="29" Count="0" />
-      <LineId Id="32" Count="0" />
-      <LineId Id="39" Count="0" />
-      <LineId Id="33" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_EncoderInput.FastTask">
-      <LineId Id="5" Count="0" />
-    </LineIds>
   </POU>
 </TcPlcObject>

@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="Fb_DevCylWithFbk" Id="{4d944a84-dab5-48bc-b450-758ff0ff83b4}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC Fb_DevCylWithFbk EXTENDS FB_DevValve
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC Fb_DevCylWithFbk EXTENDS FB_DevValve
 VAR_INPUT
 	bIcfFbkOpenPresent 	: BOOL := FALSE ; // Feedback for cylinder open is present 
 	bIcfFbkClosedPresent: BOOL := FALSE ; // Feedback for Cylinder closed is present
@@ -46,7 +47,7 @@ END_VAR
 	END_IF
 
 // call base function 
-	SUPER^();
+	SUPER^(refFbFault := refFbFault);
 
 // check for device init
 	IF NOT bInitOk THEN
@@ -181,14 +182,13 @@ END_VAR
  	IF q_Close AND fbSensorOpen.bReStatus AND NOT q_Open THEN
 		stFault.Active			:= TRUE ;
 		stFault.MessageNumber	:= E_MessageNumbers.CF_WrongDirection 	;
-		stFault.Discription		:= CONCAT( sDevName,'Cylinder Opening instead of closing');
+		stFault.Discription		:= CONCAT( sName,'Cylinder Opening instead of closing');
 		stFault.FaultType		:= E_FaultTypes.CF 					;
 		bErrorActive			:= TRUE 								;
-		refFbFault.CmdAddFault( stFault );
 	ELSIF q_Open AND fbSensorClosed.bReStatus AND NOT q_close THEN
 		stFault.Active			:= TRUE ;
 		stFault.MessageNumber	:= E_MessageNumbers.CF_WrongDirection 	;
-		stFault.Discription		:= CONCAT( sDevName,'Cylinder closing instead of opening');
+		stFault.Discription		:= CONCAT( sName,'Cylinder closing instead of opening');
 		stFault.FaultType		:= E_FaultTypes.CF 					;
 		bErrorActive			:= TRUE 								;
 	END_IF
@@ -204,7 +204,7 @@ END_VAR
       <Implementation>
         <ST><![CDATA[// ====== Call sensor Open function =======
 	IF bIcfFbkClosedPresent THEN 
-		fbSensorClosed();
+		fbSensorClosed(refFbFault := refFbFault);
 		bFco_Closed := fbSensorClosed.bFcoInputActive ;
 		bFeClosed 	:= fbSensorClosed.bFeStatus ;
 		bReClosed 	:= fbSensorClosed.bReStatus ;
@@ -215,7 +215,7 @@ END_VAR
 
 // ====== Call sensor Close function =======
 	IF bIcfFbkOpenPresent THEN 
-		fbSensorOpen() 	;
+		fbSensorOpen(refFbFault := refFbFault) 	;
 		bFco_open 	:= fbSensorOpen.bFcoInputActive ;
 		bFeOpen		:= fbSensorOpen.bFeStatus;
 		bReOpen		:= fbSensorOpen.bReStatus;
@@ -274,7 +274,7 @@ END_IF
 					// send message to HMI 
 					stFault.Active			:= TRUE 							;
 					stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToFast 	;
-					stFault.Discription		:= CONCAT( sDevName, 'Cylinder closing to fast' )	;
+					stFault.Discription		:= CONCAT( sName, 'Cylinder closing to fast' )	;
 					stFault.FaultType		:= E_FaultTypes.CF 					;
 					bErrorActive			:= TRUE 							;
 				END_IF
@@ -282,7 +282,7 @@ END_IF
 				// send message to HMI 
 				stFault.Active			:= TRUE ;
 				stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToSlow 	;
-				stFault.Discription		:= CONCAT( sDevName,'Cylinder closing to Slow')	;
+				stFault.Discription		:= CONCAT( sName,'Cylinder closing to Slow')	;
 				stFault.FaultType		:= E_FaultTypes.CF 				;
 				bErrorActive			:= TRUE 							;
 			END_IF
@@ -299,7 +299,7 @@ END_IF
 					// send message to HMI 
 					stFault.Active			:= TRUE ;
 					stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToFast 	;
-					stFault.Discription		:= CONCAT( sDevName,'Cylinder Opening to fast')		;
+					stFault.Discription		:= CONCAT( sName,'Cylinder Opening to fast')		;
 					stFault.FaultType		:= E_FaultTypes.CF 				;
 					bErrorActive			:= TRUE 							;
 				END_IF
@@ -307,24 +307,21 @@ END_IF
 				// send message to HMI 
 				stFault.Active			:= TRUE ;
 				stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToSlow 	;
-				stFault.Discription		:= CONCAT( sDevName,'Cylinder Opening to Slow')		;
+				stFault.Discription		:= CONCAT( sName,'Cylinder Opening to Slow')		;
 				stFault.FaultType		:= E_FaultTypes.CF 				;
 				bErrorActive			:= TRUE 							;
 			END_IF
 		END_IF
 	END_IF	
-
-// Handle faults 
-IF stFault.Active THEN 
-	refFbFault.CmdAddFault( stFault );
-END_IF]]></ST>
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="Init" Id="{db3610d9-73cc-44d4-8df3-a5e2149be4ab}">
       <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
 VAR_INPUT
-	// Valve data
-	nDevNumber	: UDINT				:= 0		; // Cylinder identification number
+	// Message location data
+	nId			: UDINT ; // Identification number of object
+	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
 	// Command state
 	eResetState		: E_ValveResetState := 0		; // Cylinder reset state variable (default is idle) 
 	eSafeState		: E_ValveResetState	:= 0		; // Valve safe state
@@ -334,180 +331,28 @@ END_VAR
         <ST><![CDATA[bFcoCalcDone := FALSE;
 
 // Enable sensor feedback
+fbSensorClosed.bEmbeded := TRUE ;
 fbSensorClosed.bEnable	:= TRUE ;
+fbSensorClosed.Init	(	nId 		:= 0,
+						nParentId 	:= nLocationId) ;
+
+fbSensorOpen.bEmbeded := TRUE ;
 fbSensorOpen.bEnable	:= TRUE ;
+fbSensorOpen.Init	(	nId 		:= 1,
+						nParentId 	:= nLocationId) ;
 
 // Call feedback sensors 
 ExecSetFeedback(); 
 
-SUPER^.Init(nDevNumber, eResetState, eSafeState);
+SUPER^.Init(nId, nParentId, eResetState, eSafeState);
 
 // ===== Set device type for manual control =====
 eDevType := E_Devices.Cylinder ;
 
-
-Init := bInitOk ;]]></ST>
+bInitOk := fbSensorClosed.bInitOk 	AND bInitOk ;
+bInitOk := fbSensorOpen.bInitOk		AND bInitOk ;
+Init 	:= bInitOk ;]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="Fb_DevCylWithFbk">
-      <LineId Id="924" Count="16" />
-      <LineId Id="942" Count="0" />
-      <LineId Id="944" Count="1" />
-      <LineId Id="948" Count="0" />
-      <LineId Id="954" Count="0" />
-      <LineId Id="834" Count="0" />
-    </LineIds>
-    <LineIds Name="Fb_DevCylWithFbk.CalcTimers">
-      <LineId Id="36" Count="1" />
-      <LineId Id="39" Count="1" />
-      <LineId Id="38" Count="0" />
-      <LineId Id="35" Count="0" />
-      <LineId Id="5" Count="2" />
-      <LineId Id="11" Count="1" />
-      <LineId Id="8" Count="0" />
-      <LineId Id="14" Count="0" />
-      <LineId Id="16" Count="0" />
-      <LineId Id="31" Count="0" />
-      <LineId Id="41" Count="0" />
-      <LineId Id="13" Count="0" />
-      <LineId Id="19" Count="0" />
-      <LineId Id="24" Count="0" />
-      <LineId Id="46" Count="2" />
-      <LineId Id="20" Count="0" />
-    </LineIds>
-    <LineIds Name="Fb_DevCylWithFbk.CmdSimulate">
-      <LineId Id="11" Count="0" />
-      <LineId Id="13" Count="0" />
-      <LineId Id="15" Count="0" />
-      <LineId Id="12" Count="0" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="21" Count="0" />
-      <LineId Id="23" Count="0" />
-      <LineId Id="22" Count="0" />
-      <LineId Id="28" Count="0" />
-      <LineId Id="30" Count="1" />
-      <LineId Id="34" Count="0" />
-      <LineId Id="32" Count="0" />
-      <LineId Id="35" Count="1" />
-      <LineId Id="33" Count="0" />
-      <LineId Id="37" Count="0" />
-    </LineIds>
-    <LineIds Name="Fb_DevCylWithFbk.CmdTeach">
-      <LineId Id="112" Count="0" />
-      <LineId Id="114" Count="0" />
-      <LineId Id="113" Count="0" />
-      <LineId Id="5" Count="3" />
-      <LineId Id="10" Count="3" />
-      <LineId Id="62" Count="0" />
-      <LineId Id="58" Count="0" />
-      <LineId Id="14" Count="2" />
-      <LineId Id="64" Count="0" />
-      <LineId Id="60" Count="0" />
-      <LineId Id="93" Count="0" />
-      <LineId Id="95" Count="1" />
-      <LineId Id="102" Count="0" />
-      <LineId Id="17" Count="0" />
-      <LineId Id="39" Count="0" />
-      <LineId Id="46" Count="0" />
-      <LineId Id="56" Count="0" />
-      <LineId Id="103" Count="0" />
-      <LineId Id="57" Count="0" />
-      <LineId Id="104" Count="0" />
-      <LineId Id="61" Count="0" />
-      <LineId Id="65" Count="0" />
-      <LineId Id="67" Count="0" />
-      <LineId Id="106" Count="0" />
-      <LineId Id="71" Count="0" />
-      <LineId Id="108" Count="0" />
-      <LineId Id="72" Count="1" />
-      <LineId Id="9" Count="0" />
-      <LineId Id="66" Count="0" />
-    </LineIds>
-    <LineIds Name="Fb_DevCylWithFbk.ExecDirection">
-      <LineId Id="42" Count="1" />
-      <LineId Id="74" Count="0" />
-      <LineId Id="45" Count="3" />
-      <LineId Id="66" Count="0" />
-      <LineId Id="52" Count="0" />
-      <LineId Id="76" Count="0" />
-      <LineId Id="54" Count="3" />
-      <LineId Id="61" Count="1" />
-      <LineId Id="73" Count="0" />
-    </LineIds>
-    <LineIds Name="Fb_DevCylWithFbk.ExecSetFeedback">
-      <LineId Id="141" Count="6" />
-      <LineId Id="152" Count="10" />
-      <LineId Id="167" Count="4" />
-      <LineId Id="27" Count="0" />
-    </LineIds>
-    <LineIds Name="Fb_DevCylWithFbk.ExecTimeout">
-      <LineId Id="180" Count="0" />
-      <LineId Id="208" Count="11" />
-      <LineId Id="183" Count="1" />
-      <LineId Id="229" Count="0" />
-      <LineId Id="182" Count="0" />
-      <LineId Id="179" Count="0" />
-      <LineId Id="139" Count="0" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="15" Count="0" />
-      <LineId Id="6" Count="0" />
-      <LineId Id="13" Count="0" />
-      <LineId Id="11" Count="0" />
-      <LineId Id="16" Count="0" />
-      <LineId Id="7" Count="1" />
-      <LineId Id="125" Count="0" />
-      <LineId Id="9" Count="0" />
-      <LineId Id="113" Count="0" />
-      <LineId Id="123" Count="0" />
-      <LineId Id="10" Count="0" />
-      <LineId Id="65" Count="0" />
-      <LineId Id="20" Count="0" />
-      <LineId Id="32" Count="0" />
-      <LineId Id="36" Count="0" />
-      <LineId Id="199" Count="0" />
-      <LineId Id="24" Count="2" />
-      <LineId Id="173" Count="0" />
-      <LineId Id="205" Count="0" />
-      <LineId Id="34" Count="0" />
-      <LineId Id="49" Count="0" />
-      <LineId Id="236" Count="0" />
-      <LineId Id="51" Count="3" />
-      <LineId Id="22" Count="0" />
-      <LineId Id="19" Count="0" />
-      <LineId Id="64" Count="0" />
-      <LineId Id="70" Count="1" />
-      <LineId Id="114" Count="1" />
-      <LineId Id="72" Count="4" />
-      <LineId Id="190" Count="0" />
-      <LineId Id="78" Count="1" />
-      <LineId Id="167" Count="1" />
-      <LineId Id="206" Count="0" />
-      <LineId Id="84" Count="1" />
-      <LineId Id="197" Count="0" />
-      <LineId Id="87" Count="1" />
-      <LineId Id="170" Count="1" />
-      <LineId Id="94" Count="1" />
-      <LineId Id="97" Count="0" />
-      <LineId Id="191" Count="0" />
-      <LineId Id="67" Count="0" />
-      <LineId Id="192" Count="2" />
-    </LineIds>
-    <LineIds Name="Fb_DevCylWithFbk.Init">
-      <LineId Id="52" Count="0" />
-      <LineId Id="68" Count="0" />
-      <LineId Id="65" Count="0" />
-      <LineId Id="64" Count="0" />
-      <LineId Id="66" Count="0" />
-      <LineId Id="71" Count="0" />
-      <LineId Id="70" Count="0" />
-      <LineId Id="72" Count="0" />
-      <LineId Id="62" Count="0" />
-      <LineId Id="41" Count="0" />
-      <LineId Id="90" Count="0" />
-      <LineId Id="92" Count="1" />
-      <LineId Id="91" Count="0" />
-      <LineId Id="81" Count="0" />
-      <LineId Id="50" Count="0" />
-    </LineIds>
   </POU>
 </TcPlcObject>

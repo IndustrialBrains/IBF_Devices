@@ -1,12 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.3">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
   <POU Name="FB_EncoderBase" Id="{78ccea55-8da3-46e5-834a-35136183596e}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_EncoderBase
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC FB_EncoderBase EXTENDS FB_DevBase
 VAR_INPUT
-	nCfgUnitsPerPulse	: LREAL := 1	; // Scale factor for output [units/pulse]
-	nCfgOffset			: LREAL := 0	; // Offset for output
-	
-	bIcfInverted		: BOOL	:= FALSE; // Invert output position = standard false  
 END_VAR
 VAR_OUTPUT
 	nOutPosition		: LREAL	:= 0	; // Scaled position output
@@ -14,6 +11,9 @@ VAR_OUTPUT
 	nVelocity			: LREAL	:= 0 	; // Velocity [units/sec]
 END_VAR
 VAR
+	fPulsesPerUnit		: LREAL := 1	; // Scale factor for output [units/pulse]
+	fOffset				: LREAL := 0	; // Offset for output
+	bIcfInverted		: BOOL	:= FALSE; // Invert output position = standard false  
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -28,11 +28,36 @@ END_VAR
         <ST><![CDATA[]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_EncoderBase">
-      <LineId Id="9" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_EncoderBase.FastTask">
-      <LineId Id="5" Count="0" />
-    </LineIds>
+    <Method Name="Init" Id="{4b96b077-08c2-0f5d-0b64-41873bbad573}">
+      <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
+VAR_INPUT
+	// Message location data
+	nId			: UDINT ; // Identification number of object
+	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
+	// Configuration
+	fPulsesPerUnit	: LREAL	; // Scale factor for output [units/pulse]
+	fOffset			: LREAL	; // Offset for output
+	bIcfInverted	: BOOL	; // Invert output position = standard false  
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+// ====== Calculate device id =====
+	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Encoder);
+
+// ====== Set manual device type ======
+	eDevType := E_Devices.Encoder ;	
+
+	
+// ===== Coppy values to function memory ======
+	THIS^.fPulsesPerUnit	:= MAX(fPulsesPerUnit,0.01); // Minimum value of 1
+	THIS^.fOffset			:= fOffset;
+	THIS^.bIcfInverted		:= bIcfInverted;
+	
+	
+bInitOk := TRUE ;]]></ST>
+      </Implementation>
+    </Method>
   </POU>
 </TcPlcObject>
