@@ -123,7 +123,7 @@ VAR_INPUT
 	// Config Values 
 	mcHomingMode 		: MC_HomingMode := MC_HomingMode.MC_DefaultHoming; 
 	fHomePosition		: LREAL := 0 	; // set position at homing
-	fSafeVeloLimit		: LREAL	:= 360 	; // safe velocity limit [deg/sec]
+	fSafeOverride		: LREAL := 10	; // Safe velocity override [%]
 	nEncTurnoverVal 	: LREAL := 360	; // encoder turnover value 
 	tEnableDelay		: time 	:= T#0MS; // Time between axis enable command and motion command execution (0 := no delay active)	
 	tDisabledelay		: TIME 	:= T#100MS; // Axis idle time before axis is disabled 
@@ -183,7 +183,7 @@ END_VAR]]></Declaration>
  		THIS^.mcHomingMode 			:= mcHomingMode ; // set homing mode
  		THIS^.fHomePosition			:= fHomePosition;
 	// ***** Velocity settings *****
-		THIS^.fSafeVeloLimit 		:= fSafeVeloLimit ; // set maximum safe velocity	
+		THIS^.fSafeOverride			:= fSafeOverride	; 	
 	// ***** Time delay enable off *****
 		THIS^.tEnableDelay		:= tEnableDelay	;
 		THIS^.tDisableDelay 	:= tDisabledelay ;		

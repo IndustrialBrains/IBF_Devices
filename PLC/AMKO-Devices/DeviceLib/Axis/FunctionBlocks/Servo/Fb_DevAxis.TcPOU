@@ -33,7 +33,7 @@ VAR_OUTPUT
 		fMaxAcc			: LREAL := 0 ; // Axis Maximum cceleration
 		fMaxDec			: LREAL := 0 ; // axis Maxium deceleration 
 	
-		fSafeVeloLimit	: LREAL	:= 200; // Safe velocity limit 
+//		fSafeVeloLimit	: LREAL	:= 200; // Safe velocity limit 
 		tEnableDelay	: TIME 	:= T#0MS	;
 		tDisableDelay	: TIME 	:= T#500MS  ;
 	// ==== Axis data ====
@@ -94,8 +94,8 @@ VAR	// =============== Motion status functions ================
 		fbMcMoveAbsolute	: ARRAY [0..1] OF MC_MoveAbsolute	;		// FB to move axis (velocity movement)
 		fbMcMoveModulo		: ARRAY [0..1] OF MC_MoveModulo		;		// FB to move axis to modulo position
 	// ===== Safe commands =====
-		bCmdSafeStop	: BOOL ;
-		bCmdSafeSpeed	: BOOL ; 
+		bCmdSafeStop		: BOOL ;
+		bCmdSafeSpeed		: BOOL ; 
 	// ===== Function execute triggers =====
 		bExec_Reset			: BOOL := FALSE; // Execute reset
 		bExec_Halt			: BOOL := FALSE; // Execute hold
@@ -109,18 +109,28 @@ VAR	// =============== Motion status functions ================
 		bExec_SetPosition	: BOOL := FALSE; // execute set position
 //		bExec_ParWritePers	: BOOL := FALSE; // Execute parameter write persistent 
 		
-	// ===== Move ristrictions ======
-		bCmdLimitVelocity 	: BOOL := FALSE			; // velocity limiting is active 
-		fCmdVelocityLimit	: LREAL:= fSafeVeloLimit; // Maximum velocity limit when velocity limiting is active  
 	(* PtoP Motion move commands are in arrays so multiple commands can be stacked *) 
 		arExec_MoveRelative	: ARRAY [0..1] OF BOOL ; // Execute move relative
 		arExec_MoveAbs		: ARRAY [0..1] OF BOOL ; // Execute move absolute reverse
 		arExec_MoveModulo	: ARRAY [0..1] OF BOOL ; // Execute move modulo
 
+//		bCmd_MoveRelative	: BOOL		; // Move relative command
+//		bCmd_MoveAbs		: BOOL		; // Move relative command
+//		bCmd_MoveModulo		: BOOL		; // Move relative command
+	
+//		ReCmd_MoveRelative	: R_TRIG	; // Move Relative comamnd trigger
+//		ReCmd_MoveAbs		: R_TRIG	; // Move Absolute comamnd trigger
+//		ReCmd_MoveModulo	: R_TRIG	; // Move Modulo comamnd trigger
+
+	// ===== Move ristrictions ======
+		bCmdLimitVelocity 	: BOOL := FALSE			; // velocity limiting is active 
+		fCmdVelocityLimit	: LREAL:= 100			; // Maximum velocity limit when velocity limiting is active  
+		fSafeOverride		: LREAL:= 10 			; // [%] Safe velocity override  
+		
 	// ===== Internal variables =======
-		fAcceleration	: LREAL := 0 ; // Acceleration used for functions 
-		fDeceleration	: LREAL := 0 ; // Deceleration used for functions
-		reCmdReset		: R_TRIG ; // Rising edge on reset command
+		fAcceleration		: LREAL := 0 ; // Acceleration used for functions 
+		fDeceleration		: LREAL := 0 ; // Deceleration used for functions
+		reCmdReset			: R_TRIG ; // Rising edge on reset command
 END_VAR
 VAR
 	// ===== Loop variables =====
@@ -190,7 +200,7 @@ END_VAR
 	ExecGearDynamic	();
 	
 // ====== reset velocity lmiting =====
-	bVelocityLimited	:= bCmdLimitVelocity ;	
+	bVelocityLimited	S= bCmdLimitVelocity ;	
 	bCmdLimitVelocity 	:= FALSE ; 
 
 // ====== Reset acceleration deceleration values ======
@@ -664,7 +674,7 @@ END_VAR
 bCmdSafeSpeed := TRUE ; 
 
 // Set feedback output 
-CmdSafeSpeed := AxisRef.NcToPlc.ActVelo <= fSafeVeloLimit ;]]></ST>
+CmdSafeSpeed := fbMcPower.Override = fSafeOverride  ;]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdSafeStop" Id="{b3ad69e2-24fe-00d4-08f1-72f39343c002}" FolderPath="Command Methods\">
@@ -729,7 +739,7 @@ END_IF
 				Enable			:= bCmdEnableAxis AND TofIntAxisEnable.Q, 
 				Enable_Positive	:= bIcfEnableForward, 
 				Enable_Negative	:= bIcfEnablereverse, 
-				Override		:= 100,
+				Override		:= fSafeOverride,
 				BufferMode		:= MC_Buffered );  
 				
 // ===== Reset internal enable signal =====
@@ -920,12 +930,6 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// ===== Execute Jog function =====
-	// velocity limiting
-		IF bCmdSafeSpeed THEN 
-			fbMcJog.Velocity := MIN(fSafeVeloLimit, fbMcJog.Velocity); 
-		ELSIF bCmdLimitVelocity THEN 
-			fbMcJog.Velocity := MIN(fCmdVelocityLimit, fbMcJog.Velocity); 
-		END_IF
 	// function call
 	fbMcJog (	Axis 		:= AxisRef,
 				JogForward	:= bExec_JogPositive AND bDelayedEnable,
@@ -957,12 +961,6 @@ END_VAR
       <Implementation>
         <ST><![CDATA[// ==== execute move absolute function =====
 FOR i := 0 TO 1 DO 
-	// velocity limiting
-		IF bCmdSafeSpeed THEN 
-			fbMcMoveAbsolute[i].Velocity := MIN(fSafeVeloLimit, fbMcMoveAbsolute[i].Velocity); 
-		ELSIF bCmdLimitVelocity THEN 
-			fbMcMoveAbsolute[i].Velocity := MIN(fCmdVelocityLimit, fbMcMoveAbsolute[i].Velocity); 
-		END_IF
 	// function call
 	fbMcMoveAbsolute[i](	Axis 		:= AxisRef,
 							Execute 	:= arExec_MoveAbs[i] AND bDelayedEnable,
@@ -998,14 +996,10 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ===== Execute move modulo function =====
+        <ST><![CDATA[
+
+// ===== Execute move modulo function =====
 FOR i := 0 TO 1 DO 
-	// velocity limiting
-		IF bCmdSafeSpeed THEN 
-			fbMcMoveModulo[i].Velocity := MIN(fSafeVeloLimit, fbMcMoveModulo[i].Velocity); 
-		ELSIF bCmdLimitVelocity THEN 
-			fbMcMoveModulo[i].Velocity := MIN(fCmdVelocityLimit, fbMcMoveModulo[i].Velocity); 
-		END_IF
 	// function call
 	fbMcMoveModulo[i](	Axis 		:= AxisRef,
 						Execute 	:= arExec_MoveModulo[i] AND bDelayedEnable,
@@ -1040,14 +1034,11 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ===== Execute move relative function ======
+        <ST><![CDATA[//ReCmd_MoveModulo(CLK := bCmd_MoveModulo );
+//bCmd_MoveModulo	:= FALSE ;
+
+// ===== Execute move relative function ======
 FOR i := 0 TO 1 DO 
-	// velocity limiting
-		IF bCmdSafeSpeed THEN 
-			fbMCMoveRelative[i].Velocity := MIN(fSafeVeloLimit, fbMCMoveRelative[i].Velocity); 
-		ELSIF bCmdLimitVelocity THEN 
-			fbMCMoveRelative[i].Velocity := MIN(fCmdVelocityLimit, fbMCMoveRelative[i].Velocity); 
-		END_IF
 	// function call
 	fbMCMoveRelative[i](	Axis 		:= AxisRef,
 							Execute		:= arExec_MoveRelative[i] AND bDelayedEnable,
@@ -1082,12 +1073,6 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// ===== Execute move velocity function =====
-// velocity limiting
-IF bCmdSafeSpeed THEN 
-	fbMcMoveVelocity.Velocity := MIN(fSafeVeloLimit, fbMcMoveVelocity.Velocity); 
-ELSIF bCmdLimitVelocity THEN 
-	fbMcMoveVelocity.Velocity := MIN(fCmdVelocityLimit, fbMcMoveVelocity.Velocity); 
-END_IF
 // function call
 fbMcMoveVelocity (	Axis 		:= AxisRef,
 					Execute		:= bExec_MoveVelocity  AND bDelayedEnable,
@@ -1159,6 +1144,10 @@ END_IF
 	bError 		:= AxisRef.Status.Error ; 
 	bExec_Reset	R= fbMcReset.Done  ;
 	bResetDone 	S= fbMcReset.Done AND NOT AxisRef.Status.Error ;
+
+// ===== reset limitations =====
+	bCmdSafeSpeed 	:= FALSE ;
+
 	
 // Reset fault handling 
 	IF fbSoeReset.Error OR fbMcReset.Error THEN 
@@ -1211,12 +1200,9 @@ END_VAR
 	
 // ===== Safe speed monitoring =====
 	IF bCmdSafeSpeed THEN 
-		IF AxisRef.NcToPlc.ActVelo > fSafeVeloLimit THEN 
-			bExec_Halt := TRUE ; 
-			ExecHalt(); 
-		ELSE 
-			bCmdSafeSpeed := FALSE ; 
-		END_IF
+		fbMcPower.Override := fSafeOverride ;
+	ELSE 
+		fbMcPower.Override := 100 ;
 	END_IF
 
 // ===== Dev is safe feedback =====
@@ -1288,7 +1274,7 @@ VAR_INPUT
 	// Config Values 
 	mcHomingMode 		: MC_HomingMode := MC_HomingMode.MC_DefaultHoming; 
 	fHomePosition		: LREAL := 0 	; // set position at homing
-	fSafeVeloLimit		: LREAL	:= 360 	; // safe velocity limit [deg/sec]
+	fSafeOverride		: LREAL := 10	; // Safe velocity override [%]
 	nEncTurnoverVal 	: LREAL := 360	; // encoder turnover value 
 	tEnableDelay		: time 	:= T#0MS; // Time between axis enable command and motion command execution (0 := no delay active)	
 	tDisabledelay		: TIME 	:= T#100MS; // Axis idle time before axis is disabled 
@@ -1366,7 +1352,7 @@ END_VAR]]></Declaration>
  		THIS^.mcHomingMode 			:= mcHomingMode ; // set homing mode
 		THIS^.fHomePosition			:= fHomePosition;
 	// ***** Velocity settings *****
-		THIS^.fSafeVeloLimit 		:= fSafeVeloLimit ; // set maximum safe velocity	
+		THIS^.fSafeOverride			:= fSafeOverride	; 	
 	// ***** Encoder values *****
 		THIS^.fEncoderTurnoverValue := nEncTurnoverVal	; // turnover value for encoder = 25.6 mm per rev * 4096 revolutions 
 	// ***** Time delay enable off *****
