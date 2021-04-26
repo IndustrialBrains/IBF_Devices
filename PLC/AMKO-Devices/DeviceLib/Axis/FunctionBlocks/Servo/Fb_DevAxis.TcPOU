@@ -187,7 +187,7 @@ END_VAR
 		ExecHalt		();
 	
 	// ===== Motion move functions
-		ExecJog			(); 
+		ExecJog			();
 		ExecMoveAbsolute();
 		ExecMoveRelative();
 		ExecMoveModulo	();
@@ -200,7 +200,7 @@ END_VAR
 	ExecGearDynamic	();
 	
 // ====== reset velocity lmiting =====
-	bVelocityLimited	S= bCmdLimitVelocity ;	
+	bVelocityLimited	:= bCmdLimitVelocity ;	
 	bCmdLimitVelocity 	:= FALSE ; 
 
 // ====== Reset acceleration deceleration values ======
@@ -930,6 +930,10 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// ===== Execute Jog function =====
+	IF bCmdLimitVelocity THEN 
+		fbMcJog.Velocity := MIN(fCmdVelocityLimit, fbMcJog.Velocity); 
+	END_IF
+
 	// function call
 	fbMcJog (	Axis 		:= AxisRef,
 				JogForward	:= bExec_JogPositive AND bDelayedEnable,
@@ -961,6 +965,10 @@ END_VAR
       <Implementation>
         <ST><![CDATA[// ==== execute move absolute function =====
 FOR i := 0 TO 1 DO 
+	// Limit velocity
+	IF bCmdLimitVelocity THEN 
+		fbMcJog.Velocity := MIN(fCmdVelocityLimit, fbMcMoveAbsolute[i].Velocity); 
+	END_IF
 	// function call
 	fbMcMoveAbsolute[i](	Axis 		:= AxisRef,
 							Execute 	:= arExec_MoveAbs[i] AND bDelayedEnable,
@@ -1000,6 +1008,9 @@ END_VAR
 
 // ===== Execute move modulo function =====
 FOR i := 0 TO 1 DO 
+	IF bCmdLimitVelocity THEN 
+		fbMcJog.Velocity := MIN(fCmdVelocityLimit, fbMcMoveModulo[i].Velocity); 
+	END_IF
 	// function call
 	fbMcMoveModulo[i](	Axis 		:= AxisRef,
 						Execute 	:= arExec_MoveModulo[i] AND bDelayedEnable,
@@ -1039,6 +1050,10 @@ END_VAR
 
 // ===== Execute move relative function ======
 FOR i := 0 TO 1 DO 
+	// Limit velocity
+	IF bCmdLimitVelocity THEN 
+		fbMcJog.Velocity := MIN(fCmdVelocityLimit, fbMcMoveModulo[i].Velocity); 
+	END_IF
 	// function call
 	fbMCMoveRelative[i](	Axis 		:= AxisRef,
 							Execute		:= arExec_MoveRelative[i] AND bDelayedEnable,
@@ -1073,6 +1088,10 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// ===== Execute move velocity function =====
+	IF bCmdLimitVelocity THEN 
+		fbMcJog.Velocity := MIN(fCmdVelocityLimit, fbMcMoveVelocity.Velocity); 
+	END_IF
+
 // function call
 fbMcMoveVelocity (	Axis 		:= AxisRef,
 					Execute		:= bExec_MoveVelocity  AND bDelayedEnable,
@@ -1200,7 +1219,8 @@ END_VAR
 	
 // ===== Safe speed monitoring =====
 	IF bCmdSafeSpeed THEN 
-		fbMcPower.Override := fSafeOverride ;
+		fbMcPower.Override 	:= fSafeOverride ;
+		bCmdSafeSpeed		:= FALSE ;
 	ELSE 
 		fbMcPower.Override := 100 ;
 	END_IF
