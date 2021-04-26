@@ -739,7 +739,6 @@ END_IF
 				Enable			:= bCmdEnableAxis AND TofIntAxisEnable.Q, 
 				Enable_Positive	:= bIcfEnableForward, 
 				Enable_Negative	:= bIcfEnablereverse, 
-				Override		:= fSafeOverride,
 				BufferMode		:= MC_Buffered );  
 				
 // ===== Reset internal enable signal =====
