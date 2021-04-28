@@ -25,7 +25,8 @@ VAR_OUTPUT
 		bIdle			: BOOL 	:= FALSE;
 		fVelocity		: LREAL	:= 0	; // Axis velocity [rpm or units/sec] depending on config
 		fActPosition	: LREAL := 0	; // Axis actual position [Units] depending on config	
-		bReInTargetPos	: BOOL 	:= false; // rising edge axis is in position
+		bInposition		: BOOL 	:= FALSE; // Axis is in position
+		bReInTargetPos	: BOOL 	:= FALSE; // rising edge axis is in position
 	// ====== axis reference ======
 		AxisRef			: AXIS_REF	; // Axis reference to hardware 
 	// ====== Axis Settings ======
@@ -494,9 +495,9 @@ bInternalEnable	:= TRUE ;
 
 // set feedback
 IF arExec_MoveAbs[1] OR fbMcMoveAbsolute[1].Busy THEN 
-	CmdMoveAbs :=	fbMcMoveAbsolute[1].Active ;
+	CmdMoveAbs :=	(fbMcMoveAbsolute[1].Active AND NOT bInposition) OR fbMcMoveAbsolute[1].Done ;
 ELSE 
-	CmdMoveAbs :=	fbMcMoveAbsolute[0].Active ;
+	CmdMoveAbs :=	(fbMcMoveAbsolute[0].Active AND NOT bInposition) OR fbMcMoveAbsolute[0].Done ;
 END_IF
 ]]></ST>
       </Implementation>
@@ -541,9 +542,9 @@ bInternalEnable	:= TRUE ;
 
 // set feedback
 IF arExec_MoveModulo[1] OR fbMcMoveModulo[1].Busy THEN 
-	CmdMoveModulo :=	fbMcMoveModulo[1].Active OR fbMcMoveModulo[1].Done;
+	CmdMoveModulo :=	(fbMcMoveModulo[1].Active AND NOT bInposition) OR fbMcMoveModulo[1].Done;
 ELSE
-	CmdMoveModulo :=	fbMcMoveModulo[0].Active OR fbMcMoveModulo[0].Done ;
+	CmdMoveModulo :=	(fbMcMoveModulo[0].Active AND NOT bInposition) OR fbMcMoveModulo[0].Done ;
 END_IF
 ]]></ST>
       </Implementation>
@@ -567,7 +568,7 @@ bBlockedCommand := fbMcHalt.Active ;
 
 // Determine function for command stacking
 IF NOT AxisRef.Status.CmdBuffered OR mcBuffermode <> MC_Aborting THEN 
-	IF fbMCMoveRelative[0].Active THEN 
+	IF fbMCMoveRelative[0].Active THEN
 		arExec_MoveRelative[1] := (fDistance <> fbMCMoveRelative[0].Distance OR fVelocity <> fbMCMoveRelative[0].Velocity) ;
 		fbMCMoveRelative[1].Velocity	:= fVelocity 	;
 		fbMCMoveRelative[1].Distance	:= fDistance	;
@@ -583,9 +584,9 @@ bInternalEnable	:= TRUE ;
 
 // set feedback
 IF arExec_MoveRelative[1] OR fbMCMoveRelative[1].Busy THEN 
-	CmdMoveRelative :=	fbMCMoveRelative[1].Active ;
+	CmdMoveRelative :=	(fbMCMoveRelative[1].Active AND NOT bInposition) OR fbMCMoveRelative[1].Done ;
 ELSE
-	CmdMoveRelative :=	fbMCMoveRelative[0].Active ;
+	CmdMoveRelative :=	(fbMCMoveRelative[0].Active AND NOT bInposition) OR fbMCMoveRelative[0].Done ;
 END_IF
 ]]></ST>
       </Implementation>
@@ -1138,6 +1139,7 @@ END_IF
 bIdle := NOT AxisRef.Status.HasJob ;
 
 // In position 
+	bInposition		:= 	AxisRef.Status.InTargetPosition ;
 	rtrigInPosition( 	CLK := AxisRef.Status.InTargetPosition, 
 						Q => bReInTargetPos);]]></ST>
       </Implementation>
