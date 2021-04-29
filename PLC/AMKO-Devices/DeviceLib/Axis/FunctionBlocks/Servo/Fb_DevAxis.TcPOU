@@ -115,13 +115,13 @@ VAR	// =============== Motion status functions ================
 		arExec_MoveAbs		: ARRAY [0..1] OF BOOL ; // Execute move absolute reverse
 		arExec_MoveModulo	: ARRAY [0..1] OF BOOL ; // Execute move modulo
 
-//		bCmd_MoveRelative	: BOOL		; // Move relative command
-//		bCmd_MoveAbs		: BOOL		; // Move relative command
-//		bCmd_MoveModulo		: BOOL		; // Move relative command
+		bCmd_MoveRelative	: BOOL		; // Move relative command
+		bCmd_MoveAbs		: BOOL		; // Move relative command
+		bCmd_MoveModulo		: BOOL		; // Move relative command
 	
-//		ReCmd_MoveRelative	: R_TRIG	; // Move Relative comamnd trigger
-//		ReCmd_MoveAbs		: R_TRIG	; // Move Absolute comamnd trigger
-//		ReCmd_MoveModulo	: R_TRIG	; // Move Modulo comamnd trigger
+		ReCmd_MoveRelative	: R_TRIG	; // Move Relative comamnd trigger
+		ReCmd_MoveAbs		: R_TRIG	; // Move Absolute comamnd trigger
+		ReCmd_MoveModulo	: R_TRIG	; // Move Modulo comamnd trigger
 
 	// ===== Move ristrictions ======
 		bCmdLimitVelocity 	: BOOL := FALSE			; // velocity limiting is active 
@@ -471,22 +471,25 @@ END_VAR
         <ST><![CDATA[// set blocked command if halt is active 
 bBlockedCommand := fbMcHalt.Active ;
 
+// Set command
+bCmd_MoveAbs := TRUE ;
+
 // Velocity conversion from RPM to deg/sec
 	IF bIcfCmdVelocityRpm THEN 
 		fVelocity := Rpm_To_DegS(fVelocity);
 	END_IF
 
 // Determine function for command stacking
-IF NOT AxisRef.Status.CmdBuffered OR mcBuffermode <> MC_Aborting THEN 
+IF ReCmd_MoveAbs.Q AND (NOT AxisRef.Status.CmdBuffered OR mcBuffermode <> MC_Aborting) THEN 
 	IF fbMcMoveAbsolute[0].Active THEN 
-		arExec_MoveAbs[1] 				:= (fPosition <> fbMcMoveAbsolute[0].Position OR fVelocity <> fbMcMoveAbsolute[0].Velocity) ;
-		fbMcMoveAbsolute[1].Position 	:= fPosition ;
-		fbMcMoveAbsolute[1].Velocity 	:= fVelocity ; 
+		arExec_MoveAbs[1] 				:= TRUE 		; 
+		fbMcMoveAbsolute[1].Position 	:= fPosition 	;
+		fbMcMoveAbsolute[1].Velocity 	:= fVelocity 	; 
 		fbMcMoveAbsolute[1].BufferMode 	:= mcBuffermode ;
 	ELSE
-		arExec_MoveAbs[0] 				:= (fPosition <> fbMcMoveAbsolute[1].Position OR fVelocity <> fbMcMoveAbsolute[1].Velocity) ;
-		fbMcMoveAbsolute[0].Position 	:= fPosition ;
-		fbMcMoveAbsolute[0].Velocity 	:= fVelocity ; 
+		arExec_MoveAbs[0] 				:= TRUE 		;
+		fbMcMoveAbsolute[0].Position 	:= fPosition 	;
+		fbMcMoveAbsolute[0].Velocity 	:= fVelocity 	; 
 		fbMcMoveAbsolute[0].BufferMode 	:= mcBuffermode ;
 	END_IF
 END_IF
@@ -515,6 +518,8 @@ END_VAR
         <ST><![CDATA[// set blocked command if halt is active 
 bBlockedCommand := fbMcHalt.Active ;
 
+// Set command
+bCmd_MoveModulo := TRUE ;
 
 // Velocity conversion from RPM to deg/sec
 	IF bIcfCmdVelocityRpm THEN 
@@ -522,15 +527,15 @@ bBlockedCommand := fbMcHalt.Active ;
 	END_IF
 
 // Determine function for command stacking
-IF NOT AxisRef.Status.CmdBuffered OR mcBuffermode <> MC_Aborting THEN 
+IF ReCmd_MoveModulo.Q AND (NOT AxisRef.Status.CmdBuffered OR mcBuffermode <> MC_Aborting) THEN 
 	IF fbMcMoveModulo[0].Busy THEN 
-		arExec_MoveModulo[1] 		:= (fPosition <> fbMcMoveModulo[0].Position OR fVelocity <> fbMcMoveModulo[0].Velocity)	;
+		arExec_MoveModulo[1] 		:= TRUE 		; 
 		fbMcMoveModulo[1].Velocity 	:= fVelocity 	;
 		fbMcMoveModulo[1].Position 	:= fPosition 	;
 		fbMcMoveModulo[1].Direction	:= mcDirection	;
 		fbMcMoveModulo[1].BufferMode:= mcBuffermode ;
 	ELSE    
-		arExec_MoveModulo[0] 		:= (fPosition <> fbMcMoveModulo[1].Position OR fVelocity <> fbMcMoveModulo[1].Velocity) ;
+		arExec_MoveModulo[0] 		:= TRUE 		;
 		fbMcMoveModulo[0].Velocity 	:= fVelocity 	;
 		fbMcMoveModulo[0].Position 	:= fPosition 	;
 		fbMcMoveModulo[0].Direction	:= mcDirection	;
@@ -561,20 +566,23 @@ END_VAR
         <ST><![CDATA[// set blocked command if halt is active 
 bBlockedCommand := fbMcHalt.Active ;
 
+// Set command
+bCmd_MoveRelative := TRUE ;
+
 // Velocity conversion from RPM to deg/sec
 	IF bIcfCmdVelocityRpm THEN 
 		fVelocity := Rpm_To_DegS(fVelocity);
 	END_IF
 
 // Determine function for command stacking
-IF NOT AxisRef.Status.CmdBuffered OR mcBuffermode <> MC_Aborting THEN 
+IF ReCmd_MoveRelative.Q AND (NOT AxisRef.Status.CmdBuffered OR mcBuffermode <> MC_Aborting) THEN 
 	IF fbMCMoveRelative[0].Active THEN
-		arExec_MoveRelative[1] := (fDistance <> fbMCMoveRelative[0].Distance OR fVelocity <> fbMCMoveRelative[0].Velocity) ;
+		arExec_MoveRelative[1] 			:= TRUE ;
 		fbMCMoveRelative[1].Velocity	:= fVelocity 	;
 		fbMCMoveRelative[1].Distance	:= fDistance	;
 		fbMCMoveRelative[1].BufferMode	:= mcBuffermode	;
 	ELSE 
-		arExec_MoveRelative[0] := (fDistance <> fbMCMoveRelative[1].Distance OR fVelocity <> fbMCMoveRelative[1].Velocity) ;
+		arExec_MoveRelative[0] 			:= TRUE			;
 		fbMCMoveRelative[0].Velocity	:= fVelocity 	;
 		fbMCMoveRelative[0].Distance	:= fDistance	;
 		fbMCMoveRelative[0].BufferMode	:= mcBuffermode	;
@@ -963,7 +971,11 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ==== execute move absolute function =====
+        <ST><![CDATA[// ==== check for rising edge on command ======
+ReCmd_MoveAbs ( CLK := bCmd_MoveAbs);
+bCmd_MoveAbs	:= false ;
+
+// ==== execute move absolute function =====
 FOR i := 0 TO 1 DO 
 	// Limit velocity
 	IF bCmdLimitVelocity THEN 
@@ -1004,7 +1016,9 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
+        <ST><![CDATA[// ===== check for rising edge in command =====
+	ReCmd_MoveModulo (	CLK := bCmd_MoveModulo);
+	bCmd_MoveModulo 	:= FALSE ; 
 
 // ===== Execute move modulo function =====
 FOR i := 0 TO 1 DO 
@@ -1045,8 +1059,9 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[//ReCmd_MoveModulo(CLK := bCmd_MoveModulo );
-//bCmd_MoveModulo	:= FALSE ;
+        <ST><![CDATA[// ===== check for rising edge in command =====
+	ReCmd_MoveRelative (	CLK := bCmd_MoveRelative);
+	bCmd_MoveRelative 	:= FALSE ; 
 
 // ===== Execute move relative function ======
 FOR i := 0 TO 1 DO 

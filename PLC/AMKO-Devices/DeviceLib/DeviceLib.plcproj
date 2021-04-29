@@ -18,7 +18,7 @@
     <Company>AMKO-Engineering</Company>
     <Released>false</Released>
     <Title>Device_Library</Title>
-    <ProjectVersion>1.4.2.5</ProjectVersion>
+    <ProjectVersion>1.5.0.0</ProjectVersion>
     <Description>Device library of AMKO-Engineering.</Description>
     <Author>AMKO-Engineering</Author>
     <CompilerDefines>InclSerialCom := 'true'</CompilerDefines>
