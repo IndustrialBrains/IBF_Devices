@@ -975,11 +975,11 @@ END_VAR
 ReCmd_MoveAbs ( CLK := bCmd_MoveAbs);
 bCmd_MoveAbs	:= false ;
 
-// ==== execute move absolute function =====
+// ==== execute move function =====
 FOR i := 0 TO 1 DO 
 	// Limit velocity
 	IF bCmdLimitVelocity THEN 
-		fbMcJog.Velocity := MIN(fCmdVelocityLimit, fbMcMoveAbsolute[i].Velocity); 
+		fbMcMoveAbsolute[i].Velocity := MIN(fCmdVelocityLimit, fbMcMoveAbsolute[i].Velocity); 
 	END_IF
 	// function call
 	fbMcMoveAbsolute[i](	Axis 		:= AxisRef,
@@ -1063,11 +1063,11 @@ END_VAR
 	ReCmd_MoveRelative (	CLK := bCmd_MoveRelative);
 	bCmd_MoveRelative 	:= FALSE ; 
 
-// ===== Execute move relative function ======
+// ===== Execute move function ======
 FOR i := 0 TO 1 DO 
 	// Limit velocity
 	IF bCmdLimitVelocity THEN 
-		fbMcJog.Velocity := MIN(fCmdVelocityLimit, fbMcMoveModulo[i].Velocity); 
+		fbMCMoveRelative[i].Velocity := MIN(fCmdVelocityLimit, fbMCMoveRelative[i].Velocity); 
 	END_IF
 	// function call
 	fbMCMoveRelative[i](	Axis 		:= AxisRef,
@@ -1104,7 +1104,7 @@ END_VAR
       <Implementation>
         <ST><![CDATA[// ===== Execute move velocity function =====
 	IF bCmdLimitVelocity THEN 
-		fbMcJog.Velocity := MIN(fCmdVelocityLimit, fbMcMoveVelocity.Velocity); 
+		fbMcMoveVelocity.Velocity := MIN(fCmdVelocityLimit, fbMcMoveVelocity.Velocity); 
 	END_IF
 
 // function call
