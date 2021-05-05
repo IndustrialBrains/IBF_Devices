@@ -66,7 +66,8 @@ VAR	// ====== Axis enable =====
 		bDelayedEnable		: BOOL 	:= false; // Delayed enable signal for motion commands
 		TonMotionEnable		: TON 			; // Timer on for motion command enable
 		TofIntAxisEnable	: TOF  			; // Timer off for internal axis enable 
-		bSTOOK				: BOOL 	:= false; // Axis safet torque off is ok
+		bSTOOK				: BOOL 	:= FALSE; // Axis safet torque off is ok
+		tonSTOOK			: TON	; // Safe torque off ok timer
 	// Parameter read status 
 		Cmd_EnDriveParRead	: BOOL 			; // Enable parameter read 
 	// ===== Physical Homing signal =====
@@ -1190,15 +1191,16 @@ END_VAR
 
 // ===== Safe torque off function =====
 	IF bIcfSTOPresent THEN 
-		bSTOOK := IAxisSTOOK ;
+		tonSTOOK(IN := IAxisSTOOK, PT := T#500MS);
+		bSTOOK := tonSTOOK.Q ;
 	ELSE 
 		bSTOOK := true ;
 	END_IF
 	
 // ==== Safe operation functions (overrule all other motion functions) =====
-	IF NOT AxisRef.Status.Coupled THEN 
+	IF NOT AxisRef.Status.Coupled AND bSTOOK THEN 
 		fbMcStop( 	Axis 			:= AxisRef		,
-					Execute 		:= bCmdSafeStop AND bSTOOK AND NOT bExec_Reset,
+					Execute 		:= bCmdSafeStop AND NOT bExec_Reset,
 					Deceleration	:= fMaxDec		);
 	END_IF
 	
