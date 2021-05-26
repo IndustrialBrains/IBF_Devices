@@ -68,9 +68,11 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ====== Calculate device id =====
-	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.AnOutput);
+        <ST><![CDATA[// ====== Set init to true =====
+	bInitOk	:= TRUE ; 
 
+// ====== Calculate device id =====
+	bInitOk :=	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.AnOutput) AND bInitOk;
 	
 // ====== set minimum value ========
 	IF benableNegative THEN 
@@ -80,7 +82,6 @@ END_VAR
 	END_IF
 	
 // ====== Set feedback ======
-	bInitOk := TRUE ;
 	Init 	:= TRUE ;]]></ST>
       </Implementation>
     </Method>

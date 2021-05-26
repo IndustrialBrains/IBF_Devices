@@ -122,11 +122,13 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ====== Calculate device id =====
-	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Heaters);
+        <ST><![CDATA[// ====== Set init to true =====
+	bInitOk	:= TRUE ; 
 
-// ====== Set feedback ======
-	bInitOk := true ;]]></ST>
+// ====== Calculate device id =====
+	bInitOk :=	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Heaters) AND bInitOk;
+
+]]></ST>
       </Implementation>
     </Method>
   </POU>

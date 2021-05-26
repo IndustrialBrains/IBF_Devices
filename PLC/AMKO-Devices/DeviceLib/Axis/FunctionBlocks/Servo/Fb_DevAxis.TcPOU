@@ -1340,8 +1340,11 @@ VAR
 	bActParamValid 		: BOOL ; // Parameter read is valid 
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ====== Calculate device id =====
-	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Axis);
+        <ST><![CDATA[// ====== Set init to true =====
+	bInitOk	:= TRUE ; 
+
+// ====== Calculate device id =====
+	bInitOk :=	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Axis) AND bInitOk;
 
 // ====== Set manual device type ======
 	eDevType := E_Devices.Axis ;	
@@ -1421,7 +1424,9 @@ END_VAR]]></Declaration>
 	ParAccManualScaling.sName			:= CONCAT( STR1 := sName, STR2 := 'Manual acc scaling');
 	ParAccManualScaling.sType			:= 'Mpar';
 	ParAccManualScaling.sUnit			:= '%';
+	refFbParHandler.CmdAddParameter( refParameter := ParAccManualScaling );
 
+	
 	ParDecManualScaling.fMinimum 		:= 1 	;
 	ParDecManualScaling.fMaximum		:= 100 	;
 	ParDecManualScaling.nNumber 		:= nLocationId + 2;
@@ -1429,14 +1434,13 @@ END_VAR]]></Declaration>
 	ParDecManualScaling.sName			:= CONCAT( STR1 := sName, STR2 := 'Manual dec scaling');
 	ParDecManualScaling.sType			:= 'Mpar';
 	ParDecManualScaling.sUnit			:= '%';
-		
+	refFbParHandler.CmdAddParameter( refParameter := ParAccManualScaling );
+
 // ===== reset axis state indicators ======
 	bError 	:= FALSE;
 
 // ====== Set init to done =======
-IF bActParamValid THEN 
-	bInitOk	:= TRUE ; 
-END_IF
+bInitOk := bActParamValid AND bInitOk;
 	]]></ST>
       </Implementation>
     </Method>

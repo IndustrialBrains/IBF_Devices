@@ -288,8 +288,11 @@ VAR_INPUT
 	eSafeState		: E_ValveResetState	:= 0		; // Valve safe state
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ====== Calculate device id =====
-	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Cylinder);
+        <ST><![CDATA[// ====== Set init to true =====
+	bInitOk	:= TRUE ; 
+
+// ====== Calculate device id =====
+	bInitOk :=	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Cylinder) AND bInitOk;
 	
 // ====== Set message information =======
 	stFault.ComponentType	:= E_ComponentTypes.Cylinder 		;
@@ -338,9 +341,6 @@ END_VAR]]></Declaration>
 	// add parameters to handler 
 	refFbParHandler.CmdAddParameter( refParameter := stParTimeToClose );
 	refFbParHandler.CmdAddParameter( refParameter := stParTimeToOpen );
-	
-// ====== Set init status bit =======
-	bInitOk := TRUE ;
 
 ]]></ST>
       </Implementation>

@@ -226,8 +226,11 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ====== Calculate device id =====
-	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Heaters);
+        <ST><![CDATA[// ====== Set init to true =====
+	bInitOk	:= TRUE ; 
+
+// ====== Calculate device id =====
+	bInitOk :=	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Heaters) AND bInitOk;
 
 // ====== Set message information =======
 	stFault.ComponentType	:= E_ComponentTypes.Heaters	;
@@ -278,8 +281,6 @@ END_VAR
 	refFbParHandler.CmdAddParameter( refParameter := stParDutyCycle );
 	refFbParHandler.CmdAddParameter( refParameter := stParSwitchOverTime );
 	
-// ====== Set init status bit =======
-	bInitOk := TRUE ;
 ]]></ST>
       </Implementation>
     </Method>

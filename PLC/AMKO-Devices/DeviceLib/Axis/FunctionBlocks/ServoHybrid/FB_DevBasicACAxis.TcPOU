@@ -677,8 +677,11 @@ VAR
 	bActParamValid 		: BOOL ; // Parameter read is valid 
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// Calculate device number
-	ExecIdentifyDevice(nId,nParentId,E_ComponentTypes.Axis);
+        <ST><![CDATA[// ====== Set init to true =====
+	bInitOk	:= TRUE ; 
+
+// ====== Calculate device id =====
+	bInitOk :=	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Axis) AND bInitOk;
 
 // ===== Message data set =====
 	stFault.ComponentType		:= E_ComponentTypes.Axis ;
@@ -734,10 +737,7 @@ END_VAR]]></Declaration>
 		
 // ===== reset axis state indicators ======
 	bErrorActive 	:= FALSE;
-
-// ====== Set init to done =======
-	bInitOk	:= TRUE ; 
-	]]></ST>
+]]></ST>
       </Implementation>
     </Method>
   </POU>

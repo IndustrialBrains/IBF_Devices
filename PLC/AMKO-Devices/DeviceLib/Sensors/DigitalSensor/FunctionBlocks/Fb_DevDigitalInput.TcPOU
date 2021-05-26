@@ -46,11 +46,12 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ====== Calculate device id =====
-	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.DiInput);
+        <ST><![CDATA[// ====== Set init to true =====
+	bInitOk	:= TRUE ; 
 
-// ====== Set feedback ======
-	bInitOk := TRUE ;
+// ====== Calculate device id =====
+	bInitOk :=	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.DiInput) AND bInitOk;
+
 	Init	:= true ;]]></ST>
       </Implementation>
     </Method>

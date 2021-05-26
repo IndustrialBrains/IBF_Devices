@@ -41,10 +41,11 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
+        <ST><![CDATA[// ====== Set init to true =====
+	bInitOk	:= TRUE ; 
 
 // ====== Calculate device id =====
-	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Encoder);
+	bInitOk :=	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Encoder) AND bInitOk;
 
 // ====== Set manual device type ======
 	eDevType := E_Devices.Encoder ;	
@@ -54,9 +55,7 @@ END_VAR
 	THIS^.fPulsesPerUnit	:= MAX(fPulsesPerUnit,0.01); // Minimum value of 1
 	THIS^.fOffset			:= fOffset;
 	THIS^.bIcfInverted		:= bIcfInverted;
-	
-	
-bInitOk := TRUE ;]]></ST>
+]]></ST>
       </Implementation>
     </Method>
   </POU>

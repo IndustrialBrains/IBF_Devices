@@ -185,14 +185,15 @@ END_VAR
 
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ====== Calculate device id =====
-	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Axis);
+        <ST><![CDATA[// ====== initialize components =====
+	bInitOk := TRUE ;
+
+// ====== Calculate device id =====
+	bInitOk :=	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Axis) AND bInitOk;
 
 // ====== Set manual device type ======
 	eDevType := E_Devices.AnalogAxis ;	
 
-// ====== initialize components =====
-bInitOk := TRUE ;
 
 bInitOk := 	fbVelocity.Init	( 	nId 			:= 0,
 								nParentId		:= nLocationId,
