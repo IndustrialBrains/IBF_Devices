@@ -66,7 +66,9 @@ VAR	// ====== Axis enable =====
 		bDelayedEnable		: BOOL 	:= false; // Delayed enable signal for motion commands
 		TonMotionEnable		: TON 			; // Timer on for motion command enable
 		TofIntAxisEnable	: TOF  			; // Timer off for internal axis enable 
-		bSTOOK				: BOOL 	:= false; // Axis safet torque off is ok
+		bSTOOK				: BOOL 	:= FALSE; // Axis safet torque off is ok
+		reSTOOK				: R_TRIG		; // rising edge safe torcue off ok
+		tonSTOOK			: TON	; // Safe torque off ok timer
 	// Parameter read status 
 		Cmd_EnDriveParRead	: BOOL 			; // Enable parameter read 
 	// ===== Physical Homing signal =====
@@ -114,6 +116,7 @@ VAR	// =============== Motion status functions ================
 		arExec_MoveAbs		: ARRAY [0..1] OF BOOL ; // Execute move absolute reverse
 		arExec_MoveModulo	: ARRAY [0..1] OF BOOL ; // Execute move modulo
 
+		tonResetDone		: TON := (PT := T#300MS) ;
 //		bCmd_MoveRelative	: BOOL		; // Move relative command
 //		bCmd_MoveAbs		: BOOL		; // Move relative command
 //		bCmd_MoveModulo		: BOOL		; // Move relative command
@@ -655,13 +658,9 @@ END_VAR
         <ST><![CDATA[// Set reset axis to true 				
 	bExec_Reset 	:= TRUE ; 
 	bInternalEnable	:= TRUE ;
-
-// reset internal reset done bit
-	reCmdReset(CLK 	:= bExec_Reset);
-	bResetDone		R= reCmdReset.Q ;
 	
 // Set feedback output 
-	CmdReset := bResetDone ; ]]></ST>
+	CmdReset := tonResetDone.Q ; ]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdSafeSpeed" Id="{ddc13036-fa7e-46f4-be16-22a24c1d346b}" FolderPath="Command Methods\">
@@ -716,14 +715,17 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// ===== Set axis enable ======
-IF NOT bSafetyOk THEN 
+IF NOT bSafetyOk 
+OR NOT bSTOOK 
+OR AxisRef.Status.DriveDeviceError
+OR bExec_Reset THEN 
 	bCmdEnableAxis := FALSE ;
 ELSIF bCmdManual AND bSafetyOk THEN 
 	bCmdEnableAxis 	:= TRUE ;
 	bInternalEnable S= bCmdManual ;
 	bCmdManual 		:= FALSE ;
 ELSE 
-	bCmdEnableAxis	:= bEnable AND bSTOOK  ;
+	bCmdEnableAxis	:= bEnable ;
 END_IF
 
 // ===== Check if axis is bussy with a command =====
@@ -754,7 +756,15 @@ END_IF
 	TonMotionEnable	(IN := bAxisIsEnabled, PT := tEnableDelay);
 	bDelayedEnable 	:= TonMotionEnable.Q ;	
 
-IF fbMcPower.Error THEN 
+IF AxisRef.Status.DriveDeviceError 
+AND bCmdEnableAxis THEN
+	bError					:= TRUE							;
+	stFault.Active 			:= TRUE 						;
+	stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+	stFault.Discription		:= CONCAT('Drive device error ', UDINT_TO_STRING(AxisRef.Status.ErrorID));
+	stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
+	stFault.FaultType		:= E_FaultTypes.FF				;
+ELSIF fbMcPower.Error THEN 
 	bError					:= TRUE							;
 	stFault.Active 			:= TRUE 						;
 	stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
@@ -1139,14 +1149,20 @@ bIdle := NOT AxisRef.Status.HasJob ;
 
 // In position 
 	rtrigInPosition( 	CLK := AxisRef.Status.InTargetPosition, 
-						Q => bReInTargetPos);]]></ST>
+						Q => bReInTargetPos);
+						
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="ExecReset" Id="{289eb010-9ce0-40f7-84c2-391c18144f9a}" FolderPath="Private\Organization\">
       <Declaration><![CDATA[METHOD INTERNAL ExecReset : BOOL
 VAR_INPUT
 END_VAR
-]]></Declaration>
+VAR
+	xMcReset			: BOOL ; // Execute MC reset
+	xSoeReset			: BOOL ; // Execute SOE reset
+
+END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[//IF  AxisRef.Status.Moving AND bExec_Reset THEN // If the axis is still moving execute safe stop first
 //	RETURN;
@@ -1154,14 +1170,31 @@ IF AxisRef.Status.Coupled THEN
 	RETURN;
 END_IF
 
-// ===== reset axis ========
-	fbMcReset	( 	Execute	:= bExec_Reset,
-					Axis	:= AxisRef ); 
-
 // ===== reset command =====
 	bError 		:= AxisRef.Status.Error ; 
 	bExec_Reset	R= fbMcReset.Done  ;
-	bResetDone 	S= fbMcReset.Done AND NOT AxisRef.Status.Error ;
+
+// ==== execute reset functions =====
+IF AxisRef.Status.DriveDeviceError AND IAxisSTOOK THEN 
+		xSoeReset := TRUE ;
+ELSIF bSTOOK AND bExec_Reset THEN
+		xMcReset	:= TRUE ;
+ELSE 
+	xSoeReset 	:= FALSE ;
+	xMcReset	:= FALSE ;
+END_IF
+
+fbSoeReset	( 	Execute := xSoeReset,
+				Timeout	:= T#5S,
+				Axis	:= AxisRef);
+
+fbMcReset	( 	Execute	:= xMcReset,
+				Axis	:= AxisRef ); 
+				
+// ===== Set feedback =====
+	bResetDone 	S= fbMcReset.Done  ;
+	bResetDone	R= AxisRef.Status.Error ;
+	tonResetDone (IN	:= bResetDone);
 
 // ===== reset limitations =====
 	bCmdSafeSpeed 	:= FALSE ;
@@ -1190,15 +1223,17 @@ END_VAR
 
 // ===== Safe torque off function =====
 	IF bIcfSTOPresent THEN 
-		bSTOOK := IAxisSTOOK ;
+		tonSTOOK(IN := IAxisSTOOK, PT := T#1000MS);
+		bSTOOK := tonSTOOK.Q AND NOT AxisRef.Status.DriveDeviceError;
+//		bSTOOK	:= IAxisSTOOK ;
 	ELSE 
 		bSTOOK := true ;
 	END_IF
 	
 // ==== Safe operation functions (overrule all other motion functions) =====
-	IF NOT AxisRef.Status.Coupled THEN 
+	IF NOT AxisRef.Status.Coupled AND bSTOOK THEN 
 		fbMcStop( 	Axis 			:= AxisRef		,
-					Execute 		:= bCmdSafeStop AND bSTOOK AND NOT bExec_Reset,
+					Execute 		:= bCmdSafeStop AND NOT bExec_Reset,
 					Deceleration	:= fMaxDec		);
 	END_IF
 	
