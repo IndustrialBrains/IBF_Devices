@@ -23,6 +23,7 @@ END_VAR
 IF NOT bEmbeded THEN 
 	IF NOT bAddedToManual 
 	AND sName <> '' 
+	AND __ISVALIDREF(refFbManualCtrl)
 	THEN 
 		bAddedToManual S= refFbManualCtrl.CmdAddDevice(THIS^);
 	END_IF
