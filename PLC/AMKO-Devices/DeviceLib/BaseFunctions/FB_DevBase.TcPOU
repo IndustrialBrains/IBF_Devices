@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <POU Name="FB_DevBase" Id="{fd1f0090-6070-4291-b370-d3eae943f30f}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC FB_DevBase EXTENDS FB_FunctionBase
 VAR_INPUT
 	bEmbeded		: BOOL 	:= FALSE ; // Device is embedded into another device (not added to manual screen)
 	// function references 
-	refFbManualCtrl	: REFERENCE TO FB_ManualController := GVL_DevManual.fbManualControler	; // reference to manual handler
+	refFbManualCtrl	: REFERENCE TO FB_ManualController := GVL_DevManual.fbManualControler; // reference to manual handler
 END_VAR
 VAR_OUTPUT
 	eDevType		: E_Devices		:= E_Devices.Undefined	; // Type of Device 	
@@ -21,9 +21,10 @@ END_VAR
 
 // Add device to manual screen
 IF NOT bEmbeded THEN 
-	IF NOT bAddedToManual 
+	IF bInitOk
+	AND NOT bAddedToManual 
 	AND sName <> '' 
-	AND __ISVALIDREF( refFbManualCtrl)  
+	AND __ISVALIDREF(refFbManualCtrl)
 	THEN 
 		bAddedToManual S= refFbManualCtrl.CmdAddDevice(THIS^);
 	END_IF

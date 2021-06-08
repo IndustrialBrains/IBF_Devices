@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <POU Name="Fb_DevAxis" Id="{bc69e9b9-3f3d-4df5-a0a1-a0954c261e17}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC Fb_DevAxis EXTENDS FB_DevBase
@@ -198,9 +198,11 @@ END_VAR
 	END_IF
 	
 // ===== Execute gearing functions =====
+ IF __ISVALIDREF (refMasterAxis) THEN 
 	ExecGearOut		();
 	ExecGearIn		();
 	ExecGearDynamic	();
+ END_IF
 	
 // ====== reset velocity lmiting =====
 	bVelocityLimited	:= bCmdLimitVelocity ;	
@@ -232,8 +234,20 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// set blocked command if halt is active 
-bBlockedCommand 		:= fbMcHalt.Active ;
+        <ST><![CDATA[// check if master is present
+	IF NOT __ISVALIDREF (refMasterAxis) THEN 
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Axis master not found ', UDINT_TO_STRING(fbMcHalt.ErrorID));
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+	END_IF
+
+
+// set blocked command if halt is active 
+	bBlockedCommand 		:= fbMcHalt.Active ;
+
 
 // check if command buffer is empty 
 	IF AxisRef.Status.CmdBuffered THEN 
@@ -258,7 +272,17 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// set blocked command if halt is active 
+        <ST><![CDATA[// Check if master is present
+	IF NOT __ISVALIDREF (refMasterAxis) THEN 
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Axis master not found ', UDINT_TO_STRING(fbMcHalt.ErrorID));
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+	END_IF
+
+// set blocked command if halt is active 
 	bBlockedCommand := fbMcHalt.Active ;
 
 // check if command buffer is empty 
@@ -283,7 +307,17 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// set blocked command if halt is active 
+        <ST><![CDATA[// Check if master is present
+	IF NOT __ISVALIDREF (refMasterAxis) THEN 
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Axis master not found ', UDINT_TO_STRING(fbMcHalt.ErrorID));
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+	END_IF
+
+// set blocked command if halt is active 
 bBlockedCommand := fbMcHalt.Active ;
 
 // Set command to true

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <POU Name="FB_ManualController" Id="{791f33e7-9b25-0d7d-213d-2739874fa7e2}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK FB_ManualController
@@ -39,12 +39,12 @@ VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[GVL_DevManual.bManualModeActive := bManualActive ;
+      <ST><![CDATA[
+GVL_DevManual.bManualModeActive := bManualActive ;
 IF bManualActive THEN 
 	// insert a device 
 	ExecSelectDevice();
 END_IF
-
 ]]></ST>
     </Implementation>
     <Folder Name="Private" Id="{aa1be144-3e85-00ba-24ed-50747e4a9031}" />
@@ -74,6 +74,7 @@ IF NOT bDevAdded THEN
 	bDevAdded := TRUE ;
 END_IF
 
+GVL_DevManual.nGlobalNumberOfDevices := nNumberOfDevices ;
 CmdAddDevice := bDevAdded ; ]]></ST>
       </Implementation>
     </Method>
