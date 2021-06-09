@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <POU Name="FB_DevValve" Id="{ba396402-0ac8-4d5d-a8f4-911b90a2c3dc}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC FB_DevValve EXTENDS FB_DevBase
@@ -63,7 +63,11 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ====== Set close command if enabled ======
+        <ST><![CDATA[IF bCmdManual THEN 
+	RETURN;
+END_IF
+
+// ====== Set close command if enabled ======
 	bCmdClose 	:= TRUE	;		
 	bCmdOpen 	:= FALSE;
 	
@@ -94,9 +98,11 @@ bCmdManual S= TRUE ;
 
 // execute manual command 
 	IF stManualCtrl.bCmdOpen THEN 
-		CmdOpen();
+		bCmdClose 	:= FALSE;		
+		bCmdOpen 	:= TRUE	;
 	ELSIF stManualCtrl.bCmdClose THEN 
-	 	CmdClose(); 
+		bCmdClose 	:= TRUE	;		
+		bCmdOpen 	:= FALSE;
 	ELSIF stManualCtrl.bCmdTeach THEN
 		CmdTeach ();
 	END_IF
@@ -109,7 +115,11 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ====== Set open command if enabled ======
+        <ST><![CDATA[IF bCmdManual THEN 
+	RETURN;
+END_IF
+
+// ====== Set open command if enabled ======
 	bCmdClose 	:= FALSE;		
 	bCmdOpen 	:= TRUE	;
 	
