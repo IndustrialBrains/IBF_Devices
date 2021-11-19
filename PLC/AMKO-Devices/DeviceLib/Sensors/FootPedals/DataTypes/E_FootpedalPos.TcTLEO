@@ -1,26 +1,26 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.3">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <EnumerationTextList Name="E_FootpedalPos" Id="{a45d04ff-12cb-4fd2-8aee-f6a35d915e0d}">
     <Declaration><![CDATA[{attribute 'qualified_only'}
 {attribute 'strict'}
 TYPE E_FootpedalPos :
 (
-	eReverse2 	,
-	eReverse1 	,
-	eIdle		,
-	eForward1	,
-	eForward2	,
-	eForward3	,
-	eForward4	,
-	eForward5	,
-	eForward6	,
-	eForward7	,
-	eForward8	,
-	eForward9	,
-	eForward10	,
-	eForward11	,
-	eForward12	,
-	eForward13	,
+	eReverse2 	:= -2,
+	eReverse1 	:= -1,
+	eIdle		:= 0,
+	eForward0	:= 1,
+	eForward1	:= 2,
+	eForward2	:= 3,
+	eForward3	:= 4,
+	eForward4	:= 5,
+	eForward5	:= 6,
+	eForward6	:= 7,
+	eForward7	:= 8,
+	eForward8	:= 9,
+	eForward9	:= 10,
+	eForward10	:= 11,
+	eForward11	:= 12,
+	eForward12	:= 13,
 	eFalse			
 ) INT; 
 END_TYPE
@@ -31,82 +31,82 @@ END_TYPE
           <l n="TextList" t="ArrayList" cet="TextListRow">
             <o>
               <v n="TextID">"eReverse2"</v>
-              <v n="TextDefault">""</v>
+              <v n="TextDefault">"-2"</v>
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
               <v n="TextID">"eReverse1"</v>
-              <v n="TextDefault">""</v>
+              <v n="TextDefault">"-1"</v>
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
               <v n="TextID">"eIdle"</v>
-              <v n="TextDefault">""</v>
+              <v n="TextDefault">"0"</v>
+              <l n="LanguageTexts" t="ArrayList" />
+            </o>
+            <o>
+              <v n="TextID">"eForward0"</v>
+              <v n="TextDefault">"1"</v>
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
               <v n="TextID">"eForward1"</v>
-              <v n="TextDefault">""</v>
+              <v n="TextDefault">"2"</v>
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
               <v n="TextID">"eForward2"</v>
-              <v n="TextDefault">""</v>
+              <v n="TextDefault">"3"</v>
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
               <v n="TextID">"eForward3"</v>
-              <v n="TextDefault">""</v>
+              <v n="TextDefault">"4"</v>
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
               <v n="TextID">"eForward4"</v>
-              <v n="TextDefault">""</v>
+              <v n="TextDefault">"5"</v>
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
               <v n="TextID">"eForward5"</v>
-              <v n="TextDefault">""</v>
+              <v n="TextDefault">"6"</v>
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
               <v n="TextID">"eForward6"</v>
-              <v n="TextDefault">""</v>
+              <v n="TextDefault">"7"</v>
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
               <v n="TextID">"eForward7"</v>
-              <v n="TextDefault">""</v>
+              <v n="TextDefault">"8"</v>
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
               <v n="TextID">"eForward8"</v>
-              <v n="TextDefault">""</v>
+              <v n="TextDefault">"9"</v>
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
               <v n="TextID">"eForward9"</v>
-              <v n="TextDefault">""</v>
+              <v n="TextDefault">"10"</v>
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
               <v n="TextID">"eForward10"</v>
-              <v n="TextDefault">""</v>
+              <v n="TextDefault">"11"</v>
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
               <v n="TextID">"eForward11"</v>
-              <v n="TextDefault">""</v>
+              <v n="TextDefault">"12"</v>
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
               <v n="TextID">"eForward12"</v>
-              <v n="TextDefault">""</v>
-              <l n="LanguageTexts" t="ArrayList" />
-            </o>
-            <o>
-              <v n="TextID">"eForward13"</v>
-              <v n="TextDefault">""</v>
+              <v n="TextDefault">"13"</v>
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
