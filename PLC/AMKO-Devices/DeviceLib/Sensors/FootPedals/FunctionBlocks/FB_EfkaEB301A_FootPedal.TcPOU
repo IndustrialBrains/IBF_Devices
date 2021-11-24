@@ -40,22 +40,22 @@ nGreyCodetotal.3 := I_GreyCodeD ;
 // this only makes sense in EFKA world but anyway let's convert it to our own sense
 
 CASE nGreyCodetotal OF 								  // DCBA
-	03: ePedalInputStep := E_FootpedalPos.eReverse1	; // 1100
-	01: ePedalInputStep := E_FootpedalPos.eReverse2	; // 1110
-	00: ePedalInputStep := E_FootpedalPos.eIdle		; // 1111
-	02: ePedalInputStep := E_FootpedalPos.eForward0	; // 1101
-	06: ePedalInputStep := E_FootpedalPos.eForward1	; // 1001
- 	07: ePedalInputStep := E_FootpedalPos.eForward2	; // 1000
-	05: ePedalInputStep := E_FootpedalPos.eForward3	; // 1010
-	04: ePedalInputStep := E_FootpedalPos.eForward4	; // 1011
-	12:	ePedalInputStep := E_FootpedalPos.eForward5	; // 0011
-	13:	ePedalInputStep := E_FootpedalPos.eForward6	; // 0010
-	15: ePedalInputStep := E_FootpedalPos.eForward7	; // 0000
-	14: ePedalInputStep := E_FootpedalPos.eForward8	; // 0001
-	10: ePedalInputStep := E_FootpedalPos.eForward9; // 0101
-	11: ePedalInputStep := E_FootpedalPos.eForward10; // 0100
-	09: ePedalInputStep := E_FootpedalPos.eForward11; // 0110
-	08: ePedalInputStep := E_FootpedalPos.eForward12; // 0111
+	03: ePedalInputStep := E_FootpedalPos.eReverse2	; // 0011
+	01: ePedalInputStep := E_FootpedalPos.eReverse1	; // 0001
+	00: ePedalInputStep := E_FootpedalPos.eIdle		; // 0000
+	02: ePedalInputStep := E_FootpedalPos.eForward0	; // 0010
+	06: ePedalInputStep := E_FootpedalPos.eForward1	; // 0110
+ 	07: ePedalInputStep := E_FootpedalPos.eForward2	; // 0111
+	05: ePedalInputStep := E_FootpedalPos.eForward3	; // 0101
+	04: ePedalInputStep := E_FootpedalPos.eForward4	; // 0100
+	12:	ePedalInputStep := E_FootpedalPos.eForward5	; // 1100
+	13:	ePedalInputStep := E_FootpedalPos.eForward6	; // 1101
+	15: ePedalInputStep := E_FootpedalPos.eForward7	; // 1111
+	14: ePedalInputStep := E_FootpedalPos.eForward8	; // 1110
+	10: ePedalInputStep := E_FootpedalPos.eForward9	; // 1010
+	11: ePedalInputStep := E_FootpedalPos.eForward10; // 1011
+	09: ePedalInputStep := E_FootpedalPos.eForward11; // 1001
+	08: ePedalInputStep := E_FootpedalPos.eForward12; // 1000
 	ELSE
 		ePedalInputStep := E_FootpedalPos.eFalse 	;
 END_CASE]]></ST>
