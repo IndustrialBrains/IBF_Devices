@@ -52,6 +52,7 @@ VAR // Axis configuration
 		bIcfNCHomeSensor	: BOOL := FALSE ; // Homing sensor is inverted (NC)	
 	// ===== Internal motion values ======
 		fHomePosition		: LREAL := 0 ; // set position at homing
+		fOldJogVelocity		: LREAL := 0 ; // Previous jog velocity used to switch between jog functions
 	// Command Modes
 		mcHomingMode 		: MC_HomingMode := MC_direct ; // Homing Mode ( MC_DefaultHoming, MC_Direct, MC_ForceCallibration, MC_ResetCallibration)
 	// Values from system
@@ -83,7 +84,6 @@ VAR	// =============== Motion status functions ================
 		fbMcHome			: MC_Home		;		// Fb to home Axis
 		fbMcStop 			: MC_Stop		;		// FB to stop axis
 		fbMcHalt			: MC_Halt		;		// FB to halt axis
-		fbMcJog				: MC_Jog		;		// FB to Jog axis
 		fbMcMoveVelocity	: MC_MoveVelocity;		// FB to move with specified velocity until Next command is given
 		fbMcGearInSlave		: MC_GearIn		;		// FB to gear axis to master 
 		fbMcGearInDyn		: MC_GearInDyn	;		// FB to gear axis dynamicly to master
@@ -92,6 +92,7 @@ VAR	// =============== Motion status functions ================
 //		fbMcWriteParameter	: MC_WriteParameterPersistent ; // FB to write parameters in persistend data
 
 	(* PtoP Motion move commands are in arrays so multiple commands can be stacked *) 
+		fbMcJog				: ARRAY [0..1] OF MC_Jog			;		// FB to Jog axis
 		fbMCMoveRelative	: ARRAY [0..1] OF MC_MoveRelative	;		// FB to move relative
 		fbMcMoveAbsolute	: ARRAY [0..1] OF MC_MoveAbsolute	;		// FB to move axis (velocity movement)
 		fbMcMoveModulo		: ARRAY [0..1] OF MC_MoveModulo		;		// FB to move axis to modulo position
@@ -102,8 +103,6 @@ VAR	// =============== Motion status functions ================
 		bExec_Reset			: BOOL := FALSE; // Execute reset
 		bExec_Halt			: BOOL := FALSE; // Execute hold
 		bExec_Home			: BOOL := FALSE; // Execute Home
-		bExec_JogPositive	: BOOL := FALSE; // Execute Jog in positive direction
-		bExec_JogNegative	: BOOL := FALSE; // Execute Jog in negative direction
 		bExec_MoveVelocity	: BOOL := FALSE; // Execute move velocity
 		bExec_GearAsSlave	: BOOL := FALSE; // Execute gear as slave
 		bExec_GearSlaveDyn	: BOOL := FALSE; // Execute gear slave dynamic
@@ -112,6 +111,8 @@ VAR	// =============== Motion status functions ================
 //		bExec_ParWritePers	: BOOL := FALSE; // Execute parameter write persistent 
 		
 	(* PtoP Motion move commands are in arrays so multiple commands can be stacked *) 
+		arExec_JogPositive	: ARRAY	[0..1] OF BOOL ; // Execute Jog in positive direction
+		arExec_JogNegative	: ARRAY	[0..1] OF BOOL ; // Execute Jog in negative direction
 		arExec_MoveRelative	: ARRAY [0..1] OF BOOL ; // Execute move relative
 		arExec_MoveAbs		: ARRAY [0..1] OF BOOL ; // Execute move absolute reverse
 		arExec_MoveModulo	: ARRAY [0..1] OF BOOL ; // Execute move modulo
@@ -408,19 +409,50 @@ bBlockedCommand := fbMcHalt.Active ;
 	END_IF
 
 // Set command to true
-	IF fbMcJog.Velocity = fVelocity THEN // If command velocity changes, then set exec to false for one cycle to trigger new velocity so the jog follows the set velocity
-		bExec_JogPositive	:= NOT bJogNegative ;
-		bExec_JogNegative 	:= bJogNegative ;
+	IF fOldJogVelocity <> fVelocity THEN
+		IF fbMcJog[0].Active THEN 
+			fbMcJog[0].Velocity		:= 0 			;
+			arExec_JogPositive[0]	:= FALSE 		;
+			arExec_JogNegative[0] 	:= FALSE 		;
+
+			fbMcJog[1].Velocity		:= fVelocity 	;
+			fbmcjog[1].Mode			:= eJogmode		;
+			fbMcJog[1].Position		:= fPos			;
+			arExec_JogPositive[1]	:= NOT bJogNegative ;
+			arExec_JogNegative[1] 	:= bJogNegative ;	
+		ELSE
+			fbMcJog[0].Velocity		:= fVelocity 	;
+			fbmcjog[0].Mode			:= eJogmode		;
+			fbMcJog[0].Position		:= fPos			;
+			arExec_JogPositive[0]	:= NOT bJogNegative ;
+			arExec_JogNegative[0] 	:= bJogNegative ;
+
+			fbMcJog[1].Velocity		:= fVelocity 	;
+			arExec_JogPositive[1]	:= FALSE ;
+			arExec_JogNegative[1] 	:= FALSE ;
+		END_IF
+		fOldJogVelocity := fVelocity;
+	ELSE
+		IF NOT fbMcJog[1].Busy THEN
+			arExec_JogPositive[0]	:= NOT bJogNegative ;
+			arExec_JogNegative[0] 	:= bJogNegative ;
+			arExec_JogPositive[1]	:= FALSE ;
+			arExec_JogNegative[1] 	:= FALSE ;
+		ELSE
+			arExec_JogPositive[0]	:= FALSE ;
+			arExec_JogNegative[0] 	:= FALSE ;
+			arExec_JogPositive[1]	:= NOT bJogNegative ;
+			arExec_JogNegative[1] 	:= bJogNegative ;	
+		END_IF	 
 	END_IF
+
+//	IF fbMcJog.Velocity = fVelocity THEN // If command velocity changes, then set exec to false for one cycle to trigger new velocity so the jog follows the set velocity
+//	END_IF
 	bInternalEnable			:= TRUE ;
 
-// coppy parameters
-	fbMcJog.Velocity	:= fVelocity 	;
-	fbmcjog.Mode		:= eJogmode		;
-	fbMcJog.Position	:= fPos			;
 
 // Set feedback output 
-	CmdJog := fbMcJog.Active ;]]></ST>
+	CmdJog := fbMcJog[0].Active OR fbMcJog[1].Active;]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdKeepEnabled" Id="{6433043c-c7fa-0d6f-0a7e-fc542bc7a1ca}" FolderPath="Command Methods\">
@@ -972,32 +1004,33 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ===== Execute Jog function =====
+        <ST><![CDATA[FOR i := 0 TO 1 DO 
+// ===== Execute Jog function =====
 	IF bCmdLimitVelocity THEN 
-		fbMcJog.Velocity := MIN(fCmdVelocityLimit, fbMcJog.Velocity); 
+		fbMcJog[i].Velocity := MIN(fCmdVelocityLimit, fbMcJog[i].Velocity); 
 	END_IF
 
 	// function call
-	fbMcJog (	Axis 		:= AxisRef,
-				JogForward	:= bExec_JogPositive AND bDelayedEnable,
-				JogBackwards:= bExec_JogNegative AND bDelayedEnable,
-				Acceleration:= fAcceleration,
-				Deceleration:= fDeceleration );
+	fbMcJog[i] (	Axis 		:= AxisRef,
+					JogForward	:= arExec_JogPositive[i] AND bDelayedEnable,
+					JogBackwards:= arExec_JogNegative[i] AND bDelayedEnable,
+					Acceleration:= fAcceleration,
+					Deceleration:= fDeceleration );
 
 // ===== reset command =====
-	bExec_JogPositive 	:= FALSE  ;
-	bExec_JogNegative	:= FALSE  ;
+	arExec_JogPositive[i] 	:= FALSE  ;
+	arExec_JogNegative[i]	:= FALSE  ;
 	
 // Jog fault handling 
-	IF fbMcJog.Error THEN 
+	IF fbMcJog[i].Error THEN 
 		bError					:= TRUE							;
 		stFault.Active 			:= TRUE 						;
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
-		stFault.Discription		:= CONCAT('Jog Fault ', UDINT_TO_STRING(fbMcJog.ErrorID));
+		stFault.Discription		:= CONCAT('Jog Fault ', UDINT_TO_STRING(fbMcJog[i].ErrorID));
 		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 	END_IF
-]]></ST>
+END_FOR]]></ST>
       </Implementation>
     </Method>
     <Method Name="ExecMoveAbsolute" Id="{c32ad101-c406-42f7-900a-821300c800d0}" FolderPath="Private\Motion\">
@@ -1010,7 +1043,7 @@ END_VAR
 FOR i := 0 TO 1 DO 
 	// Limit velocity
 	IF bCmdLimitVelocity THEN 
-		fbMcJog.Velocity := MIN(fCmdVelocityLimit, fbMcMoveAbsolute[i].Velocity); 
+		fbMcMoveAbsolute[i].Velocity := MIN(fCmdVelocityLimit, fbMcMoveAbsolute[i].Velocity); 
 	END_IF
 	// function call
 	fbMcMoveAbsolute[i](	Axis 		:= AxisRef,
@@ -1052,7 +1085,7 @@ END_VAR
 // ===== Execute move modulo function =====
 FOR i := 0 TO 1 DO 
 	IF bCmdLimitVelocity THEN 
-		fbMcJog.Velocity := MIN(fCmdVelocityLimit, fbMcMoveModulo[i].Velocity); 
+		fbMcMoveModulo[i].Velocity := MIN(fCmdVelocityLimit, fbMcMoveModulo[i].Velocity); 
 	END_IF
 	// function call
 	fbMcMoveModulo[i](	Axis 		:= AxisRef,
@@ -1095,7 +1128,7 @@ END_VAR
 FOR i := 0 TO 1 DO 
 	// Limit velocity
 	IF bCmdLimitVelocity THEN 
-		fbMcJog.Velocity := MIN(fCmdVelocityLimit, fbMcMoveModulo[i].Velocity); 
+		fbMCMoveRelative[i].Velocity := MIN(fCmdVelocityLimit, fbMcMoveModulo[i].Velocity); 
 	END_IF
 	// function call
 	fbMCMoveRelative[i](	Axis 		:= AxisRef,
@@ -1132,7 +1165,7 @@ END_VAR
       <Implementation>
         <ST><![CDATA[// ===== Execute move velocity function =====
 	IF bCmdLimitVelocity THEN 
-		fbMcJog.Velocity := MIN(fCmdVelocityLimit, fbMcMoveVelocity.Velocity); 
+		fbMcMoveVelocity.Velocity := MIN(fCmdVelocityLimit, fbMcMoveVelocity.Velocity); 
 	END_IF
 
 // function call
