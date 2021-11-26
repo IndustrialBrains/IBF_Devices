@@ -99,17 +99,17 @@ VAR	// =============== Motion status functions ================
 		bCmdSafeStop		: BOOL ;
 		bCmdSafeSpeed		: BOOL ; 
 	// ===== Function execute triggers =====
-		bExec_Reset			: BOOL := FALSE; // Execute reset
-		bExec_Halt			: BOOL := FALSE; // Execute hold
-		bExec_Home			: BOOL := FALSE; // Execute Home
-		bExec_JogPositive	: BOOL := FALSE; // Execute Jog in positive direction
-		bExec_JogNegative	: BOOL := FALSE; // Execute Jog in negative direction
-		bExec_MoveVelocity	: BOOL := FALSE; // Execute move velocity
-		bExec_GearAsSlave	: BOOL := FALSE; // Execute gear as slave
-		bExec_GearSlaveDyn	: BOOL := FALSE; // Execute gear slave dynamic
-		bExec_GearOutSlave	: BOOL := FALSE; // Execute gear out slave
-		bExec_SetPosition	: BOOL := FALSE; // execute set position
-//		bExec_ParWritePers	: BOOL := FALSE; // Execute parameter write persistent 
+		bExec_Reset					: BOOL := FALSE; // Execute reset
+		bExec_Halt					: BOOL := FALSE; // Execute hold
+		bExec_Home					: BOOL := FALSE; // Execute Home
+		bExec_JogPositive			: BOOL := FALSE; // Execute Jog in positive direction
+		bExec_JogNegative			: BOOL := FALSE; // Execute Jog in negative direction
+		bExec_MoveVelocity			: BOOL := FALSE; // Execute move velocity
+		bExec_MoveVelocityDynamic	: BOOL := FALSE; // Execute move velocity
+		bExec_GearAsSlave			: BOOL := FALSE; // Execute gear as slave
+		bExec_GearSlaveDyn			: BOOL := FALSE; // Execute gear slave dynamic
+		bExec_GearOutSlave			: BOOL := FALSE; // Execute gear out slave
+		bExec_SetPosition			: BOOL := FALSE; // execute set position
 		
 	(* PtoP Motion move commands are in arrays so multiple commands can be stacked *) 
 		arExec_MoveRelative	: ARRAY [0..1] OF BOOL ; // Execute move relative
@@ -117,16 +117,10 @@ VAR	// =============== Motion status functions ================
 		arExec_MoveModulo	: ARRAY [0..1] OF BOOL ; // Execute move modulo
 
 		tonResetDone		: TON := (PT := T#300MS) ;
-//		bCmd_MoveRelative	: BOOL		; // Move relative command
-//		bCmd_MoveAbs		: BOOL		; // Move relative command
-//		bCmd_MoveModulo		: BOOL		; // Move relative command
-	
-//		ReCmd_MoveRelative	: R_TRIG	; // Move Relative comamnd trigger
-//		ReCmd_MoveAbs		: R_TRIG	; // Move Absolute comamnd trigger
-//		ReCmd_MoveModulo	: R_TRIG	; // Move Modulo comamnd trigger
 
 	// ===== Move ristrictions ======
 		bCmdLimitVelocity 	: BOOL := FALSE			; // velocity limiting is active 
+		bCmdManualAccDec	: BOOL := FALSE			; // Activate manual aceleration and deceleration settings
 		fCmdVelocityLimit	: LREAL:= 100			; // Maximum velocity limit when velocity limiting is active  
 		fSafeOverride		: LREAL:= 10 			; // [%] Safe velocity override  
 		
@@ -176,9 +170,10 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// ===== Set acceleratio and deceleration values =======
-	IF bCmdManual THEN 
-		fAcceleration 	:= fCmdAcc * (ParAccManualScaling.fvalue / 100);
-		fDeceleration	:= fCmdDecc* (ParDecManualScaling.fValue / 100);
+	IF bCmdManualAccDec THEN 
+		fAcceleration 		:= fCmdAcc * (ParAccManualScaling.fvalue / 100);
+		fDeceleration		:= fCmdDecc* (ParDecManualScaling.fValue / 100);
+		bCmdManualAccDec 	:= FALSE;
 	END_IF
 
 // ===== block all other commands if axis is coupled =====
@@ -495,6 +490,17 @@ END_IF
 ]]></ST>
       </Implementation>
     </Method>
+    <Method Name="CmdManualAccDec" Id="{f1ec39c9-6e7f-0d08-2c32-3eb4d63235b8}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdManualAccDec : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bCmdManualAccDec := TRUE;
+
+CmdManualAccDec := TRUE;]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="CmdMoveAbs" Id="{897ddefe-6fd9-4aa0-8e52-b781b66bb019}" FolderPath="Command Methods\">
       <Declaration><![CDATA[METHOD PUBLIC CmdMoveAbs : BOOL // Move absolute command
 VAR_INPUT
@@ -657,6 +663,50 @@ bBlockedCommand := fbMcHalt.Active ;
 
 // Set feedback output 
 	CmdMoveVelocity := fbMcMoveVelocity.Active ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdMoveVelocityDynamic" Id="{ea2c7b33-6b97-0b9e-25ab-7e7e3c6b3c21}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdMoveVelocityDynamic : BOOL // Move with set velocity until stopped
+VAR_INPUT
+	fVelocity	: 	LREAL 	; // Maximum velocity [units/sec]
+	mcDirection : 	MC_Direction := MC_Direction.MC_Positive_Direction ; // Direction of movement mc_direction [ deafult mc_positive_direction]
+	mcBuffermode: 	MC_BufferMode ; // Buffermode defines how the previous command is executed.
+END_VAR
+VAR
+	xbNewCmdVelocity : BOOL ; // a new command velocity has been detected
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// set blocked command if halt is active 
+bBlockedCommand := fbMcHalt.Active ;
+
+// Velocity conversion from RPM to deg/sec
+	IF bIcfCmdVelocityRpm THEN 
+		fVelocity := Rpm_To_DegS(fVelocity);
+	END_IF
+
+// check for command velocity changes
+	IF fVelocity > 0 THEN 	
+		xbNewCmdVelocity := fbMcMoveVelocity.Velocity <> fVelocity ;
+	ELSE
+		bExec_Halt := TRUE;
+		fbMcHalt.Deceleration	:= fCmdDecc;
+		fbMcHalt.BufferMode		:= mcBuffermode	;
+	END_IF
+	
+// Set command to true for one cycle
+	IF NOT AxisRef.Status.CmdBuffered OR mcBuffermode <> MC_Aborting THEN 
+		bExec_MoveVelocityDynamic 	:= NOT fbMcMoveVelocity.Active OR xbNewCmdVelocity;
+		bInternalEnable				:= TRUE ;
+	END_IF
+	
+// coppy parameters
+	fbMcMoveVelocity.Velocity	:= fVelocity 	;
+	fbMcMoveVelocity.Direction 	:= mcDirection	;
+	fbMcMoveVelocity.BufferMode	:= mcBuffermode	;
+
+// Set feedback output
+	CmdMoveVelocityDynamic := fbMcMoveVelocity.Active ;]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdOverwriteAcc" Id="{0bcd5b3c-1fc1-0254-21e2-286bd45e95c0}" FolderPath="Command Methods\">
@@ -1137,12 +1187,13 @@ END_VAR
 
 // function call
 fbMcMoveVelocity (	Axis 		:= AxisRef,
-					Execute		:= bExec_MoveVelocity  AND bDelayedEnable,
+					Execute		:= (bExec_MoveVelocity OR bExec_MoveVelocityDynamic) AND bDelayedEnable,
 					Acceleration:= fAcceleration,
 					Deceleration:= fDeceleration );
 
 // ===== reset command =====
-bExec_MoveVelocity := FALSE ;
+bExec_MoveVelocity 			:= FALSE ;
+bExec_MoveVelocityDynamic 	:= FALSE;
 	
 // Halt fault handling 
 IF fbMcMoveVelocity.Error THEN 
