@@ -687,7 +687,7 @@ bBlockedCommand := fbMcHalt.Active ;
 
 // check for command velocity changes
 	IF fVelocity > 0 THEN 	
-		xbNewCmdVelocity := fbMcMoveVelocity.Velocity <> fVelocity ;
+		xbNewCmdVelocity := fbMcMoveVelocity.Velocity <> fVelocity OR NOT fbMcMoveVelocity.Active ;
 	ELSE
 		bExec_Halt := TRUE;
 		fbMcHalt.Deceleration	:= fCmdDecc;
@@ -695,8 +695,8 @@ bBlockedCommand := fbMcHalt.Active ;
 	END_IF
 	
 // Set command to true for one cycle
-	IF NOT AxisRef.Status.CmdBuffered OR mcBuffermode <> MC_Aborting THEN 
-		bExec_MoveVelocityDynamic 	:= NOT fbMcMoveVelocity.Active OR xbNewCmdVelocity;
+	IF (NOT AxisRef.Status.CmdBuffered OR mcBuffermode <> MC_Aborting) AND fVelocity > 0 THEN 
+		bExec_MoveVelocityDynamic 	:= xbNewCmdVelocity;
 		bInternalEnable				:= TRUE ;
 	END_IF
 	
