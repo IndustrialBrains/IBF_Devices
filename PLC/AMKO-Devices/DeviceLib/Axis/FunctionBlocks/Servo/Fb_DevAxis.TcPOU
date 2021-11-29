@@ -1526,7 +1526,7 @@ END_VAR]]></Declaration>
 
 // ====== Set init to done =======
 bInitOk := bActParamValid AND bInitOk;
-	]]></ST>
+Init := bInitOk;	]]></ST>
       </Implementation>
     </Method>
   </POU>
