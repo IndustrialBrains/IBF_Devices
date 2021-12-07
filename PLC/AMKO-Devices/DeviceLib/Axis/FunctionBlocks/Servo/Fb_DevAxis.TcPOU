@@ -744,7 +744,7 @@ END_VAR
 	bInternalEnable	:= TRUE ;
 	
 // Set feedback output 
-	CmdReset := tonResetDone.Q ; ]]></ST>
+	CmdReset := tonResetDone.Q OR (AxisRef.Status.Coupled AND bResetDone) ; ]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdSafeSpeed" Id="{ddc13036-fa7e-46f4-be16-22a24c1d346b}" FolderPath="Command Methods\">
@@ -1252,7 +1252,8 @@ END_VAR]]></Declaration>
         <ST><![CDATA[//IF  AxisRef.Status.Moving AND bExec_Reset THEN // If the axis is still moving execute safe stop first
 //	RETURN;
 IF AxisRef.Status.Coupled THEN 
-	bResetDone := NOT AxisRef.Status.Error;
+	bResetDone 	:= NOT AxisRef.Status.Error;
+	bExec_Reset	R= bResetDone  ;
 	RETURN;
 END_IF
 
