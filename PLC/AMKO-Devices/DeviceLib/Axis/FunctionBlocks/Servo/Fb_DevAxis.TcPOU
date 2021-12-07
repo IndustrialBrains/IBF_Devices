@@ -1252,6 +1252,7 @@ END_VAR]]></Declaration>
         <ST><![CDATA[//IF  AxisRef.Status.Moving AND bExec_Reset THEN // If the axis is still moving execute safe stop first
 //	RETURN;
 IF AxisRef.Status.Coupled THEN 
+	bResetDone := NOT AxisRef.Status.Error;
 	RETURN;
 END_IF
 
