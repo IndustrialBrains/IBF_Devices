@@ -8,7 +8,6 @@
 *.tclrs
 *.compiled-library
 *.compileinfo
-*.tmc
 *.tmcRefac
 *.library
 *.project.~u
@@ -370,5 +369,3 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
-PLC/.vs/AMKO-Devices/v15/.suo
-PLC/.vs/AMKO-Devices/v15/.suo
