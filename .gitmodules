@@ -1,0 +1,3 @@
+[submodule "Libraries/AMKOLib-Utilities"]
+	path = Libraries/AMKOLib-Utilities
+	url = https://github.com/IndustrialBrains/AMKOLib-Utilities.git
