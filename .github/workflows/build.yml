@@ -29,7 +29,7 @@ jobs:
 
       - name: Checkout submodules using a PAT
         run: |
-          git config --file .gitmodules --get-regexp url | while read url; do git config --file=.gitmodules $(echo "$url" | sed -E "s/git@github.com:|https:\/\/github.com\//https:\/\/${{ secrets.CI_PAT }}:${{ secrets.CI_PAT }}@github.com\//"); done;
+          git config --file .gitmodules --get-regexp url | do { git config --file=.gitmodules $(echo "$url" | sed -E "s/git@github.com:|https:\/\/github.com\//https:\/\/${{ secrets.CI_PAT }}:${{ secrets.CI_PAT }}@github.com\//") } while (read url) 
           git submodule sync
           git submodule update --init --recursive
 
