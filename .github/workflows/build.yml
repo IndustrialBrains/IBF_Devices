@@ -24,17 +24,17 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    - name: Checkout repository and submodules
-      uses: actions/checkout@v2
-      with:
-        submodules: recursive
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
 
-    - name: Library check
-        run:|
-          & c:/Users/Administrator/source/repos/TcCliTools/Python/venv/Scripts/Activate.ps1
-          python c:/Users/Administrator/source/repos/TcCliTools/Python/main.py .
+      - name: Library check
+          run:|
+            & c:/Users/Administrator/source/repos/TcCliTools/Python/venv/Scripts/Activate.ps1
+            python c:/Users/Administrator/source/repos/TcCliTools/Python/main.py .
 
-    - name: Restore library repository
-        run:|
-          Remove-Item -Recurse -Force "C:\TwinCAT\3.1\Components\Plc\Managed Libraries"
-          Copy-Item -Recurse -Path "C:\TwinCAT\3.1\Components\Plc\Managed Libraries - Backup" -Destination "C:\TwinCAT\3.1\Components\Plc\Managed Libraries"
+      - name: Restore library repository
+          run:|
+            Remove-Item -Recurse -Force "C:\TwinCAT\3.1\Components\Plc\Managed Libraries"
+            Copy-Item -Recurse -Path "C:\TwinCAT\3.1\Components\Plc\Managed Libraries - Backup" -Destination "C:\TwinCAT\3.1\Components\Plc\Managed Libraries"
