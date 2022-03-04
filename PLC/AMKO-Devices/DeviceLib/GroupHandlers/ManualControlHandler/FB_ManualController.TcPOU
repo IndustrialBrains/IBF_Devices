@@ -39,7 +39,8 @@ VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[
+      <ST><![CDATA[fbNodevice; // Make sure the compiler does not ignore this "unused" variable
+
 GVL_DevManual.bManualModeActive := bManualActive ;
 IF bManualActive THEN 
 	// insert a device 

@@ -67,7 +67,6 @@ VAR	// ====== Axis enable =====
 		TonMotionEnable		: TON 			; // Timer on for motion command enable
 		TofIntAxisEnable	: TOF  			; // Timer off for internal axis enable 
 		bSTOOK				: BOOL 	:= FALSE; // Axis safet torque off is ok
-		reSTOOK				: R_TRIG		; // rising edge safe torcue off ok
 		tonSTOOK			: TON	; // Safe torque off ok timer
 	// Parameter read status 
 		Cmd_EnDriveParRead	: BOOL 			; // Enable parameter read 
@@ -127,7 +126,6 @@ VAR	// =============== Motion status functions ================
 	// ===== Internal variables =======
 		fAcceleration		: LREAL := 0 ; // Acceleration used for functions 
 		fDeceleration		: LREAL := 0 ; // Deceleration used for functions
-		reCmdReset			: R_TRIG ; // Rising edge on reset command
 END_VAR
 VAR
 	// ===== Loop variables =====
