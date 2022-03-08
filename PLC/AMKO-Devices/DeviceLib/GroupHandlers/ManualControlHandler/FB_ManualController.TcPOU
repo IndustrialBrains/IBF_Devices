@@ -31,7 +31,9 @@ VAR
 	pDevEncoder			: POINTER TO FB_EncoderBase				; // Device Pointer to encoder Base
 	pDevAnalogAxis		: POINTER TO FB_DevAnalogAxis			; // Device pointer to analog axis control
 	
+	{attribute 'analysis' := '-33'} // Disable "Unused Variable" rule
 	fbNodevice			: FB_DevBase ;
+	
 	stNoDevice			: UDT_DeviceID := (sName := 'No device', sType := TO_STRING(E_Devices.Undefined), pFunction := ADR(fbNodevice)); 
 	arDeviceArray		: ARRAY [0..GVL_DevManual.nMAXDEVCOUNT] OF UDT_DeviceID := [stNoDevice]	; // Array of Devices for manual control
 	nCmdLookupindex		: UDINT := 0; // Index number in array
@@ -39,9 +41,7 @@ VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[fbNodevice; // Make sure the compiler does not ignore this "unused" variable
-
-GVL_DevManual.bManualModeActive := bManualActive ;
+      <ST><![CDATA[GVL_DevManual.bManualModeActive := bManualActive ;
 IF bManualActive THEN 
 	// insert a device 
 	ExecSelectDevice();
