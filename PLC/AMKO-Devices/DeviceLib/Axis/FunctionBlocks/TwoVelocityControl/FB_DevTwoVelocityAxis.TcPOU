@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+  <POU Name="FB_DevTwoVelocityAxis" Id="{e8eb17a6-550c-09fd-360d-8aa78e8c2d2a}" SpecialFunc="None">
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC FB_DevTwoVelocityAxis EXTENDS FB_DevBase IMPLEMENTS iTwoDirectionalMotorWithFast
+VAR // internal commands
+	bCmdRunCW		: BOOL ; // run clockwise
+	bCmdRunCWFast	: BOOL ; // Run fast
+	bCmdRunCCW		: BOOL ; // run counter clockwise
+	bCmdRunCCWFast	: BOOL ; // Run fast
+	stManualControl	: st_ManualDigitalMotorControl ; // Manual control structure
+END_VAR
+VAR // Outputs
+	qbRunCw			AT%Q* : BOOL ; // Output run clockwise
+	qbRunCWFast		AT%Q* : BOOL ; // Output run clockwise Fast
+	qbRunCCW 		AT%Q* : BOOL ; // Output run counter clockwise
+	qbRunCCWFast	AT%Q* : BOOL ; // Output run Counter clockwise Fast	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[SUPER^(refFbFault := refFbFault);
+
+IF NOT bInitOk THEN
+	RETURN;
+END_IF
+
+ExecSetOutputs();]]></ST>
+    </Implementation>
+    <Folder Name="Commands" Id="{591cba55-b3ec-09ca-2c26-d9f82172d1bf}" />
+    <Folder Name="Private" Id="{b2975725-633e-0559-1fea-455a8eb0722d}" />
+    <Method Name="CmdManual" Id="{3bbccf59-74a3-0ce3-3b51-ab24e73bb16f}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdManual : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bCmdManual S= TRUE;
+
+CmdManual := TRUE ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdRunCCW" Id="{c5a16d8a-be6b-01e9-0dfa-465ce32863dc}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD CmdRunCCW : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bCmdRunCCW := TRUE;
+
+CmdRunCCW := qbRunCCW;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdRunCCWFast" Id="{83e3e117-4418-0eff-3e98-58a89223bf59}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD CmdRunCCWFast : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bCmdRunCCWFast := TRUE;
+
+CmdRunCCWFast := qbRunCCWFast;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdRunCW" Id="{b73327c3-303d-0dcf-31ab-6083d6f63345}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD CmdRunCW : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bCmdRunCW := TRUE;
+
+CmdRunCW := qbRunCW;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdRunCWFast" Id="{2e8b8e06-7e0d-08fe-04b7-b011eb5d4f3f}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD CmdRunCWFast : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bCmdRunCWFast := TRUE;
+
+CmdRunCWFast := qbRunCWFast;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdSafeStop" Id="{2fbfa226-58a0-0f3c-136b-e927c0cfd4bc}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdSafeStop : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CmdSafeStop := TRUE;
+
+CmdSafeStop R= NOT qbRunCw;
+CmdSafeStop R= NOT qbRunCWFast;
+CmdSafeStop R= NOT qbRunCCW;
+CmdSafeStop R= NOT qbRunCCWFast;	
+
+qbRunCw			:= FALSE;
+qbRunCWFast		:= FALSE;
+qbRunCCW 		:= FALSE;
+qbRunCCWFast	:= FALSE;	
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecSetOutputs" Id="{4ede632d-5668-01ba-1dcd-7865d8312e6b}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecSetOutputs : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF bSafetyOk THEN
+	IF bManual THEN
+		qbRunCw			:= stManualControl.bManRunCW;
+		qbRunCWFast		:= stManualControl.bManRunCWFast;
+		qbRunCCW 		:= stManualControl.bManRunCCw;
+		qbRunCCWFast	:= stManualControl.bManRunCCWFast;
+	ELSIF bEnable THEN
+		qbRunCw			:= bCmdRunCW;
+		qbRunCWFast		:= bCmdRunCWFast;
+		qbRunCCW 		:= bCmdRunCCW;
+		qbRunCCWFast	:= bCmdRunCCWFast;
+	END_IF	
+ELSE
+	qbRunCw			:= FALSE;
+	qbRunCWFast		:= FALSE;
+	qbRunCCW 		:= FALSE;
+	qbRunCCWFast	:= FALSE;	
+END_IF
+
+// reset all commands
+bCmdRunCW		:= FALSE;
+bCmdRunCWFast	:= FALSE;
+bCmdRunCCW		:= FALSE;
+bCmdRunCCWFast	:= FALSE;
+stManualControl.bManRunCW 		:= FALSE;
+stManualControl.bManRunCWFast 	:= FALSE;
+stManualControl.bManRunCCw 		:= FALSE;
+stManualControl.bManRunCCWFast	:= FALSE;
+
+bCmdManual := FALSE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Init" Id="{f8f179bb-5835-054d-0444-1793de8f5f60}" FolderPath="Commands\">
+      <Declaration><![CDATA[METHOD Init : BOOL
+VAR_INPUT
+	(* Identification number of object*)
+	nId	: UDINT;
+	(* Id of higher level If aplicable (0 = no parent)*)
+	nParentId	: UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[{warning 'component type needs to be added to Utilities lib'} 
+bInitOk := ExecIdentifyDevice(nId, nParentId, eComponentType := E_ComponentTypes.NA);
+
+Init := bInitOk;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

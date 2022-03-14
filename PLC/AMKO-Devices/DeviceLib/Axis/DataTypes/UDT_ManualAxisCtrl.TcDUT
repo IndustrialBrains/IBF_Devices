@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+  <DUT Name="UDT_ManualAxisCtrl" Id="{294e2f67-670e-05e7-1506-3b969f0de2a6}">
+    <Declaration><![CDATA[TYPE UDT_ManualAxisCtrl :
+STRUCT
+	bCmdJogForward	: 	BOOL 		; // command jog forward
+	bCmdJogReverse	: 	BOOL 		; // command jog reverse
+	bCmdInching		: 	BOOL 		; // Command move relative Distance
+	bCmdToPos		: 	BOOL 		; // command move to absolute position (only moving when active)
+	bCmdHome		: 	BOOL 		; // Command home axis
+	fPosition		:	LREAL 		; // target position
+	fDistance		:	LREAL 		; // target position
+	fVelocity		: 	LREAL 		; // Maximum velocity [units/sec]
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

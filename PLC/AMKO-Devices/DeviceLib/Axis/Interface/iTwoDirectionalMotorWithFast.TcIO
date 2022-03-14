@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+  <Itf Name="iTwoDirectionalMotorWithFast" Id="{992056b8-17e9-00b5-0fc7-3c5cd8787b1d}">
+    <Declaration><![CDATA[INTERFACE iTwoDirectionalMotorWithFast EXTENDS iTwoDirectionalMotor // Two directional motor with run fast commands
+]]></Declaration>
+    <Method Name="CmdRunCCWFast" Id="{32b655a9-8667-0ca6-06ce-b62af57655e2}">
+      <Declaration><![CDATA[METHOD CmdRunCCWFast : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="CmdRunCWFast" Id="{d70282e7-67d5-0030-1a17-e8ea495802ef}">
+      <Declaration><![CDATA[METHOD CmdRunCWFast : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>

@@ -18,7 +18,7 @@
     <Company>AMKO-Engineering</Company>
     <Released>false</Released>
     <Title>Device_Library</Title>
-    <ProjectVersion>1.6.0.7</ProjectVersion>
+    <ProjectVersion>1.6.0.8</ProjectVersion>
     <Description>Device library of AMKO-Engineering.</Description>
     <Author>AMKO-Engineering</Author>
     <CompilerDefines>InclSerialCom := 'true'</CompilerDefines>
@@ -99,8 +99,10 @@
     <Folder Include="Axis\DataTypes" />
     <Folder Include="Axis\FunctionBlocks" />
     <Folder Include="Axis\FunctionBlocks\Analog" />
+    <Folder Include="Axis\FunctionBlocks\TwoVelocityControl" />
     <Folder Include="Axis\FunctionBlocks\ServoHybrid" />
     <Folder Include="Axis\FunctionBlocks\Servo" />
+    <Folder Include="Axis\FunctionBlocks\TwoVelocityControl\DataTypes" />
     <Folder Include="Axis\Interface" />
     <Folder Include="Buttons" />
     <Folder Include="Buttons\DataTypes" />
@@ -156,6 +158,9 @@
     <Compile Include="Axis\DataTypes\UDT_AxVal.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Axis\DataTypes\UDT_ManualAxisCtrl.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Axis\FunctionBlocks\Analog\FB_DevAnalogAxis.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -171,7 +176,16 @@
     <Compile Include="Axis\FunctionBlocks\Servo\Fb_DevAxis.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Axis\FunctionBlocks\UDT_ManualAxisCtrl.TcDUT">
+    <Compile Include="Axis\FunctionBlocks\TwoVelocityControl\DataTypes\st_ManualDigitalMotorControl.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Axis\FunctionBlocks\TwoVelocityControl\FB_DevTwoVelocityAxis.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Axis\Interface\iTwoDirectionalMotor.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Axis\Interface\iTwoDirectionalMotorWithFast.TcIO">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="BaseFunctions\FB_DevBase.TcPOU">

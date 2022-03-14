@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+  <DUT Name="st_ManualDigitalMotorControl" Id="{162f917f-988a-0d87-1e32-0b4813687637}">
+    <Declaration><![CDATA[TYPE st_ManualDigitalMotorControl : // commands from manual controller
+STRUCT
+	bManRunCW 		: BOOL ;
+	bManRunCWFast	: BOOL ;
+	bManRunCCw		: BOOL ;
+	bManRunCCWFast	: BOOL ; 
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>
