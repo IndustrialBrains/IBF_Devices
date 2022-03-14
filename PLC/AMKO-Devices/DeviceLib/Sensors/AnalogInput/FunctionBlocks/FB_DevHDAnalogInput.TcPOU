@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
   <POU Name="FB_DevHDAnalogInput" Id="{17595e23-620c-00d9-1a3c-cd0af05163c6}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC FB_DevHDAnalogInput EXTENDS FB_DevBase
@@ -38,7 +38,7 @@ ELSE
 	fValue := DINT_TO_LREAL(inHwInput);
 END_IF
 
-]]></ST>
+ExecSetFeedback := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Method Name="Init" Id="{89115260-2041-0458-044d-7546366459ec}">

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
   <POU Name="FB_DevAnalogInputScaled" Id="{43638945-f4e4-0cff-025b-6c03ae4b4de9}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC FB_DevAnalogInputScaled EXTENDS FB_DevAnalogInput
@@ -31,7 +31,8 @@ ELSE
 END_IF
 
 fValue := INT_TO_LREAL(nCalibValue) / fGainFactor;
-]]></ST>
+
+ExecSetFeedback := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Method Name="SetScaling" Id="{ac76234a-a867-0b26-0f7d-98f1a69590d3}">
@@ -50,7 +51,8 @@ ELSE
 END_IF
 
 nOfset := LREAL_TO_INT(fOfset * fGainFactor) ;
-]]></ST>
+
+SetScaling := TRUE;]]></ST>
       </Implementation>
     </Method>
   </POU>
