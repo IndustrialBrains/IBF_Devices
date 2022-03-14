@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
   <POU Name="FB_DevHDAnalogInAutoCalibrate" Id="{9489a00d-77df-047c-2429-91aeb238ef70}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC FB_DevHDAnalogInAutoCalibrate EXTENDS FB_DevHDAnalogInputScaled
@@ -21,7 +21,9 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// set offset to calibrate to null
-nOfset := - inHwInput ;]]></ST>
+nOfset := - inHwInput ;
+
+CmdCalibrateNull := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdCalilbrateValue" Id="{4aabd8a7-ce5a-0592-3907-22c1c8717aab}">
@@ -32,7 +34,9 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// set gain from current value
-fGainFactor := DINT_TO_LREAL(inHwInput + nOfset) / fCalibrationValue ; ]]></ST>
+fGainFactor := DINT_TO_LREAL(inHwInput + nOfset) / fCalibrationValue ; 
+
+CmdCalilbrateValue := TRUE;]]></ST>
       </Implementation>
     </Method>
   </POU>
