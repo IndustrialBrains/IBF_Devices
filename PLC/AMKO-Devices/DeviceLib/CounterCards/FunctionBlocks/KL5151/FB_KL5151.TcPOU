@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+  <POU Name="FB_KL5151" Id="{df645e77-ad73-00ed-1f06-f5798d21983d}" SpecialFunc="None">
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK FB_KL5151 EXTENDS FB_DevBase IMPLEMENTS iCounter
+VAR_INPUT
+	bInitAsCounterCard	: BOOL := FALSE; // (Default = FALSE) Use Terminal as encoder input (FALSE) or counter (TRUE) 
+END_VAR
+VAR CONSTANT // register values 
+	WRITE_FEATURE_REGISTER 	: USINT := 16#E0; // write to register address command
+	READ_FEATURE_REGISTER	: USINT := 16#A0; // Read feature register response  
+END_VAR
+VAR // Inputs and outputs
+	Status		AT%I* : USINT ; // status byte from card
+	Counter		AT%I* : UDINT ; // 
+	Ctrl 		AT%Q* : USINT ; // Control byte to card`
+	DataOut 	AT%Q* : UDINT ; // Set counter value
+END_VAR
+VAR // steppers
+	InitStep : INT := 0; // init stepper
+END_VAR
+VAR // Manual control
+	stManualControl : st_ManualCounterControl;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[SUPER^(refFbFault := refFbFault);]]></ST>
+    </Implementation>
+    <Folder Name="Public" Id="{ba5eeb51-f519-0b9d-3b18-512a69522b3c}" />
+    <Method Name="CmdManual" Id="{2c4682fb-4abf-0dcb-304c-7d205ffb993f}" FolderPath="Public\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdManual : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bCmdManual := TRUE;
+
+IF stManualControl.bManSetValue THEN 
+	// set counter to value
+	DataOut	:= stManualControl.nManValue	;
+	Ctrl.2 	:= Counter <> stManualControl.nManValue;
+	
+	stManualControl.bManSetValue R= Counter = stManualControl.nManValue;
+END_IF
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdReset" Id="{878eab4b-2982-059c-334a-891ab33aca94}" FolderPath="Public\">
+      <Declaration><![CDATA[METHOD CmdReset : BOOL // Reset the value of the counter card to 0
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// set counter value to 0
+DataOut	:= 0	;
+Ctrl.2 	:= Counter <> 0;
+
+CmdReset := Counter = 0;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdSetValue" Id="{7a4118c4-5747-0bc6-1b86-84f27a3800c8}" FolderPath="Public\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdSetValue : BOOL // Set the value of the counter card
+VAR_INPUT
+	Value	: UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// set counter to value
+DataOut	:= Value	;
+Ctrl.2 	:= Counter <> Value;
+
+CmdSetValue := Counter = Value;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="CountValue" Id="{00e066e9-3663-0599-3e6b-d6b437f2479b}" FolderPath="Public\">
+      <Declaration><![CDATA[PROPERTY PUBLIC CountValue : UDINT
+]]></Declaration>
+      <Get Name="Get" Id="{1e405d11-da5b-0d46-2f10-7c8c72afaea0}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Init" Id="{bd4538ad-b516-00fd-2eeb-cad656d156dc}" FolderPath="Public\">
+      <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
+VAR_INPUT
+	// Message location data
+	nId				: UDINT ; // Identification number of object
+	nParentId		: UDINT ; // Id of higher level If aplicable (0 = no parent)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+IF bInitAsCounterCard THEN
+	{warning 'Counter function needs to be added to devices'}
+	ExecIdentifyDevice(nId := nId, nParentId := nParentId, eComponentType := E_ComponentTypes.NA);
+	eDevType := E_Devices.Counter;
+ELSE 
+	ExecIdentifyDevice(nId := nId, nParentId := nParentId, eComponentType := E_ComponentTypes.Encoder);
+	eDevType := E_Devices.Encoder;
+END_IF
+
+// Check feature register against set function 
+CASE InitStep OF 
+	0: // check active feature register values
+		Ctrl := READ_FEATURE_REGISTER;
+		InitStep := initstep + 1;
+	1: // Check if operation mode is correct If not set operation mode
+		IF Status = READ_FEATURE_REGISTER THEN
+			IF Counter.15 = bInitAsCounterCard THEN 
+				InitStep := 10;
+			ELSE
+				DataOut := Counter;
+				DataOut.15 := bInitAsCounterCard;
+				Ctrl := WRITE_FEATURE_REGISTER;
+				InitStep := InitStep + 1;
+			END_IF
+		END_IF
+	2: // Check if register was written	
+		IF Status = READ_FEATURE_REGISTER THEN
+			InitStep := 10;
+		END_IF
+	10: // init done
+		bInitOk := TRUE;
+	ELSE
+		;
+END_CASE
+
+Init := bInitOk;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+  <Itf Name="iCounter" Id="{99eb9e42-0844-0373-3007-aa469c33325f}">
+    <Declaration><![CDATA[INTERFACE iCounter
+]]></Declaration>
+    <Method Name="CmdReset" Id="{c8f65e43-e9db-0d46-368c-11e932d8e453}">
+      <Declaration><![CDATA[METHOD PUBLIC CmdReset : BOOL
+]]></Declaration>
+    </Method>
+    <Method Name="CmdSetValue" Id="{a14f7d20-1980-0f0b-0f0b-f99755f732db}">
+      <Declaration><![CDATA[METHOD PUBLIC CmdSetValue : BOOL
+VAR_INPUT
+	Value : UDINT ;
+END_VAR
+]]></Declaration>
+    </Method>
+    <Property Name="CountValue" Id="{46a841e9-a25b-0322-3b9f-ecdddc9a6e82}">
+      <Declaration><![CDATA[PROPERTY PUBLIC CountValue : UDINT
+]]></Declaration>
+      <Get Name="Get" Id="{cee3cabc-7739-0dbc-1e49-aaf81b0685a8}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+  </Itf>
+</TcPlcObject>

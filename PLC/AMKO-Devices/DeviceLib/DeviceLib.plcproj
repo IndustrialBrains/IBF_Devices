@@ -107,6 +107,10 @@
     <Folder Include="Buttons" />
     <Folder Include="Buttons\DataTypes" />
     <Folder Include="Buttons\Functions" />
+    <Folder Include="CounterCards\DataTypes" />
+    <Folder Include="CounterCards\FunctionBlocks" />
+    <Folder Include="CounterCards\FunctionBlocks\KL5151" />
+    <Folder Include="CounterCards\Interfaces" />
     <Folder Include="Encoders" />
     <Folder Include="Encoders\DataTypes" />
     <Folder Include="Encoders\FunctionBlocks" />
@@ -119,6 +123,7 @@
     <Folder Include="GroupHandlers" />
     <Folder Include="DevTypes" />
     <Folder Include="HardwareDiagnostics" />
+    <Folder Include="CounterCards" />
     <Folder Include="Outputs" />
     <Folder Include="Outputs\DigitalOutputs" />
     <Folder Include="Outputs\AnalogOutputs" />
@@ -201,6 +206,15 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Buttons\Functions\FB_DevPushButton.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CounterCards\FunctionBlocks\KL5151\FB_KL5151.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CounterCards\Interfaces\iCounter.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CounterCards\st_ManualCounterControl.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DevTypes\E_Devices.TcTLEO">
