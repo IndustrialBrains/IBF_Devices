@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
-  <POU Name="FB_KL5151" Id="{df645e77-ad73-00ed-1f06-f5798d21983d}" SpecialFunc="None">
+  <POU Name="FB_DevKL5151" Id="{df645e77-ad73-00ed-1f06-f5798d21983d}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
-FUNCTION_BLOCK FB_KL5151 EXTENDS FB_DevBase IMPLEMENTS iCounter
+FUNCTION_BLOCK FB_DevKL5151 EXTENDS FB_DevBase IMPLEMENTS iCounter
 VAR_INPUT
 	bInitAsCounterCard	: BOOL := FALSE; // (Default = FALSE) Use Terminal as encoder input (FALSE) or counter (TRUE) 
 END_VAR
@@ -93,11 +93,12 @@ END_VAR
 IF bInitAsCounterCard THEN
 	{warning 'Counter function needs to be added to devices'}
 	ExecIdentifyDevice(nId := nId, nParentId := nParentId, eComponentType := E_ComponentTypes.NA);
-	eDevType := E_Devices.Counter;
 ELSE 
 	ExecIdentifyDevice(nId := nId, nParentId := nParentId, eComponentType := E_ComponentTypes.Encoder);
-	eDevType := E_Devices.Encoder;
 END_IF
+
+eDevType := E_Devices.KL5151;
+
 
 // Check feature register against set function 
 CASE InitStep OF 
