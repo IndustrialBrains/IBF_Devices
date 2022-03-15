@@ -8,6 +8,8 @@ END_VAR
 VAR_OUTPUT
 END_VAR
 VAR
+	nLimitMin		: INT := Utilities_Library.GVL_FixedValues.nINTMINVALUE	; // Initial value is set to integer minimum value for use with normal def analog inputs 
+	nLimitMax 		: INT := Utilities_Library.GVL_FixedValues.nINTMAXVALUE	; // Initial value is set to integer minimum value for use with high def analog inputs
 	fGainFactor 	: LREAL	:= 1	;
 	nOfset			: INT	:= 0	;
 END_VAR
