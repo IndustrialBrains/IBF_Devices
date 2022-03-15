@@ -32,6 +32,7 @@ VAR
 	pDevAnalogAxis		: POINTER TO FB_DevAnalogAxis			; // Device pointer to analog axis control
 	pDevTwoVelocityAxis	: POINTER TO FB_DevTwoVelocityAxis		; // Device pointer to two velocity axis control
 	pDevKL5151			: POINTER TO FB_DevKL5151				; // Device pointer to KL5151 encoder/ counter input card
+	pDevKL1512			: POINTER TO FB_DevKL1512				; // Device pointer to KL1512 counter input card
 	
 	{attribute 'analysis' := '-33'} // Disable "Unused Variable" rule
 	fbNodevice			: FB_DevBase ;
@@ -122,6 +123,8 @@ CASE arDeviceArray[nCmdLookupindex].pFunction^.eDevType OF
 		pDevTwoVelocityAxis := arDeviceArray[nCmdLookupindex].pFunction ;
 	E_Devices.KL5151 :
 		pDevKL5151			:= arDeviceArray[nCmdLookupindex].pFunction ;
+	E_Devices.KL1512 :
+		pDevKL1512			:= arDeviceArray[nCmdLookupindex].pFunction ;
 	ELSE
 		;
 END_CASE

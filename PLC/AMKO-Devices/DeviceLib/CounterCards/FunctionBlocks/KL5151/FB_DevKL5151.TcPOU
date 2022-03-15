@@ -76,7 +76,7 @@ CmdSetValue := Counter = Value;]]></ST>
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[]]></ST>
+          <ST><![CDATA[CountValue := Counter;]]></ST>
         </Implementation>
       </Get>
     </Property>
@@ -98,7 +98,6 @@ ELSE
 END_IF
 
 eDevType := E_Devices.KL5151;
-
 
 // Check feature register against set function 
 CASE InitStep OF 

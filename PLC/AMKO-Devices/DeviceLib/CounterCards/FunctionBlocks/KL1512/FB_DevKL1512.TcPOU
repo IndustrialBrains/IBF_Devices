@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+  <POU Name="FB_DevKL1512" Id="{13830df6-a1c8-0790-3cd4-d45b04d886e0}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_DevKL1512 EXTENDS fb_devBase IMPLEMENTS iCounter
+VAR
+	nOldCount	: UINT ; // Previous counter value 
+	nBaseCount	: UDINT; // Base counter	
+END_VAR
+VAR // Inputs and outputs
+	State		AT%I* : USINT ; // status byte from card
+	DataIn		AT%I* : UINT ; // 
+	Ctrl 		AT%Q* : USINT ; // Control byte to card`
+	DataOut 	AT%Q* : UINT ; // Set counter value
+END_VAR
+VAR // Manual control
+	stManualControl : st_ManualCounterControl;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[ExecExtendCount();]]></ST>
+    </Implementation>
+    <Folder Name="Private" Id="{011e1d81-0a3a-0a80-2e11-32fa98ed55b6}" />
+    <Method Name="CmdManual" Id="{667b226d-b64e-09ef-0f6d-7561382b7b86}">
+      <Declaration><![CDATA[METHOD PUBLIC CmdManual : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bCmdManual := TRUE;
+
+IF stManualControl.bManSetValue THEN 
+	// set counter to value
+	DataOut	:= UDINT_TO_UINT(stManualControl.nManValue)	;
+	Ctrl.5 	:= DataIn <> stManualControl.nManValue;
+	
+	stManualControl.bManSetValue R= DataIn = stManualControl.nManValue;
+END_IF
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdReset" Id="{1e8c8989-e17a-065e-1925-929be5525636}">
+      <Declaration><![CDATA[METHOD CmdReset : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[nOldCount 	:= 0;
+nBaseCount 	:= 0;
+
+// set counter value to 0
+Ctrl.1 	:= DataIn <> 0; // Set Count clear bit
+
+CmdReset := DataIn = 0;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdSetValue" Id="{fee364fa-c801-08b8-1bb3-e6197bc06666}">
+      <Declaration><![CDATA[METHOD CmdSetValue : BOOL
+VAR_INPUT
+	Value	: UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[nOldCount 	:= UDINT_TO_UINT(Value);
+nBaseCount 	:= 0;
+
+// set counter to value
+DataOut	:= UDINT_TO_UINT( Value)	;
+Ctrl.5 	:= DataOut <> Value;
+
+CmdSetValue := DataIn = Value;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="CountValue" Id="{9f3affe1-74a4-0c96-0695-50f49cc29318}">
+      <Declaration><![CDATA[PROPERTY CountValue : UDINT
+]]></Declaration>
+      <Get Name="Get" Id="{367a29bd-a1db-0712-2387-6b0607b6aad6}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CountValue := nBaseCount + DataIn;
+]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="ExecExtendCount" Id="{72002aec-3e2d-04fa-137b-ff1bbc80b078}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD ExecExtendCount : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF nOldCount > DataIn THEN
+	nBaseCount := nbasecount + 16#FFFF ;
+END_IF
+nOldCount := DataIn;
+
+
+]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>
