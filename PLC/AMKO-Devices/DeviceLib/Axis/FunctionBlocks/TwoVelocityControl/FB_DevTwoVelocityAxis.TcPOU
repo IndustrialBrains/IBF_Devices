@@ -132,15 +132,15 @@ bCmdManual := FALSE;]]></ST>
     <Method Name="Init" Id="{f8f179bb-5835-054d-0444-1793de8f5f60}" FolderPath="Commands\">
       <Declaration><![CDATA[METHOD Init : BOOL
 VAR_INPUT
-	(* Identification number of object*)
-	nId	: UDINT;
-	(* Id of higher level If aplicable (0 = no parent)*)
-	nParentId	: UDINT;
+	nId			: UDINT ; // Identification number of object
+	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[{warning 'component type needs to be added to Utilities lib'} 
-bInitOk := ExecIdentifyDevice(nId, nParentId, eComponentType := E_ComponentTypes.NA);
+        <ST><![CDATA[bInitOk := ExecIdentifyDevice(nId, nParentId, eComponentType := E_ComponentTypes.Axis);
+
+// ===== Set device type for manual control =====
+eDevType := E_Devices.TwoVelocityAxis ;
 
 Init := bInitOk;]]></ST>
       </Implementation>
