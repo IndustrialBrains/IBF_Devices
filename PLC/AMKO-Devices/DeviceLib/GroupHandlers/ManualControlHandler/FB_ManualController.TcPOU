@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
   <POU Name="FB_ManualController" Id="{791f33e7-9b25-0d7d-213d-2739874fa7e2}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK FB_ManualController
@@ -30,6 +30,8 @@ VAR
 	pDevDoublePWM		: POINTER TO FB_DevDoublePWM			; // Device pointer to Double PWM controller
 	pDevEncoder			: POINTER TO FB_EncoderBase				; // Device Pointer to encoder Base
 	pDevAnalogAxis		: POINTER TO FB_DevAnalogAxis			; // Device pointer to analog axis control
+	pDevTwoVelocityAxis	: POINTER TO FB_DevTwoVelocityAxis		; // Device pointer to two velocity axis control
+	pDevKL5151			: POINTER TO FB_DevKL5151				; // Device pointer to KL5151 encoder/ counter input card
 	
 	{attribute 'analysis' := '-33'} // Disable "Unused Variable" rule
 	fbNodevice			: FB_DevBase ;
@@ -116,6 +118,10 @@ CASE arDeviceArray[nCmdLookupindex].pFunction^.eDevType OF
 		pDevEncoder			:= arDeviceArray[nCmdLookupindex].pFunction ;
 	E_Devices.AnalogAxis:
 		pDevAnalogAxis		:= arDeviceArray[nCmdLookupindex].pFunction ;
+	E_Devices.TwoVelocityAxis :
+		pDevTwoVelocityAxis := arDeviceArray[nCmdLookupindex].pFunction ;
+	E_Devices.KL5151 :
+		pDevKL5151			:= arDeviceArray[nCmdLookupindex].pFunction ;
 	ELSE
 		;
 END_CASE
