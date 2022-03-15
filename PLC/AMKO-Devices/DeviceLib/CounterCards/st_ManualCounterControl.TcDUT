@@ -5,6 +5,7 @@
 STRUCT
 	bManSetValue 	: BOOL ; // Set value from manual control
 	nManValue		: UDINT; // Manual value
+	nCount			: UDINT; // Counter value
 END_STRUCT
 END_TYPE
 ]]></Declaration>
