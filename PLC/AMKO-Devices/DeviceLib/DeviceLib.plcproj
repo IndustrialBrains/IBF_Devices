@@ -15,12 +15,12 @@
     <Implicit_Jitter_Distribution>{5e9cb390-c73f-49f4-9021-a9c80b5b8c45}</Implicit_Jitter_Distribution>
     <LibraryReferences>{3777a586-3c4b-4e2e-9d45-11447c631d2f}</LibraryReferences>
     <CombineIds>true</CombineIds>
-    <Company>AMKO-Engineering</Company>
+    <Company>Industrial brains</Company>
     <Released>false</Released>
     <Title>Device_Library</Title>
-    <ProjectVersion>1.6.0.9</ProjectVersion>
-    <Description>Device library of AMKO-Engineering.</Description>
-    <Author>AMKO-Engineering</Author>
+    <ProjectVersion>1.6.1.0</ProjectVersion>
+    <Description>Device library of Industrial brains</Description>
+    <Author>Industrial brains</Author>
     <CompilerDefines>InclSerialCom := 'true'</CompilerDefines>
     <LibraryCategories>
       <LibraryCategory>
