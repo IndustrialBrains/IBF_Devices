@@ -11,7 +11,8 @@ VAR_OUTPUT
 	fValue	: LREAL := 0 ; // Input value from hardware (converted to LREAL)
 END_VAR
 VAR
-	inHwInput AT%I* : INT ; // Hardware connection
+	inHwInput 	AT%I* : INT ; // Hardware connection
+	inStatus	AT%I* : BYTE; // input card hardware status
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -21,12 +22,46 @@ eDevType := E_Devices.AnalogSensor ;
 // Call base function
 SUPER^(refFbFault := refFbFault);
 
+// Check Hardware connection
+CheckHardware();
 // set feedback
 ExecSetFeedback();
 
 // Make sure compiler does not skip unused variables
 ]]></ST>
     </Implementation>
+    <Method Name="CheckHardware" Id="{a46229ba-2910-0c8c-007b-bec4165a24ff}">
+      <Declaration><![CDATA[METHOD CheckHardware : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Check for hardware faults
+IF inStatus.0 THEN // signal under range
+	stFault.Active			:= TRUE 							;
+	stFault.MessageNumber	:= E_MessageNumbers.CF_FeedbackFault 	;
+	stFault.Discription		:= CONCAT( sName, 'Signal under Range' )	;
+	stFault.FaultType		:= E_FaultTypes.CF 					;
+	bErrorActive			:= TRUE 							;
+END_IF
+
+IF inStatus.1 THEN // signal over range
+	stFault.Active			:= TRUE 							;
+	stFault.MessageNumber	:= E_MessageNumbers.CF_FeedbackFault 	;
+	stFault.Discription		:= CONCAT( sName, 'Signal over Range' )	;
+	stFault.FaultType		:= E_FaultTypes.CF 					;
+	bErrorActive			:= TRUE 							;
+END_IF
+
+IF inStatus.6 THEN // general Error bit
+	stFault.Active			:= TRUE 							;
+	stFault.MessageNumber	:= E_MessageNumbers.FF_Unknown 	;
+	stFault.Discription		:= CONCAT( sName, 'Hardware General Error' )	;
+	stFault.FaultType		:= E_FaultTypes.FF 					;
+	bErrorActive			:= TRUE 							;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="ExecSetFeedback" Id="{7a115a3e-3411-01c5-2bf8-56b6258af2f3}">
       <Declaration><![CDATA[METHOD ExecSetFeedback : BOOL
 VAR_INPUT
