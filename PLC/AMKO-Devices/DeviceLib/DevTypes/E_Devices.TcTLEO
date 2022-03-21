@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
   <EnumerationTextList Name="E_Devices" Id="{46bcbc51-0c54-0108-2c95-6d230f5291c3}">
     <Declaration><![CDATA[{attribute 'qualified_only'}
 {attribute 'strict'}
@@ -18,7 +18,10 @@ TYPE E_Devices :
 	PWMController,
 	DoublePWMController,
 	Encoder,
-	AnalogAxis
+	AnalogAxis,
+	TwoVelocityAxis,
+	KL5151,
+	KL1512
 )INT;
 END_TYPE
 ]]></Declaration>
@@ -88,6 +91,21 @@ END_TYPE
             </o>
             <o>
               <v n="TextID">"AnalogAxis"</v>
+              <v n="TextDefault">""</v>
+              <l n="LanguageTexts" t="ArrayList" />
+            </o>
+            <o>
+              <v n="TextID">"TwoVelocityAxis"</v>
+              <v n="TextDefault">""</v>
+              <l n="LanguageTexts" t="ArrayList" />
+            </o>
+            <o>
+              <v n="TextID">"KL5151"</v>
+              <v n="TextDefault">""</v>
+              <l n="LanguageTexts" t="ArrayList" />
+            </o>
+            <o>
+              <v n="TextID">"KL1512"</v>
               <v n="TextDefault">""</v>
               <l n="LanguageTexts" t="ArrayList" />
             </o>

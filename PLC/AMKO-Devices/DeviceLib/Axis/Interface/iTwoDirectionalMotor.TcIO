@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+  <Itf Name="iTwoDirectionalMotor" Id="{d32567da-a499-03f5-0571-61631b1f1071}">
+    <Declaration><![CDATA[INTERFACE iTwoDirectionalMotor // Two directional motor control
+]]></Declaration>
+    <Method Name="CmdRunCCW" Id="{c8d703ed-592e-0314-2c47-a332655716e1}">
+      <Declaration><![CDATA[METHOD CmdRunCCW : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="CmdRunCW" Id="{f4cd52f4-5ff7-03f9-16ba-bfa76a95a3e0}">
+      <Declaration><![CDATA[METHOD CmdRunCW : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="Init" Id="{166128ac-fa2c-0a53-3c23-eef4d035d13b}">
+      <Declaration><![CDATA[METHOD Init : BOOL
+VAR_INPUT
+	// Message location data
+	nId				: UDINT ; // Identification number of object
+	nParentId		: UDINT ; // Id of higher level If aplicable (0 = no parent)
+END_VAR
+]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>

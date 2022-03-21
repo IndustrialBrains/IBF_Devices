@@ -11,9 +11,10 @@ VAR_OUTPUT
 	fValue	: LREAL := 0 ; // Analog input value (LREAL)
 END_VAR
 VAR
-	nLimitMin		: DINT := Utilities_Library.GVL_FixedValues.nDINTMINVALUE	; // Initial value is set to integer minimum value for use with normal def analog inputs 
-	nLimitMax 		: DINT := Utilities_Library.GVL_FixedValues.nDINTMAXVALUE 	; // Initial value is set to integer minimum value for use with high def analog inputs
-	inHwInput AT%I* : DINT ; // Hardware connection
+	nLimitMin			: DINT := Utilities_Library.GVL_FixedValues.nDINTMINVALUE	; // Initial value is set to integer minimum value for use with normal def analog inputs 
+	nLimitMax 			: DINT := Utilities_Library.GVL_FixedValues.nDINTMAXVALUE 	; // Initial value is set to integer minimum value for use with high def analog inputs
+	inHwInput 	AT%I* 	: DINT ; // Hardware connection
+	inStatus	AT%I* 	: BYTE; // input card hardware status
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -23,9 +24,44 @@ eDevType := E_Devices.AnalogSensor ;
 // Call base function
 SUPER^(refFbFault := refFbFault);
 
+// Check Hardware connection
+CheckHardware();
+
 // set feedback
 ExecSetFeedback();]]></ST>
     </Implementation>
+    <Method Name="CheckHardware" Id="{de66372f-1f59-079d-284f-b942f3a56b98}">
+      <Declaration><![CDATA[METHOD CheckHardware : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Check for hardware faults
+IF inStatus.0 THEN // signal under range
+	stFault.Active			:= TRUE 							;
+	stFault.MessageNumber	:= E_MessageNumbers.CF_FeedbackFault 	;
+	stFault.Discription		:= CONCAT( sName, 'Signal under Range' )	;
+	stFault.FaultType		:= E_FaultTypes.CF 					;
+	bErrorActive			:= TRUE 							;
+END_IF
+
+IF inStatus.1 THEN // signal over range
+	stFault.Active			:= TRUE 							;
+	stFault.MessageNumber	:= E_MessageNumbers.CF_FeedbackFault 	;
+	stFault.Discription		:= CONCAT( sName, 'Signal over Range' )	;
+	stFault.FaultType		:= E_FaultTypes.CF 					;
+	bErrorActive			:= TRUE 							;
+END_IF
+
+IF inStatus.6 THEN // general Error bit
+	stFault.Active			:= TRUE 							;
+	stFault.MessageNumber	:= E_MessageNumbers.FF_Unknown 	;
+	stFault.Discription		:= CONCAT( sName, 'Hardware General Error' )	;
+	stFault.FaultType		:= E_FaultTypes.FF 					;
+	bErrorActive			:= TRUE 							;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="ExecSetFeedback" Id="{e186a48a-464f-020c-23e9-d266b6ce2852}">
       <Declaration><![CDATA[METHOD ExecSetFeedback : BOOL
 VAR_INPUT
@@ -55,7 +91,9 @@ END_VAR
 
 // ====== Calculate device id =====
 	bInitOk :=	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.AnInput) AND bInitOk;
-]]></ST>
+
+// ====== Set feedback =====
+	Init := bInitOk ;	]]></ST>
       </Implementation>
     </Method>
   </POU>

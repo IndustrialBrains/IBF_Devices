@@ -1,8 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
   <POU Name="Fb_DevLight" Id="{96f8b868-5c9a-4b69-bf1f-8b217a5e80f7}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC Fb_DevLight EXTENDS FB_DevBase ;
+VAR_OUTPUT
+	bSoftLightOut	: BOOL ; // Software light output	
+END_VAR
 VAR
 	bCmdBlinkSlow	: BOOL := FALSE ; // Command light blink slow
 	bCmdBlinkFast 	: BOOL := FALSE ; // Command light blink fast
@@ -77,6 +80,9 @@ ELSIF bCmdBlinkSlow THEN
 ELSE
 	qLight := FALSE ;
 END_IF
+
+// set soft output
+bSoftLightOut	:= qLight;
 
 // reset all commands 
 bCmdOn			:= FALSE ;

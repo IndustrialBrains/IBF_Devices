@@ -1,12 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
   <POU Name="Fb_DevDigitalInput" Id="{611498ce-bd86-46dc-9066-1bac29019612}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC Fb_DevDigitalInput EXTENDS FB_DevBase 
 VAR_INPUT
-	tDelay			: TIME 	:= T#1S	;// Time before delayed signal becomes active 
-	bCmdSimulate	: BOOL 	:= FALSE ;// Simulate sensor Input 
-	bSimState		: BOOL 	:= FALSE ;// Simulated sensor state
+	tDelay				: TIME 	:= T#1S	;// Time before delayed signal becomes active 
+	bCmdSimulate		: BOOL 	:= FALSE ;// Simulate sensor Input 
+	bSimState			: BOOL 	:= FALSE ;// Simulated sensor state
+	bIcfNormalyClosed	: BOOL  := FALSE ;// Hardware input is a normally closed contact
+	ibSoftInput			: BOOL 			;// Software input (bFcoInputActive := 
 END_VAR
 VAR_OUTPUT
 	bFcoInputActive		: BOOL 			;// Digital sensor, Button active state
@@ -29,8 +31,10 @@ IF bEnable OR bCmdManual THEN
 	IF bCmdSimulate  THEN 
 		bFcoInputActive := bSimState ;
 		bCmdSimulate	:= FALSE ;  
+	ELSIF bIcfNormalyClosed THEN
+		bFcoInputActive := NOT Istatus OR ibSoftInput;
 	ELSE
-		bFcoInputActive := Istatus ;
+		bFcoInputActive := Istatus OR ibSoftInput ;
 	END_IF
 ELSE 
 	bFcoInputActive := FALSE ;

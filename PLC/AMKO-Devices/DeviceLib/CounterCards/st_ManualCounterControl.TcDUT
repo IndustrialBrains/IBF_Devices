@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+  <DUT Name="st_ManualCounterControl" Id="{087c674c-fdfb-0251-264e-21fde04c5ab5}">
+    <Declaration><![CDATA[TYPE st_ManualCounterControl :
+STRUCT
+	bManSetValue 	: BOOL ; // Set value from manual control
+	nManValue		: UDINT; // Manual value
+	nCount			: UDINT; // Counter value
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>
