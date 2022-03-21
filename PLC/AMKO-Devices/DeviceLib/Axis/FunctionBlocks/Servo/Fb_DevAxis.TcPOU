@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <POU Name="Fb_DevAxis" Id="{bc69e9b9-3f3d-4df5-a0a1-a0954c261e17}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC Fb_DevAxis EXTENDS FB_DevBase
@@ -67,6 +67,7 @@ VAR	// ====== Axis enable =====
 		TonMotionEnable		: TON 			; // Timer on for motion command enable
 		TofIntAxisEnable	: TOF  			; // Timer off for internal axis enable 
 		bSTOOK				: BOOL 	:= FALSE; // Axis safet torque off is ok
+		{attribute 'analysis' := '-33'}
 		reSTOOK				: R_TRIG		; // rising edge safe torcue off ok
 		tonSTOOK			: TON	; // Safe torque off ok timer
 	// Parameter read status 
@@ -133,6 +134,7 @@ VAR	// =============== Motion status functions ================
 	// ===== Internal variables =======
 		fAcceleration		: LREAL := 0 ; // Acceleration used for functions 
 		fDeceleration		: LREAL := 0 ; // Deceleration used for functions
+		{attribute 'analysis' := '-33'}
 		reCmdReset			: R_TRIG ; // Rising edge on reset command
 END_VAR
 VAR

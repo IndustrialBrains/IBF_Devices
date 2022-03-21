@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <POU Name="FB_DevAnalogInput" Id="{438fca26-964b-0408-10a5-3e8ee84a0164}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC FB_DevAnalogInput EXTENDS FB_DevBase
@@ -11,7 +11,9 @@ VAR_OUTPUT
 	fValue	: LREAL := 0 ; // Input value from hardware (converted to LREAL)
 END_VAR
 VAR
+	{attribute 'analysis' := '-33'}
 	nLimitMin		: INT := Utilities_Library.GVL_FixedValues.nINTMINVALUE ; // Initial value is set to integer minimum value for use with normal def analog inputs 
+	{attribute 'analysis' := '-33'}
 	nLimitMax 		: INT := Utilities_Library.GVL_FixedValues.nINTMAXVALUE	; // Initial value is set to integer minimum value for use with high def analog inputs
 	inHwInput AT%I* : INT ; // Hardware connection
 END_VAR

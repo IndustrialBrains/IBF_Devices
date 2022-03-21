@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <POU Name="FB_ManualController" Id="{791f33e7-9b25-0d7d-213d-2739874fa7e2}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK FB_ManualController
@@ -31,6 +31,7 @@ VAR
 	pDevEncoder			: POINTER TO FB_EncoderBase				; // Device Pointer to encoder Base
 	pDevAnalogAxis		: POINTER TO FB_DevAnalogAxis			; // Device pointer to analog axis control
 	
+	{attribute 'analysis' := '-33'}
 	fbNodevice			: FB_DevBase ;
 	stNoDevice			: UDT_DeviceID := (sName := 'No device', sType := TO_STRING(E_Devices.Undefined), pFunction := ADR(fbNodevice)); 
 	arDeviceArray		: ARRAY [0..GVL_DevManual.nMAXDEVCOUNT] OF UDT_DeviceID := [stNoDevice]	; // Array of Devices for manual control

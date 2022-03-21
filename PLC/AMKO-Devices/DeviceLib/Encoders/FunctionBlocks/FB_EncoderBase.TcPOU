@@ -1,13 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <POU Name="FB_EncoderBase" Id="{78ccea55-8da3-46e5-834a-35136183596e}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC FB_EncoderBase EXTENDS FB_DevBase
 VAR_INPUT
 END_VAR
 VAR_OUTPUT
+	{attribute 'analysis' := '-33'}
 	nOutPosition		: LREAL	:= 0	; // Scaled position output
-	nOutRaw				: UDINT := 0	; // Raw output value	 
+	{attribute 'analysis' := '-33'}
+	nOutRaw				: UDINT := 0	; // Raw output value
+	{attribute 'analysis' := '-33'}
 	nVelocity			: LREAL	:= 0 	; // Velocity [units/sec]
 END_VAR
 VAR
