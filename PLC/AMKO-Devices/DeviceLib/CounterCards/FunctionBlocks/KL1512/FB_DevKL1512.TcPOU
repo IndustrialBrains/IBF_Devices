@@ -7,6 +7,8 @@ VAR
 	nBaseCount	: UDINT; // Base counter	
 END_VAR
 VAR // Inputs and outputs
+	{info 'TODO: Add device state information and warnings (status is now unused var)'}
+	{attribute 'analysis' := '-33'}
 	State		AT%I* : USINT ; // status byte from card
 	DataIn		AT%I* : UINT ; // 
 	Ctrl 		AT%Q* : USINT ; // Control byte to card`
