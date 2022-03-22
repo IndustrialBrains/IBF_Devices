@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
   <POU Name="Fb_DevCylWithFbk" Id="{4d944a84-dab5-48bc-b450-758ff0ff83b4}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC Fb_DevCylWithFbk EXTENDS FB_DevValve
@@ -15,7 +15,11 @@ VAR_OUTPUT
 	bFeClosed			: BOOL 	:= FALSE	; // closed sensor falling edge
 	bReClosed			: BOOL 	:= FALSE	; // closed sensor rising edge
 	bFeOpen				: BOOL 	:= FALSE 	; // Open sensor falling edge
-	bReOpen				: BOOL 	:= false 	; // open sensor rising edge 
+	bReOpen				: BOOL 	:= FALSE 	; // open sensor rising edge 
+	bReOpenSlow         : BOOL  := FALSE    ; // rising edge, opening went too slow
+	bReOpenFast         : BOOL  := FALSE    ; // rising edge, opening went too fast
+	bReCloseSlow        : BOOL  := FALSE    ; // rising edge, closing went too slow
+	bReCloseFast        : BOOL  := FALSE    ; // rising edge, closing went too fast
 END_VAR
 VAR	
 	bFcoCalcDone	: BOOL := FALSE ; // Calculate timers done 
@@ -57,6 +61,12 @@ END_VAR
 // ====== Check direction of movement =======
 	ExecDirection();
 	
+// ====== Reset movement indicators =======
+	bReOpenSlow  := FALSE;
+	bReOpenFast  := FALSE;
+	bReCloseSlow := FALSE;
+	bReCloseFast := FALSE;
+
 // ====== Check movement speed =======
 	ExecTimeout();
 	
@@ -277,14 +287,16 @@ END_IF
 					stFault.Discription		:= CONCAT( sName, 'Cylinder closing to fast' )	;
 					stFault.FaultType		:= E_FaultTypes.CF 					;
 					bErrorActive			:= TRUE 							;
+					bReCloseFast			:= TRUE                             ;
 				END_IF
 			ELSIF	nTimePassedMs > stTimesClose.Maximum  THEN
 				// send message to HMI 
 				stFault.Active			:= TRUE ;
-				stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToSlow 	;
+				stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToSlow		;
 				stFault.Discription		:= CONCAT( sName,'Cylinder closing to Slow')	;
-				stFault.FaultType		:= E_FaultTypes.CF 				;
-				bErrorActive			:= TRUE 							;
+				stFault.FaultType		:= E_FaultTypes.CF 						;
+				bErrorActive			:= TRUE 								;
+				bReCloseSlow			:= TRUE                             	;
 			END_IF
 		END_IF
 	END_IF	
@@ -300,16 +312,18 @@ END_IF
 					stFault.Active			:= TRUE ;
 					stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToFast 	;
 					stFault.Discription		:= CONCAT( sName,'Cylinder Opening to fast')		;
-					stFault.FaultType		:= E_FaultTypes.CF 				;
+					stFault.FaultType		:= E_FaultTypes.CF 					;
 					bErrorActive			:= TRUE 							;
+					bReOpenFast 			:= TRUE 							;
 				END_IF
 			ELSIF	nTimePassedMs > stTimesOpen.Maximum  THEN
 				// send message to HMI 
 				stFault.Active			:= TRUE ;
 				stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToSlow 	;
 				stFault.Discription		:= CONCAT( sName,'Cylinder Opening to Slow')		;
-				stFault.FaultType		:= E_FaultTypes.CF 				;
+				stFault.FaultType		:= E_FaultTypes.CF 					;
 				bErrorActive			:= TRUE 							;
+				bReOpenSlow 			:= TRUE 							;
 			END_IF
 		END_IF
 	END_IF	
