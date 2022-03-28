@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
   <POU Name="FB_DevAnalogAxis" Id="{2d577320-0726-040c-269d-52c0e83d50e7}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevAnalogAxis EXTENDS FB_DevBase
 VAR_INPUT
@@ -216,7 +216,9 @@ bInitOk	:= 	fbqReverse.Init	( 	nId				:= 3,
 bInitOk	:= 	fbiEnabled.Init	( 	nId				:= 4,
 								nParentId		:= nLocationId)
 								AND bInitOk;
-]]></ST>
+
+// ====== Set feedback =======
+Init := bInitOk;]]></ST>
       </Implementation>
     </Method>
   </POU>
