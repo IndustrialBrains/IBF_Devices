@@ -79,18 +79,19 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[CmdSafeStop := TRUE;
+        <ST><![CDATA[bIsSafe := TRUE;
 
-CmdSafeStop R= NOT qbRunCw;
-CmdSafeStop R= NOT qbRunCWFast;
-CmdSafeStop R= NOT qbRunCCW;
-CmdSafeStop R= NOT qbRunCCWFast;	
+bIsSafe R= qbRunCw;
+bIsSafe R= qbRunCWFast;
+bIsSafe R= qbRunCCW;
+bIsSafe R= qbRunCCWFast;	
 
 qbRunCw			:= FALSE;
 qbRunCWFast		:= FALSE;
 qbRunCCW 		:= FALSE;
 qbRunCCWFast	:= FALSE;	
-]]></ST>
+
+CmdSafeStop := bIsSafe;]]></ST>
       </Implementation>
     </Method>
     <Method Name="ExecSetOutputs" Id="{4ede632d-5668-01ba-1dcd-7865d8312e6b}" FolderPath="Private\">
