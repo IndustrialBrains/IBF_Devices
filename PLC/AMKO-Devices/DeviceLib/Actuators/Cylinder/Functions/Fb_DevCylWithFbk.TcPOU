@@ -192,13 +192,13 @@ END_VAR
  	IF q_Close AND fbSensorOpen.bReStatus AND NOT q_Open THEN
 		stFault.Active			:= TRUE ;
 		stFault.MessageNumber	:= E_MessageNumbers.CF_WrongDirection 	;
-		stFault.Discription		:= CONCAT( sName,'Cylinder Opening instead of closing');
+		stFault.Discription		:= CONCAT( sName,' Cylinder Opening instead of closing');
 		stFault.FaultType		:= E_FaultTypes.CF 					;
 		bErrorActive			:= TRUE 								;
 	ELSIF q_Open AND fbSensorClosed.bReStatus AND NOT q_close THEN
 		stFault.Active			:= TRUE ;
 		stFault.MessageNumber	:= E_MessageNumbers.CF_WrongDirection 	;
-		stFault.Discription		:= CONCAT( sName,'Cylinder closing instead of opening');
+		stFault.Discription		:= CONCAT( sName,' Cylinder closing instead of opening');
 		stFault.FaultType		:= E_FaultTypes.CF 					;
 		bErrorActive			:= TRUE 								;
 	END_IF
@@ -284,7 +284,7 @@ END_IF
 					// send message to HMI 
 					stFault.Active			:= TRUE 							;
 					stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToFast 	;
-					stFault.Discription		:= CONCAT( sName, 'Cylinder closing to fast' )	;
+					stFault.Discription		:= CONCAT( sName, ' Cylinder closing to fast' )	;
 					stFault.FaultType		:= E_FaultTypes.CF 					;
 					bErrorActive			:= TRUE 							;
 					bReCloseFast			:= TRUE                             ;
@@ -293,7 +293,7 @@ END_IF
 				// send message to HMI 
 				stFault.Active			:= TRUE ;
 				stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToSlow		;
-				stFault.Discription		:= CONCAT( sName,'Cylinder closing to Slow')	;
+				stFault.Discription		:= CONCAT( sName,' Cylinder closing to Slow')	;
 				stFault.FaultType		:= E_FaultTypes.CF 						;
 				bErrorActive			:= TRUE 								;
 				bReCloseSlow			:= TRUE                             	;
@@ -311,7 +311,7 @@ END_IF
 					// send message to HMI 
 					stFault.Active			:= TRUE ;
 					stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToFast 	;
-					stFault.Discription		:= CONCAT( sName,'Cylinder Opening to fast')		;
+					stFault.Discription		:= CONCAT( sName,' Cylinder Opening to fast')		;
 					stFault.FaultType		:= E_FaultTypes.CF 					;
 					bErrorActive			:= TRUE 							;
 					bReOpenFast 			:= TRUE 							;
@@ -320,7 +320,7 @@ END_IF
 				// send message to HMI 
 				stFault.Active			:= TRUE ;
 				stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToSlow 	;
-				stFault.Discription		:= CONCAT( sName,'Cylinder Opening to Slow')		;
+				stFault.Discription		:= CONCAT( sName,' Cylinder Opening to Slow')		;
 				stFault.FaultType		:= E_FaultTypes.CF 					;
 				bErrorActive			:= TRUE 							;
 				bReOpenSlow 			:= TRUE 							;
