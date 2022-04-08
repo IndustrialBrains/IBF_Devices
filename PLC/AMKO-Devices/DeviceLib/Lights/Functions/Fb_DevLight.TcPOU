@@ -105,7 +105,9 @@ END_VAR
 
 // ====== Calculate device id =====
 	bInitOk :=	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.DiOutput) AND bInitOk;
-]]></ST>
+
+// ===== Set feedback =====
+	Init := bInitOk;]]></ST>
       </Implementation>
     </Method>
   </POU>
