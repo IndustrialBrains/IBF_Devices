@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
   <POU Name="FB_DevValve" Id="{ba396402-0ac8-4d5d-a8f4-911b90a2c3dc}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC FB_DevValve EXTENDS FB_DevBase
@@ -70,9 +70,13 @@ END_IF
 // ====== Set close command if enabled ======
 	bCmdClose 	:= TRUE	;		
 	bCmdOpen 	:= FALSE;
+
+// ====== Check if command is blocked =====
+	bBlockedCommand := bCmdHold;
 	
 // ===== Set feedback ======
-	CmdClose := bFco_Closed ;]]></ST>
+	CmdClose := bFco_Closed ;
+	]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdHold" Id="{af07192d-9229-4e2b-8dd0-febfb84d4f3e}">
@@ -122,6 +126,9 @@ END_IF
 // ====== Set open command if enabled ======
 	bCmdClose 	:= FALSE;		
 	bCmdOpen 	:= TRUE	;
+
+// ====== Check if command is blocked =====
+	bBlockedCommand := bCmdHold;
 	
 // ===== Set feedback ======
 	CmdOpen := bFco_Open ;]]></ST>
@@ -259,9 +266,6 @@ IF bSafetyOk THEN
 	IF NOT bCmdHold AND (bEnable OR bCmdManual) THEN  
 		q_Close	:= bCmdClose;
 		q_Open	:= bCmdOpen	;
-		bBlockedCommand := FALSE ;
-	ELSE
-		bBlockedCommand := TRUE ;
 	END_IF
 ELSE
 	CASE eSafeState OF 
