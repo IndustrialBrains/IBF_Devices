@@ -64,8 +64,8 @@ END_VAR
 nBaseCount 	:= 0;
 
 // set counter to value
-DataOut	:= UDINT_TO_UINT( Value)	;
-Ctrl.5 	:= DataOut <> Value;
+DataOut	:= UDINT_TO_UINT(Value);
+Ctrl.5 	:= DataIn <> Value;
 
 CmdSetValue := DataIn = Value;]]></ST>
       </Implementation>
