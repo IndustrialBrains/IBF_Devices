@@ -107,21 +107,39 @@ CASE InitStep OF
 		InitStep := initstep + 1;
 	1: // Check if operation mode is correct If not set operation mode
 		IF Status = READ_FEATURE_REGISTER THEN
+			//Check if we are the requested mode
 			IF Counter.15 = bInitAsCounterCard THEN 
-				InitStep := 10;
+				InitStep := 3;
 			ELSE
+				//Copy the current value into the output
 				DataOut := Counter;
+				//Set the encoder/counter bit as requested
 				DataOut.15 := bInitAsCounterCard;
+				//Give the command to write to the card
 				Ctrl := WRITE_FEATURE_REGISTER;
-				InitStep := InitStep + 1;
+				InitStep := 2;
 			END_IF
 		END_IF
 	2: // Check if register was written	
 		IF Status = READ_FEATURE_REGISTER THEN
+			InitStep := 3;
+		END_IF
+		
+	3: //Stop register access, return to normal
+		//Copy the current value into the output
+		Ctrl := Status;
+		//Reset the register access bit
+		Ctrl.7 := FALSE;
+		InitStep := 4;
+		
+	4: //Check if the command was accepted
+		IF Status.7 = 0 THEN
 			InitStep := 10;
 		END_IF
+		
 	10: // init done
 		bInitOk := TRUE;
+		
 	ELSE
 		;
 END_CASE
