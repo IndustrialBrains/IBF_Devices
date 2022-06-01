@@ -132,6 +132,7 @@ ELSE
 	bCmdRunCCW		:= FALSE;
 END_IF 
 
+{warning disable C0371}
 // ====== Set outputs =======
 	fbVelocity	(	bEmbeded 	:= TRUE,
 					bSafetyOk	:= bSafetyOk,
@@ -156,7 +157,7 @@ END_IF
 					bEnable		:= bInternalEnable,
 					bCmdOn		:= bCmdReset,
 					refFbFault	:= refFbFault);
-
+{warning restore C0371}
 // ===== reset input commands =====
 	fCmdVelocity 	:= 0;
 	bCmdRunCW		:= FALSE;

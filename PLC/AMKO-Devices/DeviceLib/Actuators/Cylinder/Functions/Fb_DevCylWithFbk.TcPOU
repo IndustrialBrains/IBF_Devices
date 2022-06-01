@@ -212,7 +212,8 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ====== Call sensor Open function =======
+        <ST><![CDATA[{warning disable C0371}
+// ====== Call sensor Open function =======
 	IF bIcfFbkClosedPresent THEN 
 		fbSensorClosed(refFbFault := refFbFault);
 		bFco_Closed := fbSensorClosed.bFcoInputActive ;
@@ -234,6 +235,7 @@ END_VAR
 		bFco_Open := FbTOnOpen.Q ;
 	END_IF
 
+{warning restore C0371}
 // ====== set outputs =======
 	bReady		:= bFco_Closed OR bFco_Open ;]]></ST>
       </Implementation>

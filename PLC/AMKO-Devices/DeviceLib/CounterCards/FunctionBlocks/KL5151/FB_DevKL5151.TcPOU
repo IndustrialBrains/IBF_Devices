@@ -92,7 +92,7 @@ END_VAR
       <Implementation>
         <ST><![CDATA[
 IF bInitAsCounterCard THEN
-	{warning 'Counter function needs to be added to devices'}
+//	{warning 'Counter function needs to be added to devices'}
 	ExecIdentifyDevice(nId := nId, nParentId := nParentId, eComponentType := E_ComponentTypes.NA);
 ELSE 
 	ExecIdentifyDevice(nId := nId, nParentId := nParentId, eComponentType := E_ComponentTypes.Encoder);
