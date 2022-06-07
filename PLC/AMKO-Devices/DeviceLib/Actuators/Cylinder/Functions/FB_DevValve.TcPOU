@@ -356,7 +356,8 @@ END_VAR]]></Declaration>
 	refFbParHandler.CmdAddParameter( refParameter := stParTimeToClose );
 	refFbParHandler.CmdAddParameter( refParameter := stParTimeToOpen );
 
-]]></ST>
+// Set feedback
+Init := bInitOk;]]></ST>
       </Implementation>
     </Method>
   </POU>
