@@ -44,15 +44,26 @@ END_IF
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="CmdReset" Id="{878eab4b-2982-059c-334a-891ab33aca94}" FolderPath="Public\">
-      <Declaration><![CDATA[METHOD CmdReset : BOOL // Reset the value of the counter card to 0
+    <Method Name="CmdReset" Id="{1177881d-8cd4-0a69-1822-d089e6fc248e}" FolderPath="Public\">
+      <Declaration><![CDATA[METHOD CmdReset : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Ctrl.2 	:= FALSE;
+
+CmdReset := NOT Status.2;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdResetValue" Id="{878eab4b-2982-059c-334a-891ab33aca94}" FolderPath="Public\">
+      <Declaration><![CDATA[METHOD CmdResetValue : BOOL // Reset the value of the counter card to 0
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// set counter value to 0
 DataOut	:= 0	;
 Ctrl.2 	:= Counter <> 0;
 
-CmdReset := Counter = 0;]]></ST>
+CmdResetValue := Counter = 0;]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdSetValue" Id="{7a4118c4-5747-0bc6-1b86-84f27a3800c8}" FolderPath="Public\">

@@ -3,8 +3,8 @@
   <Itf Name="iCounter" Id="{99eb9e42-0844-0373-3007-aa469c33325f}">
     <Declaration><![CDATA[INTERFACE iCounter
 ]]></Declaration>
-    <Method Name="CmdReset" Id="{c8f65e43-e9db-0d46-368c-11e932d8e453}">
-      <Declaration><![CDATA[METHOD PUBLIC CmdReset : BOOL
+    <Method Name="CmdResetValue" Id="{c8f65e43-e9db-0d46-368c-11e932d8e453}">
+      <Declaration><![CDATA[METHOD PUBLIC CmdResetValue : BOOL
 ]]></Declaration>
     </Method>
     <Method Name="CmdSetValue" Id="{a14f7d20-1980-0f0b-0f0b-f99755f732db}">

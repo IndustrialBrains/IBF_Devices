@@ -3,22 +3,27 @@
   <POU Name="FB_DevKL1512" Id="{13830df6-a1c8-0790-3cd4-d45b04d886e0}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_DevKL1512 EXTENDS fb_devBase IMPLEMENTS iCounter
 VAR
-	nOldCount	: UINT ; // Previous counter value 
-	nBaseCount	: UDINT; // Base counter	
+	nOldCount	   : UINT ; // Previous counter value 
+	nBaseCount	   : UDINT; // Base counter
+	ResetStep      : UINT;  // Current state of the reset sequence	
+	bCmdResetValue : BOOL;  // The command to start the reset sequence
+	bCmdResetDone  : BOOL;  // The reset has been processed
 END_VAR
 VAR // Inputs and outputs
 	{info 'TODO: Add device state information and warnings (status is now unused var)'}
 	{attribute 'analysis' := '-33'}
 	State		AT%I* : USINT ; // status byte from card
-	DataIn		AT%I* : UINT ; // 
+	DataIn		AT%I* : UINT ;  // Data from the card 
 	Ctrl 		AT%Q* : USINT ; // Control byte to card`
-	DataOut 	AT%Q* : UINT ; // Set counter value
+	DataOut 	AT%Q* : UINT ;  // Data to the card
 END_VAR
 VAR // Manual control
 	stManualControl : st_ManualCounterControl;
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[ExecExtendCount();]]></ST>
+      <ST><![CDATA[ExecExtendCount();
+
+ExecResetValue();]]></ST>
     </Implementation>
     <Folder Name="Private" Id="{011e1d81-0a3a-0a80-2e11-32fa98ed55b6}" />
     <Folder Name="Public" Id="{b9f6bbd9-a864-03b2-3253-64d505f73cce}" />
@@ -40,17 +45,26 @@ END_IF
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="CmdReset" Id="{1e8c8989-e17a-065e-1925-929be5525636}" FolderPath="Public\">
+    <Method Name="CmdReset" Id="{7246d1c7-fd17-0ca6-397a-59910b5675e5}" FolderPath="Public\">
       <Declaration><![CDATA[METHOD CmdReset : BOOL
+VAR_INPUT
+END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[nOldCount 	:= 0;
-nBaseCount 	:= 0;
+        <ST><![CDATA[//Clear the control register
+Ctrl := 0;
 
-// set counter value to 0
-Ctrl.1 	:= DataIn <> 0; // Set Count clear bit
+//Check the state is cleared
+CmdReset := State = 0;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdResetValue" Id="{1e8c8989-e17a-065e-1925-929be5525636}" FolderPath="Public\">
+      <Declaration><![CDATA[METHOD CmdResetValue : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bCmdResetValue := TRUE;
 
-CmdReset := DataIn = 0;]]></ST>
+CmdResetValue := bCmdResetDone;]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdSetValue" Id="{fee364fa-c801-08b8-1bb3-e6197bc06666}" FolderPath="Public\">
@@ -88,12 +102,84 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF nOldCount > DataIn THEN
-	nBaseCount := nbasecount + 16#FFFF ;
+	nBaseCount := nbasecount + 16#10000 ;
 END_IF
 nOldCount := DataIn;
 
 
 ]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecResetValue" Id="{39fd392e-656f-0fee-2779-26e56e3ca116}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD ExecResetValue : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE ResetStep OF
+	0: (* Wait for the command to start *)
+		IF (bCmdResetValue) THEN
+			ResetStep := 10;
+		END_IF
+		
+	10: (* Determine the next action *)
+		IF (DataIn <> 0) THEN
+			//Counter reset required
+			ResetStep := 20;
+		ELSE
+			//Skip the reset procedure, just clear the internal counters
+			ResetStep := 70;
+		END_IF
+		
+	20: (* Set the clear bit *)
+		Ctrl.1 := TRUE;
+		ResetStep := 30;
+		
+	30: (* Wait untill the reset command has arrived *)
+		IF (State.1) THEN
+			ResetStep := 40;
+		END_IF
+		
+	40: (* Release the clear bit *)
+		Ctrl.1 := FALSE;
+		ResetStep := 50;
+		
+	50: (* Validate the counter is cleared *)
+		IF (DataIn = 0) THEN
+			//Clear, proceed
+			ResetStep := 60;
+		ELSE
+			//Not cleared, re-try
+			ResetStep := 20;
+		END_IF
+
+	60: (* Clear the internal counters *)
+		nOldCount := 0;
+		nBaseCount := 0;
+		ResetStep := 70;
+
+	70: (* Indicate we are done *)
+		bCmdResetDone := TRUE;
+		IF (NOT bCmdResetValue) THEN
+			bCmdResetDone := FALSE;
+			ResetStep := 0;
+		END_IF
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Init" Id="{149b0737-d857-01fc-1e6e-7831ec4edf2c}" FolderPath="Public\">
+      <Declaration><![CDATA[METHOD Init : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//Clear the control register
+Ctrl := 0;
+
+//Wait untill the control register is cleared
+bInitOk := State = 0;
+
+Init := bInitOk;]]></ST>
       </Implementation>
     </Method>
   </POU>
