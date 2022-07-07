@@ -23,7 +23,9 @@ END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[ExecExtendCount();
 
-ExecResetValue();]]></ST>
+ExecResetValue();
+
+bCmdResetValue := FALSE;]]></ST>
     </Implementation>
     <Folder Name="Private" Id="{011e1d81-0a3a-0a80-2e11-32fa98ed55b6}" />
     <Folder Name="Public" Id="{b9f6bbd9-a864-03b2-3253-64d505f73cce}" />
@@ -101,13 +103,10 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF nOldCount > DataIn THEN
+        <ST><![CDATA[IF nOldCount > DataIn AND NOT bCmdResetValue THEN
 	nBaseCount := nbasecount + 16#10000 ;
 END_IF
-nOldCount := DataIn;
-
-
-]]></ST>
+nOldCount := DataIn;]]></ST>
       </Implementation>
     </Method>
     <Method Name="ExecResetValue" Id="{39fd392e-656f-0fee-2779-26e56e3ca116}" FolderPath="Private\">
@@ -128,7 +127,7 @@ END_VAR
 			ResetStep := 20;
 		ELSE
 			//Skip the reset procedure, just clear the internal counters
-			ResetStep := 70;
+			ResetStep := 60;
 		END_IF
 		
 	20: (* Set the clear bit *)
