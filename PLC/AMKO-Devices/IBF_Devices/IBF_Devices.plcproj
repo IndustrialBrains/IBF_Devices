@@ -6,7 +6,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{8eb83378-bdf3-4265-abb5-a63ef0920c8b}</ProjectGuid>
     <SubObjectsSortedByName>True</SubObjectsSortedByName>
-    <Name>IBF_Device</Name>
+    <Name>IBF_Devices</Name>
     <ProgramVersion>3.1.4022.4</ProgramVersion>
     <Application>{a418cbad-4f34-47a5-a82b-4692d76da9c1}</Application>
     <TypeSystem>{a0f2c8fa-42df-47bf-870b-4ca70854118e}</TypeSystem>
@@ -306,7 +306,7 @@
     </PlaceholderResolution>
   </ItemGroup>
   <ItemGroup>
-    <None Include="IBF_Device.tmc">
+    <None Include="IBF_Devices.tmc">
       <SubType>Content</SubType>
     </None>
   </ItemGroup>

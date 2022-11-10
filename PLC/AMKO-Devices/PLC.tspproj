@@ -2,7 +2,7 @@
 <TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4024.29">
 	<Project ProjectGUID="{EBFCA43A-3FEB-4D88-92A2-025B6708553D}" ShowHideConfigurations="#x306">
 		<Plc>
-			<Project GUID="{8EB83378-BDF3-4265-ABB5-A63EF0920C8B}" Name="IBF_Device" PrjFilePath="IBF_Device\IBF_Device.plcproj" TmcFilePath="IBF_Device\IBF_Device.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e"/>
+			<Project GUID="{8EB83378-BDF3-4265-ABB5-A63EF0920C8B}" Name="IBF_Devices" PrjFilePath="IBF_Devices\IBF_Devices.plcproj" TmcFilePath="IBF_Devices\IBF_Devices.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e"/>
 		</Plc>
 	</Project>
 </TcSmProject>
