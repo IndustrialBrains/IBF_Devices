@@ -1,0 +1,221 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.16">
+  <EnumerationTextList Name="E_AxisCmd" Id="{8353c49c-d722-4c13-8e1d-2c20c8ac3f13}">
+    <Declaration><![CDATA[(* axis command structure *)
+TYPE E_AxisCmd :
+(
+	Ax_Idle 		:= 0,// Axis command Referance 0 Axis Idle
+	Ax_Init 		:= 1,// Axis command Referance 1 Initialize axis
+	Ax_Enable 		:= 2,// Axis command Referance 2 Enable
+	Ax_Disable 		:= 3,// Axis command Referance 3 Disable
+	Ax_Reset 		:= 4,// Axis command Referance 4 Reset
+	Ax_Hold 		:= 5,// Axis command Referance 5 Hold
+	Ax_Home 		:= 6,// Axis command Referance 6 Home
+	Ax_JogFwd 		:= 7,// Axis command Referance 7 Jog Forward
+	Ax_JogRev 		:= 8,// Axis command Referance 8 Jog Reverse
+	Ax_MoveRelative := 9,// Axis command Referance 9 Move axis relative
+	Ax_MoveAbs 		:= 10,// Axis command Referance 11 Move absolute reverse
+	Ax_MoveModulo 	:= 11,// Axis command Referance 11 Move Module
+	Ax_MoveVeloFwd 	:= 12,// Axis command Referance 12 Move velocity forward
+	Ax_MoveVeloRev 	:= 13,// Axis command Referance 13 Move velocity reverse
+	Ax_HardStop 	:= 14,// Axis command Referance 14 hard stop or emergency stop
+	Ax_SoftStop 	:= 15,// Axis command Referance 15 soft stop after motion command
+	Ax_GearSlave 	:= 16,// Axis command Referance 16 gear axis as slave
+	Ax_GearSlaveDyn	:= 17,// Axis command Referance 17 gear axis as slave dynamic
+	Ax_GearOutSlave := 18,// Axis command Referance 18 gear out from Master axis 
+	Ax_Maintenance	:= 50 // Axis Command referance 50 maintenance mode, axis enabled with no command active
+);
+END_TYPE
+]]></Declaration>
+    <XmlArchive>
+      <Data>
+        <o xml:space="preserve" t="TextListEnumerationTextListObject">
+          <l n="TextList" t="ArrayList" cet="TextListRow">
+            <o>
+              <v n="TextID">"Ax_Idle"</v>
+              <v n="TextDefault">"0"</v>
+              <l n="LanguageTexts" t="ArrayList" cet="String">
+                <v></v>
+                <v></v>
+              </l>
+            </o>
+            <o>
+              <v n="TextID">"Ax_Init"</v>
+              <v n="TextDefault">"1"</v>
+              <l n="LanguageTexts" t="ArrayList" cet="String">
+                <v></v>
+                <v></v>
+              </l>
+            </o>
+            <o>
+              <v n="TextID">"Ax_Enable"</v>
+              <v n="TextDefault">"2"</v>
+              <l n="LanguageTexts" t="ArrayList" cet="String">
+                <v></v>
+                <v></v>
+              </l>
+            </o>
+            <o>
+              <v n="TextID">"Ax_Disable"</v>
+              <v n="TextDefault">"3"</v>
+              <l n="LanguageTexts" t="ArrayList" cet="String">
+                <v></v>
+                <v></v>
+              </l>
+            </o>
+            <o>
+              <v n="TextID">"Ax_Reset"</v>
+              <v n="TextDefault">"4"</v>
+              <l n="LanguageTexts" t="ArrayList" cet="String">
+                <v></v>
+                <v></v>
+              </l>
+            </o>
+            <o>
+              <v n="TextID">"Ax_Hold"</v>
+              <v n="TextDefault">"5"</v>
+              <l n="LanguageTexts" t="ArrayList" cet="String">
+                <v></v>
+                <v></v>
+              </l>
+            </o>
+            <o>
+              <v n="TextID">"Ax_Home"</v>
+              <v n="TextDefault">"6"</v>
+              <l n="LanguageTexts" t="ArrayList" cet="String">
+                <v></v>
+                <v></v>
+              </l>
+            </o>
+            <o>
+              <v n="TextID">"Ax_JogFwd"</v>
+              <v n="TextDefault">"7"</v>
+              <l n="LanguageTexts" t="ArrayList" cet="String">
+                <v></v>
+                <v></v>
+              </l>
+            </o>
+            <o>
+              <v n="TextID">"Ax_JogRev"</v>
+              <v n="TextDefault">"8"</v>
+              <l n="LanguageTexts" t="ArrayList" cet="String">
+                <v></v>
+                <v></v>
+              </l>
+            </o>
+            <o>
+              <v n="TextID">"Ax_MoveRelative"</v>
+              <v n="TextDefault">"9"</v>
+              <l n="LanguageTexts" t="ArrayList" cet="String">
+                <v></v>
+                <v></v>
+              </l>
+            </o>
+            <o>
+              <v n="TextID">"Ax_MoveAbs"</v>
+              <v n="TextDefault">"10"</v>
+              <l n="LanguageTexts" t="ArrayList" cet="String">
+                <v></v>
+                <v></v>
+              </l>
+            </o>
+            <o>
+              <v n="TextID">"Ax_MoveModulo"</v>
+              <v n="TextDefault">"11"</v>
+              <l n="LanguageTexts" t="ArrayList" cet="String">
+                <v></v>
+                <v></v>
+              </l>
+            </o>
+            <o>
+              <v n="TextID">"Ax_MoveVeloFwd"</v>
+              <v n="TextDefault">"12"</v>
+              <l n="LanguageTexts" t="ArrayList" cet="String">
+                <v></v>
+                <v></v>
+              </l>
+            </o>
+            <o>
+              <v n="TextID">"Ax_MoveVeloRev"</v>
+              <v n="TextDefault">"13"</v>
+              <l n="LanguageTexts" t="ArrayList" cet="String">
+                <v></v>
+                <v></v>
+              </l>
+            </o>
+            <o>
+              <v n="TextID">"Ax_HardStop"</v>
+              <v n="TextDefault">"14"</v>
+              <l n="LanguageTexts" t="ArrayList" cet="String">
+                <v></v>
+                <v></v>
+              </l>
+            </o>
+            <o>
+              <v n="TextID">"Ax_SoftStop"</v>
+              <v n="TextDefault">"15"</v>
+              <l n="LanguageTexts" t="ArrayList" cet="String">
+                <v></v>
+                <v></v>
+              </l>
+            </o>
+            <o>
+              <v n="TextID">"Ax_GearSlave"</v>
+              <v n="TextDefault">"16"</v>
+              <l n="LanguageTexts" t="ArrayList" cet="String">
+                <v></v>
+                <v></v>
+              </l>
+            </o>
+            <o>
+              <v n="TextID">"Ax_GearSlaveDyn"</v>
+              <v n="TextDefault">"17"</v>
+              <l n="LanguageTexts" t="ArrayList" cet="String">
+                <v></v>
+                <v></v>
+              </l>
+            </o>
+            <o>
+              <v n="TextID">"Ax_GearOutSlave"</v>
+              <v n="TextDefault">"18"</v>
+              <l n="LanguageTexts" t="ArrayList" cet="String">
+                <v></v>
+                <v></v>
+              </l>
+            </o>
+            <o>
+              <v n="TextID">"Ax_Maintenance"</v>
+              <v n="TextDefault">"50"</v>
+              <l n="LanguageTexts" t="ArrayList" cet="String">
+                <v></v>
+                <v></v>
+              </l>
+            </o>
+            <o>
+              <v n="TextID">""</v>
+              <v n="TextDefault">""</v>
+              <l n="LanguageTexts" t="ArrayList" cet="String">
+                <v></v>
+                <v></v>
+              </l>
+            </o>
+          </l>
+          <l n="Languages" t="ArrayList" cet="String">
+            <v>NL</v>
+            <v>UK</v>
+          </l>
+          <v n="GuidInit">{397554c1-a81a-446b-ad47-aa77ce547b82}</v>
+          <v n="GuidReInit">{47bc98b4-1436-4dcc-b351-549e990f32dc}</v>
+          <v n="GuidExitX">{b45c7148-5dbc-4118-93d6-1c1edb79d94e}</v>
+        </o>
+      </Data>
+      <TypeList>
+        <Type n="ArrayList">System.Collections.ArrayList</Type>
+        <Type n="Guid">System.Guid</Type>
+        <Type n="String">System.String</Type>
+        <Type n="TextListEnumerationTextListObject">{4b60233c-f940-4beb-b331-82133b520151}</Type>
+        <Type n="TextListRow">{53da1be7-ad25-47c3-b0e8-e26286dad2e0}</Type>
+      </TypeList>
+    </XmlArchive>
+  </EnumerationTextList>
+</TcPlcObject>

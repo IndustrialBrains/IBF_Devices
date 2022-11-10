@@ -1,0 +1,1533 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+  <POU Name="Fb_DevAxis" Id="{bc69e9b9-3f3d-4df5-a0a1-a0954c261e17}" SpecialFunc="None">
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC Fb_DevAxis EXTENDS FB_DevBase
+VAR_INPUT
+	// ===== General Function input =====
+		fCmdAcc			: LREAL := 15000;
+		fCmdDecc		: LREAL := 15000; 
+	// ===== Master Axis =====
+		refMasterAxis	: REFERENCE TO AXIS_REF ; // Master axis reference (if applicable)
+		bReverseSlave	: BOOL 	:= FALSE; // Reverse slave axis relative to master
+		fCmdGearRatio	: LREAL := 1 ; // Gear ratio Master/Slave (1/Ratio) 
+	// Manual control reference
+		stManualCtrl	: UDT_ManualAxisCtrl ;
+END_VAR
+VAR_OUTPUT
+	// ====== State indications =======
+		bHomed			: BOOL 	:= FALSE; 
+		bError 			: BOOL 	:= FALSE;
+		bStopped		: BOOL 	:= FALSE;
+		bResetDone		: BOOL 	:= FALSE;
+		bGearedAsSlave	: BOOL 	:= FALSE;
+		bVelocityLimited: BOOL 	:= FALSE;  
+		bIdle			: BOOL 	:= FALSE;
+		fVelocity		: LREAL	:= 0	; // Axis velocity [rpm or units/sec] depending on config
+		fActPosition	: LREAL := 0	; // Axis actual position [Units] depending on config	
+		bReInTargetPos	: BOOL 	:= false; // rising edge axis is in position
+	// ====== axis reference ======
+		AxisRef			: AXIS_REF	; // Axis reference to hardware 
+	// ====== Axis Settings ======
+		fMaxVelo		: LREAL := 0 ; // Axis Maximum velocity
+		fMaxAcc			: LREAL := 0 ; // Axis Maximum cceleration
+		fMaxDec			: LREAL := 0 ; // axis Maxium deceleration 
+	
+//		fSafeVeloLimit	: LREAL	:= 200; // Safe velocity limit 
+		tEnableDelay	: TIME 	:= T#0MS	;
+		tDisableDelay	: TIME 	:= T#500MS  ;
+	// ==== Axis data ====
+		fEncoderTurnoverValue	: LREAL ;   
+		
+END_VAR
+VAR // Axis configuration 
+	// ===== HW Config Bits =====
+		bIcfCmdVelocityRpm	: BOOL ; // input speeds in Rpm
+		bIcfEnableForward 	: BOOL ; // Enable forward motion
+ 		bIcfEnablereverse	: BOOL ; // Enable reverse motion
+		bIcfAlwaysEnable	: BOOL ; // 1 = Axis always enabled, 0 = Axis disabled at Idle 
+		bIcfSimulationMode	: BOOL := FALSE ; // Simulation mode is active [default set to False] 
+		bIcfModuloAxis		: BOOL := FALSE ; // Show axis position as modulo
+		bIcfSTOPresent		: BOOL := FALSE ; // Axis Safe torque off is present
+		bIcfNCHomeSensor	: BOOL := FALSE ; // Homing sensor is inverted (NC)	
+	// ===== Internal motion values ======
+		fHomePosition		: LREAL := 0 ; // set position at homing
+	// Command Modes
+		mcHomingMode 		: MC_HomingMode := MC_direct ; // Homing Mode ( MC_DefaultHoming, MC_Direct, MC_ForceCallibration, MC_ResetCallibration)
+	// Values from system
+		McReadSysVelo		: MC_ReadParameter		; // Read Acceleration parameter from drive 
+		McReadSysAcc		: MC_ReadParameter		; // Read Acceleration parameter from drive 
+		McReadSysDec		: MC_ReadParameter		; // Read Acceleration parameter from drive 
+END_VAR
+VAR	// ====== Axis enable =====
+		bCmdEnableAxis 		: BOOL 	:= FALSE; // Command to enable the axis (External)
+		bInternalEnable		: BOOL 	:= FALSE; // internal enable command (turns off after set time, and on at new motion command
+		bAxisIsEnabled		: BOOL 	:= false; // Axis is enabled and ready for commands
+		bDelayedEnable		: BOOL 	:= false; // Delayed enable signal for motion commands
+		TonMotionEnable		: TON 			; // Timer on for motion command enable
+		TofIntAxisEnable	: TOF  			; // Timer off for internal axis enable 
+		bSTOOK				: BOOL 	:= FALSE; // Axis safet torque off is ok
+		tonSTOOK			: TON	; // Safe torque off ok timer
+	// Parameter read status 
+		Cmd_EnDriveParRead	: BOOL 			; // Enable parameter read 
+	// ===== Physical Homing signal =====
+		IAxisHome 	AT %I* 	: BOOL 			; // Axis homing sensor from PLC (if MC_DefaultHoming is used)
+		IAxisSTOOK	AT %I* 	: BOOL 			; // Axis STO is ok
+END_VAR
+VAR	// =============== Motion status functions ================
+	// =============== Motion function blocks =================
+		fbMcPower 			: MC_Power		;		// FB for enable and override
+		fbMcReset 			: MC_Reset		;		// FB to reset axis
+		fbSoeReset			: FB_SoEReset	; 		// FB to reset axis hardware
+		fbMcHome			: MC_Home		;		// Fb to home Axis
+		fbMcStop 			: MC_Stop		;		// FB to stop axis
+		fbMcHalt			: MC_Halt		;		// FB to halt axis
+		fbMcJog				: MC_Jog		;		// FB to Jog axis
+		fbMcMoveVelocity	: MC_MoveVelocity;		// FB to move with specified velocity until Next command is given
+		fbMcGearInSlave		: MC_GearIn		;		// FB to gear axis to master 
+		fbMcGearInDyn		: MC_GearInDyn	;		// FB to gear axis dynamicly to master
+		fbMcGearOutSlave	: MC_GearOut	;		// FB to decouple gearing
+		fbMcSetPosition		: MC_SetPosition;		// FB to Set axis position
+//		fbMcWriteParameter	: MC_WriteParameterPersistent ; // FB to write parameters in persistend data
+
+	(* PtoP Motion move commands are in arrays so multiple commands can be stacked *) 
+		fbMCMoveRelative	: ARRAY [0..1] OF MC_MoveRelative	;		// FB to move relative
+		fbMcMoveAbsolute	: ARRAY [0..1] OF MC_MoveAbsolute	;		// FB to move axis (velocity movement)
+		fbMcMoveModulo		: ARRAY [0..1] OF MC_MoveModulo		;		// FB to move axis to modulo position
+	// ===== Safe commands =====
+		bCmdSafeStop		: BOOL ;
+		bCmdSafeSpeed		: BOOL ; 
+	// ===== Function execute triggers =====
+		bExec_Reset					: BOOL := FALSE; // Execute reset
+		bExec_Halt					: BOOL := FALSE; // Execute hold
+		bExec_Home					: BOOL := FALSE; // Execute Home
+		bExec_JogPositive			: BOOL := FALSE; // Execute Jog in positive direction
+		bExec_JogNegative			: BOOL := FALSE; // Execute Jog in negative direction
+		bExec_MoveVelocity			: BOOL := FALSE; // Execute move velocity
+		bExec_MoveVelocityDynamic	: BOOL := FALSE; // Execute move velocity
+		bExec_GearAsSlave			: BOOL := FALSE; // Execute gear as slave
+		bExec_GearSlaveDyn			: BOOL := FALSE; // Execute gear slave dynamic
+		bExec_GearOutSlave			: BOOL := FALSE; // Execute gear out slave
+		bExec_SetPosition			: BOOL := FALSE; // execute set position
+		
+	(* PtoP Motion move commands are in arrays so multiple commands can be stacked *) 
+		arExec_MoveRelative	: ARRAY [0..1] OF BOOL ; // Execute move relative
+		arExec_MoveAbs		: ARRAY [0..1] OF BOOL ; // Execute move absolute reverse
+		arExec_MoveModulo	: ARRAY [0..1] OF BOOL ; // Execute move modulo
+
+		tonResetDone		: TON := (PT := T#300MS) ;
+
+	// ===== Move ristrictions ======
+		bCmdLimitVelocity 	: BOOL := FALSE			; // velocity limiting is active 
+		bCmdManualAccDec	: BOOL := FALSE			; // Activate manual aceleration and deceleration settings
+		fCmdVelocityLimit	: LREAL:= 100			; // Maximum velocity limit when velocity limiting is active  
+		fSafeOverride		: LREAL:= 10 			; // [%] Safe velocity override  
+		
+	// ===== Internal variables =======
+		fAcceleration		: LREAL := 0 ; // Acceleration used for functions 
+		fDeceleration		: LREAL := 0 ; // Deceleration used for functions
+END_VAR
+VAR
+	// ===== Loop variables =====
+		i : DINT := 0 ; // For loop increment
+	// ===== check variable ======
+		rtrigInPosition	: R_TRIG ; // in position trigger
+	// ===== Par write timer ===== 
+END_VAR
+VAR // Parameters 
+	ParAccManualScaling	: Udt_Parameter := (fValue := 50, fFactory := 50, bTeachable := FALSE)  ; // Acceleration scaling factor for manual functions 
+	ParDecManualScaling	: Udt_Parameter := (fValue := 50, fFactory := 50, bTeachable := FALSE)	; // Deceleration scaling factor for manual functions 
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Call base function
+SUPER^(refFbFault := refFbFault);
+
+// ==== Check if axis is initiated =====
+IF NOT bInitOk THEN 
+	RETURN ; 
+END_IF
+// ===== Execute safe functions =====
+	ExecSafeFunctions(); 
+	
+// ==== Execute organizational functions =====
+	CallOrganizationFunctions();
+// ==== execute motion functions =====
+	CallMotionFunctions();
+]]></ST>
+    </Implementation>
+    <Folder Name="Command Methods" Id="{e50539d8-81cc-4181-8633-d48ea6a3afe6}" />
+    <Folder Name="Private" Id="{5a5a8788-fda6-4189-8936-e923757baeb9}">
+      <Folder Name="Motion" Id="{8c2ebe7c-f13d-4e72-aa37-ecee84af7d2f}" />
+      <Folder Name="Organization" Id="{b45159df-0aaf-4b82-b633-88517773f7ca}" />
+    </Folder>
+    <Method Name="CallMotionFunctions" Id="{e3f4db07-f896-41c6-b4ce-2c24a2a65ee1}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PRIVATE CallMotionFunctions : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ===== Set acceleratio and deceleration values =======
+	IF bCmdManualAccDec THEN 
+		fAcceleration 		:= fCmdAcc * (ParAccManualScaling.fvalue / 100);
+		fDeceleration		:= fCmdDecc* (ParDecManualScaling.fValue / 100);
+		bCmdManualAccDec 	:= FALSE;
+	END_IF
+
+// ===== block all other commands if axis is coupled =====
+	IF NOT AxisRef.Status.Coupled THEN 
+	// ===== Homing functions =====
+		ExecHome		(); 
+	
+	// ===== Motion standstil commands =====
+		ExecHalt		();
+	
+	// ===== Motion move functions
+		ExecJog			();
+		ExecMoveAbsolute();
+		ExecMoveRelative();
+		ExecMoveModulo	();
+		ExecMoveVelocity();
+	END_IF
+	
+// ===== Execute gearing functions =====
+ IF __ISVALIDREF (refMasterAxis) THEN 
+	ExecGearOut		();
+	ExecGearIn		();
+	ExecGearDynamic	();
+ END_IF
+	
+// ====== reset velocity lmiting =====
+	bVelocityLimited	:= bCmdLimitVelocity ;	
+	bCmdLimitVelocity 	:= FALSE ; 
+
+// ====== Reset acceleration deceleration values ======
+	fAcceleration	:= fCmdAcc;
+	fDeceleration	:= fCmdDecc;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CallOrganizationFunctions" Id="{30788d1f-d292-49da-a183-d882588243a9}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PRIVATE CallOrganizationFunctions : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ==== execute organizational functions =====
+	ExecReadStatus		(); 
+	ExecEnable			();
+	ExecReset			();
+//	ExecWriteParameter	();
+	ExecSetPosition		();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdGearDynamic" Id="{7011281c-220c-4832-81a9-6de31a7ec1a3}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdGearDynamic : BOOL // Set axis to geared, activates with variable gear ratio until geared out or stopped (if method is no longer called then gear ratio is locked to last value)
+VAR_INPUT
+	fGearRatio	:	LREAL	:= 1	; // Slave Axis gearing ratio (Master = 1/ fGearRatio = Slave)	
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// check if master is present
+	IF NOT __ISVALIDREF (refMasterAxis) THEN 
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Axis master not found ', UDINT_TO_STRING(fbMcHalt.ErrorID));
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+	END_IF
+
+
+// set blocked command if halt is active 
+	bBlockedCommand 		:= fbMcHalt.Active ;
+
+
+// check if command buffer is empty 
+	IF AxisRef.Status.CmdBuffered THEN 
+		RETURN ;
+	END_IF 
+
+// Set command to true 
+	bExec_GearSlaveDyn 	:= TRUE ;
+	bInternalEnable		:= TRUE ;
+
+// coppy parameters
+	fCmdGearRatio 		:= fGearRatio ;
+
+// Set feedback output 
+	CmdGearDynamic 		:= bGearedAsSlave ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdGearIn" Id="{d39d912d-cd60-47f9-9c58-f4c673b83377}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdGearIn : BOOL // Set axis to geared, activates with constant gear ratio until geared out or stopped
+VAR_INPUT
+	fGearRatio	:	LREAL	:= 1	; // Slave Axis gearing ratio (Master = 1/ fGearRatio = Slave)	
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Check if master is present
+	IF NOT __ISVALIDREF (refMasterAxis) THEN 
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Axis master not found ', UDINT_TO_STRING(fbMcHalt.ErrorID));
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+	END_IF
+
+// set blocked command if halt is active 
+	bBlockedCommand := fbMcHalt.Active ;
+
+// check if command buffer is empty 
+	IF AxisRef.Status.CmdBuffered THEN 
+		RETURN ;
+	END_IF 
+	
+// Set command to true 
+	bExec_GearAsSlave 	:= TRUE ;
+	bInternalEnable		:= TRUE ;
+
+// coppy parameters
+	fCmdGearRatio 				:= fGearRatio ;
+
+// Set feedback output 
+	CmdGearIn := bGearedAsSlave ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdGearOut" Id="{0eba1dc5-045c-4e71-9b15-315cb2debe34}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD CmdGearOut : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Check if master is present
+	IF NOT __ISVALIDREF (refMasterAxis) THEN 
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Axis master not found ', UDINT_TO_STRING(fbMcHalt.ErrorID));
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+	END_IF
+
+// set blocked command if halt is active 
+bBlockedCommand := fbMcHalt.Active ;
+
+// Set command to true
+bExec_GearOutSlave 	:= TRUE ;
+bExec_GearAsSlave	:= FALSE;
+bExec_GearSlaveDyn 	:= FALSE;
+
+// Set feedback Output
+CmdGearOut := fbMcGearOutSlave.Done;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdHalt" Id="{76ed2c19-987b-01bf-2d8e-dfce06b9fc82}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdHalt : BOOL
+VAR_INPUT
+	fDeceleration 	: LREAL := 0 ; // command deceleration
+	mcBuffermode	: MC_BufferMode ; // Buffermode defines how the previous command is executed.
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Set command to true 
+bExec_Halt 		:= TRUE ;
+bInternalEnable	:= TRUE ;
+
+// coppy parameters
+fbMcHalt.Deceleration	:= fDeceleration;
+fbMcHalt.BufferMode		:= mcBuffermode	;
+
+// Set feedback output 
+CmdHalt := fbMchalt.Active OR fbMcHalt.Done ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdHold" Id="{addb655d-652c-0e59-2bae-c9b2b7cd0849}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdHold : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Set command to true 
+bExec_Halt 		:= TRUE ;
+bInternalEnable	:= TRUE ;
+
+// coppy parameters
+fbMcHalt.Deceleration	:= 0;
+fbMcHalt.BufferMode		:= 0;
+
+// Set feedback output 
+CmdHold := fbMchalt.Active OR fbMcHalt.Done ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdHome" Id="{9156a5be-9684-4b33-891a-938949533f96}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdHome : BOOL // start axis homing procedure
+VAR_INPUT
+	fPosition 		: LREAL := 0 ; // Homing position
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// set blocked command if halt is active 
+bBlockedCommand := fbMcHalt.Active ;
+
+// set command to true 
+bExec_Home 		:= TRUE	; 
+bInternalEnable	:= TRUE ;
+
+// coppy parameters
+fbMcHome.Position 	:= fPosition 	;
+
+// Set feedback output
+CmdHome := fbMcHome.Done ;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdJog" Id="{19a0b1de-6384-40c6-bca2-fc0bfb1b6d9a}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdJog : BOOL // Jog axis with variable speed. jog stops as soon as the command is false
+VAR_INPUT
+	fVelocity		: LREAL 	; // jog velocity can be adjusted as long as the command is active
+	fPos			: LREAL 	; // Jog position or step size (if aplicable)
+	bJogNegative 	: BOOL 		:= FALSE ; // jog in negative direction
+	eJogmode		: E_JogMode := E_JogMode.MC_JOGMODE_CONTINOUS ; // jogmode [default MC_JOGMODE_CONTINOUS] 
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// set blocked command if halt is active 
+bBlockedCommand := fbMcHalt.Active ;
+
+// Velocity conversion from RPM to deg/sec
+	IF bIcfCmdVelocityRpm THEN 
+		fVelocity := Rpm_To_DegS(fVelocity);
+	END_IF
+
+// Set command to true
+	IF fbMcJog.Velocity = fVelocity THEN // If command velocity changes, then set exec to false for one cycle to trigger new velocity so the jog follows the set velocity
+		bExec_JogPositive	:= NOT bJogNegative ;
+		bExec_JogNegative 	:= bJogNegative ;
+	END_IF
+	bInternalEnable			:= TRUE ;
+
+// coppy parameters
+	fbMcJog.Velocity	:= fVelocity 	;
+	fbmcjog.Mode		:= eJogmode		;
+	fbMcJog.Position	:= fPos			;
+
+// Set feedback output 
+	CmdJog := fbMcJog.Active ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdKeepEnabled" Id="{6433043c-c7fa-0d6f-0a7e-fc542bc7a1ca}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdKeepEnabled : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Keep internal enable on while command is active
+bInternalEnable			:= TRUE ;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdLimitVelocity" Id="{5d066d54-5fea-4b4f-abf4-5d71884c951d}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdLimitVelocity : BOOL // limit axis maximum velocity, stays active as long as command is called. 
+VAR_INPUT
+	fVelocityLimit	: LREAL ; // velocity Maximum limit
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// set blocked command if halt is active 
+bBlockedCommand := fbMcHalt.Active ;
+
+// Set velocity limiting command 
+bCmdLimitVelocity S= TRUE;
+	
+// Set velocity maximum value 
+fCmdVelocityLimit := fVelocityLimit ; 
+
+// set feedback 
+CmdLimitVelocity := bVelocityLimited ; ]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdManual" Id="{bc280ce4-7b96-06c9-0aff-4a50ef532241}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdManual : BOOL
+VAR
+	eJogmode		: E_JogMode := E_JogMode.MC_JOGMODE_CONTINOUS ; // jogging mode 
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// set blocked command if halt is active 
+bBlockedCommand := fbMcHalt.Active ;
+
+// Enable axis for manual control
+bCmdManual := TRUE ;
+
+// check safety 
+IF NOT bSafetyOk THEN 
+	RETURN;
+END_IF
+
+// set jog mode 
+IF stManualCtrl.bCmdInching THEN 
+	eJogmode := E_JogMode.MC_JOGMODE_INCHING ;
+END_IF
+
+// execute motion commands
+IF stManualCtrl.bCmdJogForward OR stManualCtrl.bCmdJogReverse THEN 
+	CmdJog (fVelocity := stManualCtrl.fVelocity, 
+			fPos := stManualCtrl.fDistance, 
+			bJogNegative := stManualCtrl.bCmdJogReverse, 
+			eJogmode := eJogmode);
+ELSIF stManualCtrl.bCmdToPos THEN 
+	CmdMoveAbs( fPosition := stManualCtrl.fPosition, 
+				fVelocity := stManualCtrl.fVelocity, 
+				mcBuffermode := MC_BufferMode.MC_Aborting);
+ELSIF stManualCtrl.bCmdHome THEN 
+	CmdHome( fPosition := 0);
+ELSE 
+	CmdHalt( 	fDeceleration := fMaxDec * 0.9, 
+				mcBuffermode := MC_BufferMode.MC_Aborting) ; 
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdManualAccDec" Id="{f1ec39c9-6e7f-0d08-2c32-3eb4d63235b8}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdManualAccDec : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bCmdManualAccDec := TRUE;
+
+CmdManualAccDec := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdMoveAbs" Id="{897ddefe-6fd9-4aa0-8e52-b781b66bb019}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdMoveAbs : BOOL // Move absolute command
+VAR_INPUT
+	fPosition	:	LREAL 	; // target position
+	fVelocity	: 	LREAL 	; // Maximum velocity [units/sec]
+	mcBuffermode: 	MC_BufferMode ; // Buffermode defines how the previous command is executed.
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// set blocked command if halt is active 
+bBlockedCommand := fbMcHalt.Active ;
+
+// Velocity conversion from RPM to deg/sec
+	IF bIcfCmdVelocityRpm THEN 
+		fVelocity := Rpm_To_DegS(fVelocity);
+	END_IF
+
+// Determine function for command stacking
+IF NOT AxisRef.Status.CmdBuffered OR mcBuffermode <> MC_Aborting THEN 
+	IF fbMcMoveAbsolute[0].Active THEN 
+		arExec_MoveAbs[1] 				:= (fPosition <> fbMcMoveAbsolute[0].Position OR fVelocity <> fbMcMoveAbsolute[0].Velocity) ;
+		fbMcMoveAbsolute[1].Position 	:= fPosition ;
+		fbMcMoveAbsolute[1].Velocity 	:= fVelocity ; 
+		fbMcMoveAbsolute[1].BufferMode 	:= mcBuffermode ;
+	ELSE
+		arExec_MoveAbs[0] 				:= (fPosition <> fbMcMoveAbsolute[1].Position OR fVelocity <> fbMcMoveAbsolute[1].Velocity) ;
+		fbMcMoveAbsolute[0].Position 	:= fPosition ;
+		fbMcMoveAbsolute[0].Velocity 	:= fVelocity ; 
+		fbMcMoveAbsolute[0].BufferMode 	:= mcBuffermode ;
+	END_IF
+END_IF
+	
+bInternalEnable	:= TRUE ;
+
+// set feedback
+IF arExec_MoveAbs[1] OR fbMcMoveAbsolute[1].Busy THEN 
+	CmdMoveAbs :=	fbMcMoveAbsolute[1].Active ;
+ELSE 
+	CmdMoveAbs :=	fbMcMoveAbsolute[0].Active ;
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdMoveModulo" Id="{8d63fd5b-c612-4ee0-92e7-3eb778fa38f1}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdMoveModulo : BOOL // Move to a modulo position
+VAR_INPUT
+	fPosition	:	LREAL 	; // target position
+	fVelocity	: 	LREAL 	; // Maximum velocity [units/sec]
+	mcDirection : 	MC_Direction := MC_Direction.MC_Positive_Direction ; // Direction of movement mc_direction [ deafult mc_positive_direction]
+	mcBuffermode: 	MC_BufferMode ; // Buffermode defines how the previous command is executed.
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// set blocked command if halt is active 
+bBlockedCommand := fbMcHalt.Active ;
+
+
+// Velocity conversion from RPM to deg/sec
+	IF bIcfCmdVelocityRpm THEN 
+		fVelocity := Rpm_To_DegS(fVelocity);
+	END_IF
+
+// Determine function for command stacking
+IF NOT AxisRef.Status.CmdBuffered OR mcBuffermode <> MC_Aborting THEN 
+	IF fbMcMoveModulo[0].Busy THEN 
+		arExec_MoveModulo[1] 		:= (fPosition <> fbMcMoveModulo[0].Position OR fVelocity <> fbMcMoveModulo[0].Velocity)	;
+		fbMcMoveModulo[1].Velocity 	:= fVelocity 	;
+		fbMcMoveModulo[1].Position 	:= fPosition 	;
+		fbMcMoveModulo[1].Direction	:= mcDirection	;
+		fbMcMoveModulo[1].BufferMode:= mcBuffermode ;
+	ELSE    
+		arExec_MoveModulo[0] 		:= (fPosition <> fbMcMoveModulo[1].Position OR fVelocity <> fbMcMoveModulo[1].Velocity) ;
+		fbMcMoveModulo[0].Velocity 	:= fVelocity 	;
+		fbMcMoveModulo[0].Position 	:= fPosition 	;
+		fbMcMoveModulo[0].Direction	:= mcDirection	;
+		fbMcMoveModulo[0].BufferMode:= mcBuffermode ;
+	END_IF
+END_IF 
+	
+bInternalEnable	:= TRUE ;
+
+// set feedback
+IF arExec_MoveModulo[1] OR fbMcMoveModulo[1].Busy THEN 
+	CmdMoveModulo :=	fbMcMoveModulo[1].Active OR fbMcMoveModulo[1].Done;
+ELSE
+	CmdMoveModulo :=	fbMcMoveModulo[0].Active OR fbMcMoveModulo[0].Done ;
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdMoveRelative" Id="{2ed540a9-f0c6-4ad5-b603-5e75ef38aff1}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD CmdMoveRelative : BOOL // move relative command 
+VAR_INPUT
+	fDistance	:	LREAL 	; // target position
+	fVelocity	: 	LREAL 	; // Maximum velocity [units/sec]
+	mcBuffermode: 	MC_BufferMode ; // Buffermode defines how the previous command is executed.
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// set blocked command if halt is active 
+bBlockedCommand := fbMcHalt.Active ;
+
+// Velocity conversion from RPM to deg/sec
+	IF bIcfCmdVelocityRpm THEN 
+		fVelocity := Rpm_To_DegS(fVelocity);
+	END_IF
+
+// Determine function for command stacking
+IF NOT AxisRef.Status.CmdBuffered OR mcBuffermode <> MC_Aborting THEN 
+	IF fbMCMoveRelative[0].Active THEN 
+		arExec_MoveRelative[1] := (fDistance <> fbMCMoveRelative[0].Distance OR fVelocity <> fbMCMoveRelative[0].Velocity) ;
+		fbMCMoveRelative[1].Velocity	:= fVelocity 	;
+		fbMCMoveRelative[1].Distance	:= fDistance	;
+		fbMCMoveRelative[1].BufferMode	:= mcBuffermode	;
+	ELSE 
+		arExec_MoveRelative[0] := (fDistance <> fbMCMoveRelative[1].Distance OR fVelocity <> fbMCMoveRelative[1].Velocity) ;
+		fbMCMoveRelative[0].Velocity	:= fVelocity 	;
+		fbMCMoveRelative[0].Distance	:= fDistance	;
+		fbMCMoveRelative[0].BufferMode	:= mcBuffermode	;
+	END_IF
+END_IF
+bInternalEnable	:= TRUE ;
+
+// set feedback
+IF arExec_MoveRelative[1] OR fbMCMoveRelative[1].Busy THEN 
+	CmdMoveRelative :=	fbMCMoveRelative[1].Active ;
+ELSE
+	CmdMoveRelative :=	fbMCMoveRelative[0].Active ;
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdMoveVelocity" Id="{87d516ce-706c-45c2-bb7f-438c77a1a8af}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdMoveVelocity : BOOL // Move with set velocity until stopped
+VAR_INPUT
+	fVelocity	: 	LREAL 	; // Maximum velocity [units/sec]
+	mcDirection : 	MC_Direction := MC_Direction.MC_Positive_Direction ; // Direction of movement mc_direction [ deafult mc_positive_direction]
+	mcBuffermode: 	MC_BufferMode ; // Buffermode defines how the previous command is executed.
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// set blocked command if halt is active 
+bBlockedCommand := fbMcHalt.Active ;
+
+// Velocity conversion from RPM to deg/sec
+	IF bIcfCmdVelocityRpm THEN 
+		fVelocity := Rpm_To_DegS(fVelocity);
+	END_IF
+
+// Set command to true 
+	IF NOT AxisRef.Status.CmdBuffered OR mcBuffermode <> MC_Aborting THEN 
+		bExec_MoveVelocity 	:= TRUE ;
+		bInternalEnable		:= TRUE ;
+	END_IF
+	
+// coppy parameters
+	fbMcMoveVelocity.Velocity	:= fVelocity 	;
+	fbMcMoveVelocity.Direction 	:= mcDirection	;
+	fbMcMoveVelocity.BufferMode	:= mcBuffermode	;
+
+// Set feedback output 
+	CmdMoveVelocity := fbMcMoveVelocity.Active ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdMoveVelocityDynamic" Id="{ea2c7b33-6b97-0b9e-25ab-7e7e3c6b3c21}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdMoveVelocityDynamic : BOOL // Move with set velocity until stopped
+VAR_INPUT
+	fVelocity	: 	LREAL 	; // Maximum velocity [units/sec]
+	mcDirection : 	MC_Direction := MC_Direction.MC_Positive_Direction ; // Direction of movement mc_direction [ deafult mc_positive_direction]
+	mcBuffermode: 	MC_BufferMode ; // Buffermode defines how the previous command is executed.
+END_VAR
+VAR
+	xbNewCmdVelocity : BOOL ; // a new command velocity has been detected
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// set blocked command if halt is active 
+bBlockedCommand := fbMcHalt.Active ;
+
+// Velocity conversion from RPM to deg/sec
+	IF bIcfCmdVelocityRpm THEN 
+		fVelocity := Rpm_To_DegS(fVelocity);
+	END_IF
+
+// check for command velocity changes
+	IF fVelocity > 0 THEN 	
+		xbNewCmdVelocity := fbMcMoveVelocity.Velocity <> fVelocity OR NOT fbMcMoveVelocity.Active ;
+	ELSE
+		bExec_Halt := TRUE;
+		fbMcHalt.Deceleration	:= fCmdDecc;
+		fbMcHalt.BufferMode		:= mcBuffermode	;
+	END_IF
+	
+// Set command to true for one cycle
+	IF (NOT AxisRef.Status.CmdBuffered OR mcBuffermode <> MC_Aborting) AND fVelocity > 0 THEN 
+		bExec_MoveVelocityDynamic 	:= xbNewCmdVelocity;
+		bInternalEnable				:= TRUE ;
+	END_IF
+	
+// coppy parameters
+	fbMcMoveVelocity.Velocity	:= fVelocity 	;
+	fbMcMoveVelocity.Direction 	:= mcDirection	;
+	fbMcMoveVelocity.BufferMode	:= mcBuffermode	;
+
+// Set feedback output
+	CmdMoveVelocityDynamic := fbMcMoveVelocity.Active ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdOverwriteAcc" Id="{0bcd5b3c-1fc1-0254-21e2-286bd45e95c0}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdOverwriteAcc : BOOL // temporarilly overwrite deceleration values
+VAR_INPUT	
+	fValue	: LREAL ; // Overwrite value 
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fAcceleration := fValue ;
+
+CmdOverwriteAcc := TRUE ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdOverwriteDec" Id="{d18160bd-16ee-085d-3a89-64c41286e618}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdOverwriteDec : BOOL // Temporarilly overwrite deceleration values
+VAR_INPUT
+	fValue	: LREAL ; // Overwrite value 
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fDeceleration := fValue ;
+
+CmdOverwriteDec := TRUE ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdReset" Id="{9ed88b7b-6fd1-4ff9-a6de-53b6c8907919}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdReset : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Set reset axis to true 				
+	bExec_Reset 	:= TRUE ; 
+	bInternalEnable	:= TRUE ;
+	
+// Set feedback output 
+	CmdReset := tonResetDone.Q OR (AxisRef.Status.Coupled AND bResetDone) ; ]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdSafeSpeed" Id="{ddc13036-fa7e-46f4-be16-22a24c1d346b}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdSafeSpeed : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Set safestop command
+bCmdSafeSpeed := TRUE ; 
+
+// Set feedback output 
+CmdSafeSpeed := fbMcPower.Override = fSafeOverride  ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdSafeStop" Id="{b3ad69e2-24fe-00d4-08f1-72f39343c002}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdSafeStop : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF AxisRef.Status.Coupled THEN 
+	CmdSafeStop := AxisRef.Status.NotMoving ;
+	RETURN;
+END_IF
+// Set safestop command
+bCmdSafeStop := TRUE ; 
+
+// Set feedback output 
+CmdSafeStop := bIsSafe OR NOT bInitOk;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdSetPosition" Id="{cdd58728-eb33-090b-146a-18a5bc82ad75}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdSetPosition : BOOL
+VAR_INPUT
+	fPosition		: LREAL ; // encoder position
+	bSetRelative	: BOOL 	; // TRUE = relative position offset, FALSE = Absolute position
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bExec_SetPosition 			:= NOT fbMcSetPosition.Busy AND NOT fbMcSetPosition.Done ; 
+fbMcSetPosition.Position	:= fPosition ;
+fbMcSetPosition.Mode		:= bSetRelative ;
+
+CmdSetPosition := fbMcSetPosition.Done;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecEnable" Id="{97d17d4c-4218-4969-bb76-cf3660f2ac5b}" FolderPath="Private\Organization\">
+      <Declaration><![CDATA[METHOD PRIVATE ExecEnable : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ===== Set axis enable ======
+IF NOT bSafetyOk 
+OR NOT bSTOOK 
+OR AxisRef.Status.DriveDeviceError
+OR bExec_Reset THEN 
+	bCmdEnableAxis := FALSE ;
+ELSIF bCmdManual AND bSafetyOk THEN 
+	bCmdEnableAxis 	:= TRUE ;
+	bInternalEnable S= bCmdManual ;
+	bCmdManual 		:= FALSE ;
+ELSE 
+	bCmdEnableAxis	:= bEnable ;
+END_IF
+
+// ===== Check if axis is bussy with a command =====
+	bInternalEnable S= AxisRef.Status.HasJob;
+	bInternalEnable	S= bIcfAlwaysEnable ; // always enable axis if configured
+	bInternalEnable	S= AxisRef.Status.Coupled ;
+
+// ===== Axis disable timer after last command =====
+	TofIntAxisEnable (	IN:= bInternalEnable, PT := tDisableDelay);
+
+// ===== Enable drive =====
+	fbMcPower(	Axis			:= AxisRef , 
+				Enable			:= bCmdEnableAxis AND TofIntAxisEnable.Q, 
+				Enable_Positive	:= bIcfEnableForward, 
+				Enable_Negative	:= bIcfEnablereverse, 
+				BufferMode		:= MC_Buffered );  
+				
+// ===== Reset internal enable signal =====
+	bInternalEnable := FALSE ; 	
+
+// ===== Delayed enable function =====	
+	IF fbMcPower.Enable AND fbMcPower.Status THEN
+		bAxisIsEnabled := TRUE ;
+	ELSIF NOT fbMcPower.Enable OR AxisRef.Status.Error THEN 
+		bAxisIsEnabled := FALSE ; 
+	END_IF
+
+	TonMotionEnable	(IN := bAxisIsEnabled, PT := tEnableDelay);
+	bDelayedEnable 	:= TonMotionEnable.Q ;	
+
+IF AxisRef.Status.DriveDeviceError 
+AND bCmdEnableAxis THEN
+	bError					:= TRUE							;
+	stFault.Active 			:= TRUE 						;
+	stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+	stFault.Discription		:= CONCAT('Drive device error ', UDINT_TO_STRING(AxisRef.Status.ErrorID));
+	stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
+	stFault.FaultType		:= E_FaultTypes.FF				;
+ELSIF fbMcPower.Error THEN 
+	bError					:= TRUE							;
+	stFault.Active 			:= TRUE 						;
+	stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+	stFault.Discription		:= CONCAT('Enable Fault ', UDINT_TO_STRING(fbMcPower.ErrorID));
+	stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
+	stFault.FaultType		:= E_FaultTypes.FF				;
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecGearDynamic" Id="{a5fd620e-146f-471b-9689-dc40fdcad502}" FolderPath="Private\Motion\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecGearDynamic : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ===== invert gear ratio if reverse slave is active =====
+	IF bReverseSlave THEN 
+		fbMcGearInDyn.GearRatio := fCmdGearRatio * -1 ;
+	ELSE 
+		fbMcGearInDyn.GearRatio := fCmdGearRatio ;
+	END_IF
+
+// ===== Execute gear in function =====
+	fbMcGearInDyn ( 	Master 			:= refMasterAxis,
+						Slave			:= AxisRef,
+						Enable 			:= bExec_GearSlaveDyn AND bDelayedEnable,
+						Acceleration	:= 0,
+						Deceleration	:= 0	); 
+						
+// ===== reset command =====
+	bExec_GearSlaveDyn	:= FALSE ;
+	bGearedAsSlave		:= fbMcGearInDyn.InGear ; 
+
+// Gearing fault handling 
+	IF fbMcGearInDyn.Error THEN 
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Gear dynamic Fault ', UDINT_TO_STRING(fbMcGearInDyn.ErrorID));	
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+	END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecGearIn" Id="{0347e51e-7471-437a-a77d-dd0ede1aed70}" FolderPath="Private\Motion\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecGearIn : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ===== invert gear ratio if reverse slave is active =====
+	IF bReverseSlave THEN 
+		fbMcGearInSlave.RatioNumerator := fCmdGearRatio * -1 ;
+	ELSE 
+		fbMcGearInSlave.RatioNumerator := fCmdGearRatio ;
+	END_IF
+
+// ===== Execute gear in function =====
+	fbMcGearInSlave ( 	Master 			:= refMasterAxis,
+						Slave			:= AxisRef,
+						Execute 		:= bExec_GearAsSlave AND bDelayedEnable,
+						RatioDenominator:= 1,
+						Acceleration	:= 0,
+						Deceleration	:= 0	); 
+						
+// ===== reset command =====
+	bExec_GearAsSlave 	:= FALSE  ;
+	bGearedAsSlave		S= fbMcGearInSlave.InGear ; 
+
+// Gearing fault handling 
+	IF fbMcGearInSlave.Error THEN 
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Gear as slave Fault ', UDINT_TO_STRING(fbMcGearInSlave.ErrorID));
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+	END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecGearOut" Id="{137dca5b-ff36-41d7-8d1e-db831854f7be}" FolderPath="Private\Motion\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecGearOut : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ===== execute gear out function ======
+	fbMcGearOutSlave (	Slave 	:= AxisRef,
+						Execute := bExec_GearOutSlave );
+
+// ===== reset command =====
+	bExec_GearOutSlave	:= false ;
+	bGearedAsSlave		R= fbMcGearOutSlave.Done 	; 
+
+// Gearing fault handling 
+	IF fbMcGearOutSlave.Error THEN 
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Gear out Fault ', UDINT_TO_STRING(fbMcGearOutSlave.ErrorID));
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+	END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecHalt" Id="{b37253d8-5f2a-4031-b9a5-f7589796c62b}" FolderPath="Private\Motion\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecHalt : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ==== Execute halt function ===== 
+fbMcHalt (	Axis 		:= AxisRef,
+			Execute 	:= bExec_Halt );
+
+// ===== reset command =====
+	bExec_Halt := FALSE ;
+	
+// Halt fault handling 
+	IF fbMcHalt.Error THEN 
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Halt Fault ', UDINT_TO_STRING(fbMcHalt.ErrorID));
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+	END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecHome" Id="{e9c8969e-9f26-46cc-b798-0ff95ca0c652}" FolderPath="Private\Motion\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecHome : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ==== execute homing function =====
+	IF bIcfNCHomeSensor THEN 
+		fbmchome.bCalibrationCam	:= NOT IAxisHome;
+	ELSE
+		fbmchome.bCalibrationCam	:= IAxisHome;
+	END_IF		
+		
+	fbMcHome(	Axis			:= AxisRef,
+				Execute			:= bExec_Home AND bDelayedEnable,
+				HomingMode		:= mcHomingMode ); 
+			
+// Reset exec command 
+	bExec_Home 	:= FALSE ;
+	bHomed		S= fbMcHome.Done ;	
+				
+// fault handling 
+	IF fbMcHome.Error THEN 
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Homing Fault ', UDINT_TO_STRING(fbMcHome.ErrorID));
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+	END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecJog" Id="{f7873e37-f6a3-45f7-a57d-76a2b3d914bd}" FolderPath="Private\Motion\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecJog : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ===== Execute Jog function =====
+	IF bCmdLimitVelocity THEN 
+		fbMcJog.Velocity := MIN(fCmdVelocityLimit, fbMcJog.Velocity); 
+	END_IF
+
+	// function call
+	fbMcJog (	Axis 		:= AxisRef,
+				JogForward	:= bExec_JogPositive AND bDelayedEnable,
+				JogBackwards:= bExec_JogNegative AND bDelayedEnable,
+				Acceleration:= fAcceleration,
+				Deceleration:= fDeceleration );
+
+// ===== reset command =====
+	bExec_JogPositive 	:= FALSE  ;
+	bExec_JogNegative	:= FALSE  ;
+	
+// Jog fault handling 
+	IF fbMcJog.Error THEN 
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Jog Fault ', UDINT_TO_STRING(fbMcJog.ErrorID));
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+	END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecMoveAbsolute" Id="{c32ad101-c406-42f7-900a-821300c800d0}" FolderPath="Private\Motion\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecMoveAbsolute : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ==== execute move absolute function =====
+FOR i := 0 TO 1 DO 
+	// Limit velocity
+	IF bCmdLimitVelocity THEN 
+		fbMcJog.Velocity := MIN(fCmdVelocityLimit, fbMcMoveAbsolute[i].Velocity); 
+	END_IF
+	// function call
+	fbMcMoveAbsolute[i](	Axis 		:= AxisRef,
+							Execute 	:= arExec_MoveAbs[i] AND bDelayedEnable,
+							Acceleration:= fAcceleration,
+							Deceleration:= fDeceleration );  
+
+	// If function is done then reset command values
+	IF fbMcMoveAbsolute[i].Done OR fbMcMoveAbsolute[i].CommandAborted OR NOT arExec_MoveAbs[i] THEN 
+		fbMcMoveAbsolute[i].Velocity	:= 0 ;
+		fbMcMoveAbsolute[i].Position	:= 0 ; 
+	END_IF
+
+	// reset Exec command 
+	arExec_MoveAbs[i] := FALSE ; 
+	
+	// fault handling 
+	IF fbMcMoveAbsolute[i].Error THEN 
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Move absolute Fault ', UDINT_TO_STRING(fbMcMoveAbsolute[i].ErrorID));
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+	END_IF
+END_FOR 
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecMoveModulo" Id="{ddd8d330-0e54-4a84-b928-b81d871d62c3}" FolderPath="Private\Motion\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecMoveModulo : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+// ===== Execute move modulo function =====
+FOR i := 0 TO 1 DO 
+	IF bCmdLimitVelocity THEN 
+		fbMcJog.Velocity := MIN(fCmdVelocityLimit, fbMcMoveModulo[i].Velocity); 
+	END_IF
+	// function call
+	fbMcMoveModulo[i](	Axis 		:= AxisRef,
+						Execute 	:= arExec_MoveModulo[i] AND bDelayedEnable,
+						Acceleration:= fAcceleration,
+						Deceleration:= fDeceleration);  
+	
+	// If function is done then reset command values
+	IF fbMcMoveModulo[i].Done OR fbMcMoveModulo[i].CommandAborted OR NOT arExec_MoveModulo[i] THEN 
+		fbMcMoveModulo[i].Velocity	:= 0 ;
+		fbMcMoveModulo[i].Position	:= 0 ; 
+	END_IF
+
+	// reset Exec command 
+	arExec_MoveModulo[i] := FALSE ; 
+	
+	// fault handling 
+	IF fbMcMoveModulo[i].Error THEN 
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Move module Fault ', UDINT_TO_STRING(fbMcMoveModulo[i].ErrorID));
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
+		stFault.FaultType		:= E_FaultTypes.FF			;
+	END_IF
+END_FOR 
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecMoveRelative" Id="{ff02329f-50f4-404d-ae21-618dca212cb3}" FolderPath="Private\Motion\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecMoveRelative : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//ReCmd_MoveModulo(CLK := bCmd_MoveModulo );
+//bCmd_MoveModulo	:= FALSE ;
+
+// ===== Execute move relative function ======
+FOR i := 0 TO 1 DO 
+	// Limit velocity
+	IF bCmdLimitVelocity THEN 
+		fbMcJog.Velocity := MIN(fCmdVelocityLimit, fbMcMoveModulo[i].Velocity); 
+	END_IF
+	// function call
+	fbMCMoveRelative[i](	Axis 		:= AxisRef,
+							Execute		:= arExec_MoveRelative[i] AND bDelayedEnable,
+							Acceleration:= fAcceleration,
+							Deceleration:= fDeceleration );
+
+	// If function is done then reset command values
+	IF fbMCMoveRelative[i].Done OR fbMCMoveRelative[i].CommandAborted OR NOT arExec_MoveRelative[i] THEN 
+		fbMCMoveRelative[i].Velocity	:= 0 ;
+		fbMCMoveRelative[i].Distance	:= 0 ; 
+	END_IF
+
+	// reset Exec command 
+	arExec_MoveRelative[i] := FALSE ; 
+	
+	// fault handling 
+	IF fbMCMoveRelative[i].Error THEN 
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Move relative Fault ', UDINT_TO_STRING(fbMCMoveRelative[i].ErrorID));
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
+		stFault.FaultType		:= E_FaultTypes.FF			;
+	END_IF
+END_FOR]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecMoveVelocity" Id="{d07f3661-ff1b-448e-89ce-6edde810b751}" FolderPath="Private\Motion\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecMoveVelocity : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ===== Execute move velocity function =====
+	IF bCmdLimitVelocity THEN 
+		fbMcJog.Velocity := MIN(fCmdVelocityLimit, fbMcMoveVelocity.Velocity); 
+	END_IF
+
+// function call
+fbMcMoveVelocity (	Axis 		:= AxisRef,
+					Execute		:= (bExec_MoveVelocity OR bExec_MoveVelocityDynamic) AND bDelayedEnable,
+					Acceleration:= fAcceleration,
+					Deceleration:= fDeceleration );
+
+// ===== reset command =====
+bExec_MoveVelocity 			:= FALSE ;
+bExec_MoveVelocityDynamic 	:= FALSE;
+	
+// Halt fault handling 
+IF fbMcMoveVelocity.Error THEN 
+	bError					:= TRUE							;
+	stFault.Active 			:= TRUE 						;
+	stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+	stFault.Discription		:= CONCAT('Move velocity Fault ', UDINT_TO_STRING(fbMcMoveVelocity.ErrorID));
+	stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
+	stFault.FaultType		:= E_FaultTypes.FF				;
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecReadStatus" Id="{bcfefbac-5e3a-4829-b533-395a75a11713}" FolderPath="Private\Organization\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecReadStatus : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[AxisRef.ReadStatus();
+					
+// convert velocity to RPM for output if aplicable
+IF bIcfCmdVelocityRpm THEN 
+	fVelocity := AxisRef.NcToPlc.ActVelo / 6 ;
+ELSE 
+	fVelocity := AxisRef.NcToPlc.ActVelo ;
+END_IF
+
+// write position output
+IF bIcfModuloAxis THEN 
+	fActPosition := AxisRef.NcToPlc.ModuloActPos ;
+ELSE
+	fActPosition := AxisRef.NcToPlc.ActPos ;
+END_IF
+						
+// set status bits 
+bIdle := NOT AxisRef.Status.HasJob ;
+
+// In position 
+	rtrigInPosition( 	CLK := AxisRef.Status.InTargetPosition, 
+						Q => bReInTargetPos);
+						
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecReset" Id="{289eb010-9ce0-40f7-84c2-391c18144f9a}" FolderPath="Private\Organization\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecReset : BOOL
+VAR_INPUT
+END_VAR
+VAR
+	xMcReset			: BOOL ; // Execute MC reset
+	xSoeReset			: BOOL ; // Execute SOE reset
+
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//IF  AxisRef.Status.Moving AND bExec_Reset THEN // If the axis is still moving execute safe stop first
+//	RETURN;
+IF AxisRef.Status.Coupled THEN 
+	bResetDone 	:= NOT AxisRef.Status.Error;
+	bExec_Reset	R= bResetDone  ;
+	RETURN;
+END_IF
+
+// ===== reset command =====
+	bError 		:= AxisRef.Status.Error ; 
+	bExec_Reset	R= fbMcReset.Done  ;
+
+// ==== execute reset functions =====
+IF AxisRef.Status.DriveDeviceError AND IAxisSTOOK THEN 
+		xSoeReset := TRUE ;
+ELSIF bSTOOK AND bExec_Reset THEN
+		xMcReset	:= TRUE ;
+ELSE 
+	xSoeReset 	:= FALSE ;
+	xMcReset	:= FALSE ;
+END_IF
+
+fbSoeReset	( 	Execute := xSoeReset,
+				Timeout	:= T#5S,
+				Axis	:= AxisRef);
+
+fbMcReset	( 	Execute	:= xMcReset,
+				Axis	:= AxisRef ); 
+				
+// ===== Set feedback =====
+	bResetDone 	S= fbMcReset.Done  ;
+	bResetDone	R= AxisRef.Status.Error ;
+	tonResetDone (IN	:= bResetDone);
+
+// ===== reset limitations =====
+	bCmdSafeSpeed 	:= FALSE ;
+
+	
+// Reset fault handling 
+	IF fbSoeReset.Error OR fbMcReset.Error THEN 
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Reset Fault ', UDINT_TO_STRING(fbMcReset.ErrorID));
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+	END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecSafeFunctions" Id="{de6e8394-dce8-4579-9944-987f245a933f}" FolderPath="Private\Organization\">
+      <Declaration><![CDATA[METHOD PRIVATE ExecSafeFunctions : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ==== Stop when safety is not ok =====
+	bCmdSafeStop S= NOT bSafetyOk ;
+
+// ===== Safe torque off function =====
+	IF bIcfSTOPresent THEN 
+		tonSTOOK(IN := IAxisSTOOK, PT := T#1000MS);
+		bSTOOK := tonSTOOK.Q AND NOT AxisRef.Status.DriveDeviceError;
+//		bSTOOK	:= IAxisSTOOK ;
+	ELSE 
+		bSTOOK := true ;
+	END_IF
+	
+// ==== Safe operation functions (overrule all other motion functions) =====
+	IF NOT AxisRef.Status.Coupled AND bSTOOK THEN 
+		fbMcStop( 	Axis 			:= AxisRef		,
+					Execute 		:= bCmdSafeStop AND NOT bExec_Reset,
+					Deceleration	:= fMaxDec		);
+	END_IF
+	
+	// Reset axis command			
+	bCmdSafeStop 	R= fbMcStop.Done OR AxisRef.Status.HasBeenStopped OR NOT bSTOOK ;
+	bStopped		:= AxisRef.Status.HasBeenStopped OR NOT bSTOOK ;
+
+// Safestop fault handling 
+	IF fbMcStop.Error THEN 
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Safe stop axis fault ', UDINT_TO_STRING(fbMcStop.ErrorID));
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+	END_IF
+	
+// ===== Safe speed monitoring =====
+	IF bCmdSafeSpeed THEN 
+		fbMcPower.Override 	:= fSafeOverride ;
+		bCmdSafeSpeed		:= FALSE ;
+	ELSE 
+		fbMcPower.Override := 100 ;
+	END_IF
+
+// ===== Dev is safe feedback =====
+bIsSafe := AxisRef.Status.HasBeenStopped OR AxisRef.Status.Disabled  ;
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecSetPosition" Id="{42f95ac0-57d0-06e7-037d-d914ca0d57d6}" FolderPath="Private\Organization\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecSetPosition : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ====== set position of axis ======
+IF bExec_SetPosition OR fbMcSetPosition.Busy THEN 
+	fbMcSetPosition (	Axis 	:= AxisRef,
+						Execute	:= bExec_SetPosition );
+	bExec_SetPosition := TRUE ;
+END_IF					]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecWriteParameter" Id="{e25e6df9-2845-09eb-3e44-2acd7fb0470d}" FolderPath="Private\Organization\">
+      <Declaration><![CDATA[METHOD PRIVATE ExecWriteParameter : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// check if axis is disabled before writeing parameter
+	AxisRef.ReadStatus();
+	IF AxisRef.Status.Disabled 
+	AND (fbMcWriteParameter.Busy OR bExec_ParWritePers) THEN
+		fbMcWriteParameter	( 	Axis 	:= AxisRef,
+								Execute	:= bExec_ParWritePers );
+	ELSE
+		fbMcWriteParameter.Execute := FALSE ; 
+		RETURN;
+	END_IF
+						
+// fault handling 
+	IF fbMcWriteParameter.Error THEN 
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Discription		:= CONCAT('Cannot write parameter Id#:', UDINT_TO_STRING(fbMcHome.ErrorID));
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+	END_IF
+ 
+// reset commands
+	bExec_ParWritePers := FALSE ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Init" Id="{0a8c2089-518e-4a9f-9c10-83a2f8fbff86}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
+VAR_INPUT
+	// Message location data
+	nId			: UDINT ; // Identification number of object
+	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
+	// Config Bits
+	bIcfCmdVelocityRpm	: BOOL := FALSE ; // input speeds in Rpm
+	bIcfEnableForward 	: BOOL := TRUE 	; // Enable forward motion
+	bIcfEnablereverse	: BOOL := TRUE 	; // Enable reverse motion
+	bIcfAlwaysEnable	: BOOL := FALSE ; // 1 = Axis always enabled, 0 = Axis disabled at Idle 
+	bIcfSimulationMode	: BOOL := FALSE ; // Simulation mode is active [default set to False] Used for testing without hardware present 
+	bIcfModuloAxis		: BOOL := FALSE ; // Show axis position as modulo
+	bIcfSTOPresent		: BOOL := FALSE ; // Axis safe torque off is present
+	bIcfNCHomeSensor	: BOOL := FALSE ; // Homing sensor is inverted (NC)	
+	// Config Values 
+	mcHomingMode 		: MC_HomingMode := MC_HomingMode.MC_DefaultHoming; 
+	fHomePosition		: LREAL := 0 	; // set position at homing
+	fSafeOverride		: LREAL := 10	; // Safe velocity override [%]
+	nEncTurnoverVal 	: LREAL := 360	; // encoder turnover value 
+	tEnableDelay		: time 	:= T#0MS; // Time between axis enable command and motion command execution (0 := no delay active)	
+	tDisabledelay		: TIME 	:= T#100MS; // Axis idle time before axis is disabled 
+END_VAR
+VAR 
+	bActVeloReadValid 	: BOOL ; // velocity parameter read is valid 
+	bActAccReadValid 	: BOOL ; // Acceleration parameter read is valid 
+	bActDecReadValid 	: BOOL ; // Deceleration parameter read is valid 
+	bActParamValid 		: BOOL ; // Parameter read is valid 
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ====== Set init to true =====
+	bInitOk	:= TRUE ; 
+
+// ====== Calculate device id =====
+	bInitOk :=	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Axis) AND bInitOk;
+
+// ====== Set manual device type ======
+	eDevType := E_Devices.Axis ;	
+	
+// ===== Message data set =====
+	stFault.ComponentType		:= E_ComponentTypes.Axis ;
+	
+// ===== Read system configuration =====
+	McReadSysVelo	(	Axis 			:= AxisRef,
+						Enable 			:= Cmd_EnDriveParRead ,
+						ParameterNumber := MaxVelocitySystem ,
+						ReadMode		:= 1,
+						Valid			=> bActVeloReadValid ,						
+						Busy			=> ,
+						Error			=> ,
+						ErrorID			=> ,
+						Value			=> fMaxVelo );
+	McReadSysAcc	(	Axis 			:= AxisRef,
+						Enable 			:= Cmd_EnDriveParRead ,
+						ParameterNumber := MaxAccelerationSystem ,
+						ReadMode		:= 1,
+						Valid			=> bActAccReadValid ,						
+						Busy			=> ,
+						Error			=> ,
+						ErrorID			=> ,
+						Value			=> fMaxAcc );
+	McReadSysDec	(	Axis 			:= AxisRef,
+						Enable 			:= Cmd_EnDriveParRead ,
+						ParameterNumber := MaxDecelerationSystem ,
+						ReadMode		:= 1,
+						Valid			=> bActDecReadValid ,						
+						Busy			=> ,
+						Error			=> ,
+						ErrorID			=> ,
+						Value			=> fMaxDec );
+
+	IF 	fMaxVelo > 0 
+	AND fMaxAcc >0
+	AND fMaxDec >0 THEN 
+		bActParamValid	:= TRUE ; 
+		fCmdAcc 		:= fMaxAcc * 0.9;
+		fCmdDecc		:= fMaxDec * 0.9;
+	END_IF
+
+	IF NOT Cmd_EnDriveParRead AND NOT bActParamValid THEN  
+		Cmd_EnDriveParRead := TRUE;
+	ELSIF Cmd_EnDriveParRead THEN
+		Cmd_EnDriveParRead := FALSE;
+	END_IF
+
+// ===== Configure Axis =====
+	// ***** Config Bits *****
+		THIS^.bIcfCmdVelocityRpm	:= bIcfCmdVelocityRpm	; // Enable speed inputs in Rpm
+		THIS^.bIcfEnableForward 	:= bIcfEnableForward 	; // Enable forward motion
+		THIS^.bIcfEnablereverse		:= bIcfEnablereverse	; // Enable reverse motion
+		THIS^.bIcfAlwaysEnable		:= bIcfAlwaysEnable		; // Always enable motor and brake if safety is ok
+		THIS^.bIcfSimulationMode	:= bIcfSimulationMode 	; // Simulation mode is active [default set to False] 
+		THIS^.bIcfModuloAxis		:= bIcfModuloAxis		; // show axis position as modulo
+		THIS^.bIcfSTOPresent		:= bIcfSTOPresent		; // Axis has safe torque off function
+		THIS^.bIcfNCHomeSensor		:= bIcfNCHomeSensor		; // Axis homing sensor is NC	
+	// ***** config homing Mode ***** 
+ 		THIS^.mcHomingMode 			:= mcHomingMode ; // set homing mode
+		THIS^.fHomePosition			:= fHomePosition;
+	// ***** Velocity settings *****
+		THIS^.fSafeOverride			:= fSafeOverride	; 	
+	// ***** Encoder values *****
+		THIS^.fEncoderTurnoverValue := nEncTurnoverVal	; // turnover value for encoder = 25.6 mm per rev * 4096 revolutions 
+	// ***** Time delay enable off *****
+		THIS^.tEnableDelay		:= tEnableDelay	;
+		THIS^.tDisableDelay 	:= tDisabledelay ;		
+		
+// ===== configure parameters =====
+	ParAccManualScaling.fMinimum 		:= 1 	;
+	ParAccManualScaling.fMaximum		:= 100 	;
+	ParAccManualScaling.nNumber 		:= nLocationId + 1;
+	ParAccManualScaling.sDiscription  	:= CONCAT( STR1 := sName, STR2 := 'percantage of acceleration used For jogging');
+	ParAccManualScaling.sName			:= CONCAT( STR1 := sName, STR2 := 'Manual acc scaling');
+	ParAccManualScaling.sType			:= 'Mpar';
+	ParAccManualScaling.sUnit			:= '%';
+	refFbParHandler.CmdAddParameter( refParameter := ParAccManualScaling );
+
+	
+	ParDecManualScaling.fMinimum 		:= 1 	;
+	ParDecManualScaling.fMaximum		:= 100 	;
+	ParDecManualScaling.nNumber 		:= nLocationId + 2;
+	ParDecManualScaling.sDiscription  	:= CONCAT( STR1 := sName, STR2 := 'percantage of deceleration used For jogging');
+	ParDecManualScaling.sName			:= CONCAT( STR1 := sName, STR2 := 'Manual dec scaling');
+	ParDecManualScaling.sType			:= 'Mpar';
+	ParDecManualScaling.sUnit			:= '%';
+	refFbParHandler.CmdAddParameter( refParameter := ParAccManualScaling );
+
+// ===== reset axis state indicators ======
+	bError 	:= FALSE;
+
+// ====== Set init to done =======
+bInitOk := bActParamValid AND bInitOk;
+Init := bInitOk;	]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

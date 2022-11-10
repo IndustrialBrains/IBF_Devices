@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+  <POU Name="FB_EfkaEB301A_FootPedal" Id="{1fe54914-84ab-46dd-bab5-0e826b7e2e25}" SpecialFunc="None">
+    <Declaration><![CDATA[{attribute 'reflection'}
+FUNCTION_BLOCK PUBLIC FB_EfkaEB301A_FootPedal EXTENDS FB_DevBase
+VAR_OUTPUT
+	ePedalInputStep		: E_FootpedalPos	:= 0 ;
+	bRTrigtoReverse1 	: BOOL := FALSE ; // rising edge trigger when pedal moves from 0 to -1 or Idle to reverse 1 
+	bRTrigtoReverse2 	: BOOL := FALSE ; // rising edge trigger when pedal moves from 1 to -2 or reverse 1 to reverse 2 
+	bRTrigtoForward1 	: BOOL := FALSE ; // rising edge trigger when pedal moves from 0 to 1 or idle to forward 1 
+	bRTrigtoForward2 	: BOOL := FALSE ; // rising edge trigger when pedal moves from 0 to 1 or forward to forward 2 
+END_VAR
+VAR
+	// ===== greycode switches from footpedal =====
+	I_GreyCodeA AT%I* : BOOL	; // Greycode input a from foot pedal 
+	I_GreyCodeB AT%I* : BOOL	; // Greycode input a from foot pedal 
+	I_GreyCodeC AT%I* : BOOL	; // Greycode input a from foot pedal 
+	I_GreyCodeD AT%I* : BOOL	; // Greycode input a from foot pedal 
+	nGreyCodetotal	: BYTE ; // all greycode switches combined
+	// ==== decimal value =====
+	ePreviousPedalInput	: E_FootpedalPos	:= 0 ;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// ===== Read input from pedal =====
+ACT_ConvertGreycode();
+
+// ===== Create edge flanks for functions =====
+ACT_CreateEdges();]]></ST>
+    </Implementation>
+    <Action Name="ACT_ConvertGreycode" Id="{4dc4fe5b-1b07-40bb-ac34-b0c414962263}">
+      <Implementation>
+        <ST><![CDATA[// ===== Combine greycode sensors =====
+nGreyCodetotal.0 := I_GreyCodeA ;
+nGreyCodetotal.1 := I_GreyCodeB ;
+nGreyCodetotal.2 := I_GreyCodeC ;
+nGreyCodetotal.3 := I_GreyCodeD ;
+
+// ==== Convert greycode decimal to speed steps =====
+// this only makes sense in EFKA world but anyway let's convert it to our own sense
+
+CASE nGreyCodetotal OF 								  // DCBA
+	03: ePedalInputStep := E_FootpedalPos.eReverse2	; // 0011
+	01: ePedalInputStep := E_FootpedalPos.eReverse1	; // 0001
+	00: ePedalInputStep := E_FootpedalPos.eIdle		; // 0000
+	02: ePedalInputStep := E_FootpedalPos.eForward0	; // 0010
+	06: ePedalInputStep := E_FootpedalPos.eForward1	; // 0110
+ 	07: ePedalInputStep := E_FootpedalPos.eForward2	; // 0111
+	05: ePedalInputStep := E_FootpedalPos.eForward3	; // 0101
+	04: ePedalInputStep := E_FootpedalPos.eForward4	; // 0100
+	12:	ePedalInputStep := E_FootpedalPos.eForward5	; // 1100
+	13:	ePedalInputStep := E_FootpedalPos.eForward6	; // 1101
+	15: ePedalInputStep := E_FootpedalPos.eForward7	; // 1111
+	14: ePedalInputStep := E_FootpedalPos.eForward8	; // 1110
+	10: ePedalInputStep := E_FootpedalPos.eForward9	; // 1010
+	11: ePedalInputStep := E_FootpedalPos.eForward10; // 1011
+	09: ePedalInputStep := E_FootpedalPos.eForward11; // 1001
+	08: ePedalInputStep := E_FootpedalPos.eForward12; // 1000
+	ELSE
+		ePedalInputStep := E_FootpedalPos.eFalse 	;
+END_CASE]]></ST>
+      </Implementation>
+    </Action>
+    <Action Name="ACT_CreateEdges" Id="{7ec27deb-0d28-4e72-b3b3-e348e7c9dad1}">
+      <Implementation>
+        <ST><![CDATA[// ===== create edges on which functions can be triggerd =====
+CASE ePedalInputStep OF
+	E_FootpedalPos.eReverse2:
+		bRTrigtoReverse2 := ePreviousPedalInput = E_FootpedalPos.eReverse1 ;
+	E_FootpedalPos.eReverse1:
+		bRTrigtoReverse1 := ePreviousPedalInput = E_FootpedalPos.eIdle ;
+	E_FootpedalPos.eForward0:
+		bRTrigtoForward1 := ePreviousPedalInput = E_FootpedalPos.eIdle ;
+	E_FootpedalPos.eForward1: 
+		bRTrigtoForward2 := ePreviousPedalInput = E_FootpedalPos.eForward0 ; 
+END_CASE 
+
+// write previous pedal input 
+ePreviousPedalInput := ePedalInputStep ;]]></ST>
+      </Implementation>
+    </Action>
+    <Method Name="Init" Id="{bae9dbfc-bbd4-07c0-2d7f-2a9564acf8ab}">
+      <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
+VAR_INPUT
+	// Location data for messages  
+	nId			: UDINT ; // Identification number of object
+	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ====== Set init to true =====
+	bInitOk	:= TRUE ; 
+
+// ====== Calculate device id =====
+	bInitOk :=	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.NA) AND bInitOk;
+
+// ====== Set feedback =====
+	Init := bInitOk;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

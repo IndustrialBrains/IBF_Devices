@@ -1,0 +1,466 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <!-- <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>-->
+    <FileVersion>1.0.0.0</FileVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{8eb83378-bdf3-4265-abb5-a63ef0920c8b}</ProjectGuid>
+    <SubObjectsSortedByName>True</SubObjectsSortedByName>
+    <Name>IBF_Device</Name>
+    <ProgramVersion>3.1.4022.4</ProgramVersion>
+    <Application>{a418cbad-4f34-47a5-a82b-4692d76da9c1}</Application>
+    <TypeSystem>{a0f2c8fa-42df-47bf-870b-4ca70854118e}</TypeSystem>
+    <Implicit_Task_Info>{8ea55184-5241-46ad-96f6-4004b2f3cb3a}</Implicit_Task_Info>
+    <Implicit_KindOfTask>{10799a01-a4e5-44cc-8d1a-3f11252a117c}</Implicit_KindOfTask>
+    <Implicit_Jitter_Distribution>{5e9cb390-c73f-49f4-9021-a9c80b5b8c45}</Implicit_Jitter_Distribution>
+    <LibraryReferences>{3777a586-3c4b-4e2e-9d45-11447c631d2f}</LibraryReferences>
+    <CombineIds>true</CombineIds>
+    <Company>Industrial Brains B.V.</Company>
+    <Released>false</Released>
+    <Title>IBF_Device</Title>
+    <ProjectVersion>0.0.0.0</ProjectVersion>
+    <Description>
+    </Description>
+    <Author>
+    </Author>
+    <CompilerDefines>InclSerialCom := 'true'</CompilerDefines>
+    <LibraryCategories>
+      <LibraryCategory>
+        <Id>{25052fee-a005-47ad-93b2-b0f6630efe72}</Id>
+        <Version>1.0.0.0</Version>
+        <DefaultName>Industrial Brains B.V.</DefaultName>
+      </LibraryCategory>
+    </LibraryCategories>
+    <SelectedLibraryCategories>
+      <Id>{25052fee-a005-47ad-93b2-b0f6630efe72}</Id>
+    </SelectedLibraryCategories>
+    <Placeholder>
+    </Placeholder>
+    <!--    <OutputType>Exe</OutputType>
+    <RootNamespace>MyApplication</RootNamespace>
+    <AssemblyName>MyApplication</AssemblyName>-->
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Actuators\Cylinder\DataTypes\ManualControls" />
+    <Folder Include="Axis" />
+    <Folder Include="Axis\DataTypes" />
+    <Folder Include="Axis\FunctionBlocks" />
+    <Folder Include="Axis\FunctionBlocks\Analog" />
+    <Folder Include="Axis\FunctionBlocks\TwoVelocityControl" />
+    <Folder Include="Axis\FunctionBlocks\ServoHybrid" />
+    <Folder Include="Axis\FunctionBlocks\Servo" />
+    <Folder Include="Axis\FunctionBlocks\TwoVelocityControl\DataTypes" />
+    <Folder Include="Axis\Interface" />
+    <Folder Include="Buttons" />
+    <Folder Include="Buttons\DataTypes" />
+    <Folder Include="Buttons\Functions" />
+    <Folder Include="CounterCards\DataTypes" />
+    <Folder Include="CounterCards\FunctionBlocks" />
+    <Folder Include="CounterCards\FunctionBlocks\KL5151" />
+    <Folder Include="CounterCards\FunctionBlocks\KL1512" />
+    <Folder Include="CounterCards\Interfaces" />
+    <Folder Include="Encoders" />
+    <Folder Include="Encoders\DataTypes" />
+    <Folder Include="Encoders\FunctionBlocks" />
+    <Folder Include="GroupHandlers\ManualControlHandler" />
+    <Folder Include="Lights" />
+    <Folder Include="Lights\DataTypes" />
+    <Folder Include="Lights\Functions" />
+    <Folder Include="BaseFunctions" />
+    <Folder Include="Heaters" />
+    <Folder Include="GroupHandlers" />
+    <Folder Include="DevTypes" />
+    <Folder Include="HardwareDiagnostics" />
+    <Folder Include="CounterCards" />
+    <Folder Include="Outputs" />
+    <Folder Include="Outputs\DigitalOutputs" />
+    <Folder Include="Outputs\AnalogOutputs" />
+    <Folder Include="Sensors" />
+    <Folder Include="Sensors\AnalogInput\FunctionBlocks" />
+    <Folder Include="Sensors\DigitalSensor" />
+    <Folder Include="Sensors\DigitalSensor\DataTypes" />
+    <Folder Include="Sensors\DigitalSensor\FunctionBlocks" />
+    <Folder Include="Actuators" />
+    <Folder Include="Actuators\Cylinder" />
+    <Folder Include="Actuators\Cylinder\DataTypes" />
+    <Folder Include="Actuators\Cylinder\Functions" />
+    <Folder Include="Sensors\FootPedals" />
+    <Folder Include="Sensors\FootPedals\DataTypes" />
+    <Folder Include="Sensors\FootPedals\FunctionBlocks" />
+    <Folder Include="Sensors\AnalogInput" />
+    <Folder Include="Sensors\ModuleSpecific" />
+    <Folder Include="Sensors\ModuleSpecific\EL3556_Loadcell" />
+    <Folder Include="Version" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Actuators\Cylinder\DataTypes\E_CylinderCmd.TcTLEO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Actuators\Cylinder\DataTypes\ManualControls\UDT_ManualValveControl.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Actuators\Cylinder\Functions\Fb_DevCylWithFbk.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Axis\DataTypes\E_AxisCmd.TcTLEO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Axis\DataTypes\UDT_AxisData.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Axis\DataTypes\UDT_AxVal.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Axis\DataTypes\UDT_ManualAxisCtrl.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Axis\FunctionBlocks\Analog\FB_DevAnalogAxis.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Axis\FunctionBlocks\Analog\ST_ManualAnalogAxisCtrl.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Axis\FunctionBlocks\ServoHybrid\FB_DevBasicACAxis.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Axis\FunctionBlocks\ServoHybrid\FB_DevHybridAc.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Axis\FunctionBlocks\Servo\Fb_DevAxis.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Axis\FunctionBlocks\TwoVelocityControl\DataTypes\st_ManualDigitalMotorControl.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Axis\FunctionBlocks\TwoVelocityControl\FB_DevTwoVelocityAxis.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Axis\Interface\iTwoDirectionalMotor.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Axis\Interface\iTwoDirectionalMotorWithFast.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BaseFunctions\FB_DevBase.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BaseFunctions\UDT_DevManualCtrl.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Buttons\Functions\FB_DevHMIButton.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Buttons\Functions\FB_DevPushbuttonLight.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Buttons\Functions\FB_DevPushButton.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CounterCards\FunctionBlocks\KL1512\FB_DevKL1512.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CounterCards\FunctionBlocks\KL5151\FB_DevKL5151.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CounterCards\Interfaces\iCounter.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CounterCards\st_ManualCounterControl.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DevTypes\E_Devices.TcTLEO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Encoders\FunctionBlocks\FB_EncoderBase.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Encoders\FunctionBlocks\FB_EncoderInput.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GroupHandlers\GVL_DevManual.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="GroupHandlers\ManualControlHandler\FB_ManualController.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GroupHandlers\ManualControlHandler\UDT_DeviceID.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HardwareDiagnostics\FB_ELModuleDiag.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Heaters\FB_DevDoublePWM.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Heaters\FB_DevPWMGenerator.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Lights\Functions\Fb_DevLight.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Outputs\AnalogOutputs\FB_DevAnalogOutput.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Outputs\AnalogOutputs\FB_DevAnalogOutputScaled.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Outputs\DigitalOutputs\FB_DevDigitalOutput.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Sensors\AnalogInput\FunctionBlocks\FB_DevAnalogInput.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Sensors\AnalogInput\FunctionBlocks\FB_DevAnalogInputScaled.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Sensors\AnalogInput\FunctionBlocks\FB_DevHDAnalogInAutoCalibrate.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Sensors\AnalogInput\FunctionBlocks\FB_DevAnalogInAutoCalibrate.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Sensors\AnalogInput\FunctionBlocks\FB_DevHDAnalogInputScaled.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Sensors\AnalogInput\FunctionBlocks\FB_DevHDAnalogInput.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Sensors\DigitalSensor\FunctionBlocks\Fb_DevDigitalInput.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Actuators\Cylinder\DataTypes\E_ValveResetState.TcTLEO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Actuators\Cylinder\Functions\FB_DevValve.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Sensors\DigitalSensor\FunctionBlocks\Fb_DevDigitalInputFunctions.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Sensors\FootPedals\DataTypes\E_FootpedalPos.TcTLEO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Sensors\FootPedals\FunctionBlocks\FB_EfkaEB301A_FootPedal.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Sensors\ModuleSpecific\EL3556_Loadcell\Fb_DevEL3356_LoadCell.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Version\Global_Version.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <PlaceholderReference Include="IBF_Utilities">
+      <DefaultResolution>IBF_Utilities, * (Industrial Brains B.V.)</DefaultResolution>
+      <Namespace>IBF_Utilities</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_Math">
+      <DefaultResolution>Tc2_Math, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_Math</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_MC2">
+      <DefaultResolution>Tc2_MC2, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_MC2</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_MC2_Drive">
+      <DefaultResolution>Tc2_MC2_Drive, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_MC2_Drive</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_Standard">
+      <DefaultResolution>Tc2_Standard, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_Standard</Namespace>
+    </PlaceholderReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PlaceholderResolution Include="Tc2_Drive">
+      <Resolution>Tc2_Drive, * (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc2_EtherCAT">
+      <Resolution>Tc2_EtherCAT, * (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc2_IoFunctions">
+      <Resolution>Tc2_IoFunctions, * (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc2_Math">
+      <Resolution>Tc2_Math, * (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc2_MC2">
+      <Resolution>Tc2_MC2, * (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc2_MC2_Drive">
+      <Resolution>Tc2_MC2_Drive, * (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc2_Standard">
+      <Resolution>Tc2_Standard, * (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc2_System">
+      <Resolution>Tc2_System, * (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc2_Utilities">
+      <Resolution>Tc2_Utilities, * (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc3_Module">
+      <Resolution>Tc3_Module, * (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="IBF_Device.tmc">
+      <SubType>Content</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <SubObject Include="Fb_DevAxis.ExecWriteParameter">
+      <ExcludeFromBuild>true</ExcludeFromBuild>
+    </SubObject>
+  </ItemGroup>
+  <ProjectExtensions>
+    <PlcProjectOptions>
+      <XmlArchive>
+        <Data>
+          <o xml:space="preserve" t="OptionKey">
+      <v n="Name">"&lt;ProjectRoot&gt;"</v>
+      <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
+        <v>{8F99A816-E488-41E4-9FA3-846536012284}</v>
+        <o>
+          <v n="Name">"{8F99A816-E488-41E4-9FA3-846536012284}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" />
+        </o>
+        <v>{29BD8D0C-3586-4548-BB48-497B9A01693F}</v>
+        <o>
+          <v n="Name">"{29BD8D0C-3586-4548-BB48-497B9A01693F}"</v>
+          <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
+            <v>Rules</v>
+            <o>
+              <v n="Name">"Rules"</v>
+              <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
+                <v>167</v>
+                <o>
+                  <v n="Name">"167"</v>
+                  <d n="SubKeys" t="Hashtable" />
+                  <d n="Values" t="Hashtable" ckt="String" cvt="Boolean">
+                    <v>bActive</v>
+                    <v>True</v>
+                  </d>
+                </o>
+                <v>4</v>
+                <o>
+                  <v n="Name">"4"</v>
+                  <d n="SubKeys" t="Hashtable" />
+                  <d n="Values" t="Hashtable" ckt="String" cvt="Boolean">
+                    <v>bActive</v>
+                    <v>True</v>
+                  </d>
+                </o>
+                <v>33</v>
+                <o>
+                  <v n="Name">"33"</v>
+                  <d n="SubKeys" t="Hashtable" />
+                  <d n="Values" t="Hashtable" ckt="String" cvt="Boolean">
+                    <v>bActive</v>
+                    <v>True</v>
+                  </d>
+                </o>
+                <v>6</v>
+                <o>
+                  <v n="Name">"6"</v>
+                  <d n="SubKeys" t="Hashtable" />
+                  <d n="Values" t="Hashtable" ckt="String" cvt="Boolean">
+                    <v>bActive</v>
+                    <v>True</v>
+                  </d>
+                </o>
+                <v>27</v>
+                <o>
+                  <v n="Name">"27"</v>
+                  <d n="SubKeys" t="Hashtable" />
+                  <d n="Values" t="Hashtable" ckt="String" cvt="Boolean">
+                    <v>bActive</v>
+                    <v>True</v>
+                  </d>
+                </o>
+                <v>28</v>
+                <o>
+                  <v n="Name">"28"</v>
+                  <d n="SubKeys" t="Hashtable" />
+                  <d n="Values" t="Hashtable" ckt="String" cvt="Boolean">
+                    <v>bActive</v>
+                    <v>True</v>
+                  </d>
+                </o>
+              </d>
+              <d n="Values" t="Hashtable" />
+            </o>
+          </d>
+          <d n="Values" t="Hashtable" />
+        </o>
+        <v>{40450F57-0AA3-4216-96F3-5444ECB29763}</v>
+        <o>
+          <v n="Name">"{40450F57-0AA3-4216-96F3-5444ECB29763}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" ckt="String">
+            <v>ActiveVisuExtensionsLength</v>
+            <v>0</v>
+            <v>ActiveVisuProfile</v>
+            <v>"IR0whWr8bwfwBwAAiD2qpQAAAABVAgAA37x72QAAAAABAAAAAAAAAAEaUwB5AHMAdABlAG0ALgBTAHQAcgBpAG4AZwACTHsAZgA5ADUAYgBiADQAMgA2AC0ANQA1ADIANAAtADQAYgA0ADUALQA5ADQAMAAwAC0AZgBiADAAZgAyAGUANwA3AGUANQAxAGIAfQADCE4AYQBtAGUABDBUAHcAaQBuAEMAQQBUACAAMwAuADEAIABCAHUAaQBsAGQAIAA0ADAAMgA0AC4ANwAFFlAAcgBvAGYAaQBsAGUARABhAHQAYQAGTHsAMQA2AGUANQA1AGIANgAwAC0ANwAwADQAMwAtADQAYQA2ADMALQBiADYANQBiAC0ANgAxADQANwAxADMAOAA3ADgAZAA0ADIAfQAHEkwAaQBiAHIAYQByAGkAZQBzAAhMewAzAGIAZgBkADUANAA1ADkALQBiADAANwBmAC0ANABkADYAZQAtAGEAZQAxAGEALQBhADgAMwAzADUANgBhADUANQAxADQAMgB9AAlMewA5AGMAOQA1ADgAOQA2ADgALQAyAGMAOAA1AC0ANAAxAGIAYgAtADgAOAA3ADEALQA4ADkANQBmAGYAMQBmAGUAZABlADEAYQB9AAoOVgBlAHIAcwBpAG8AbgALBmkAbgB0AAwKVQBzAGEAZwBlAA0KVABpAHQAbABlAA4aVgBpAHMAdQBFAGwAZQBtAE0AZQB0AGUAcgAPDkMAbwBtAHAAYQBuAHkAEAxTAHkAcwB0AGUAbQARElYAaQBzAHUARQBsAGUAbQBzABIwVgBpAHMAdQBFAGwAZQBtAHMAUwBwAGUAYwBpAGEAbABDAG8AbgB0AHIAbwBsAHMAEyhWAGkAcwB1AEUAbABlAG0AcwBXAGkAbgBDAG8AbgB0AHIAbwBsAHMAFCRWAGkAcwB1AEUAbABlAG0AVABlAHgAdABFAGQAaQB0AG8AcgAVIlYAaQBzAHUATgBhAHQAaQB2AGUAQwBvAG4AdAByAG8AbAAWFHYAaQBzAHUAaQBuAHAAdQB0AHMAFwxzAHkAcwB0AGUAbQAYGFYAaQBzAHUARQBsAGUAbQBCAGEAcwBlABkmRABlAHYAUABsAGEAYwBlAGgAbwBsAGQAZQByAHMAVQBzAGUAZAAaCGIAbwBvAGwAGyJQAGwAdQBnAGkAbgBDAG8AbgBzAHQAcgBhAGkAbgB0AHMAHEx7ADQAMwBkADUAMgBiAGMAZQAtADkANAAyAGMALQA0ADQAZAA3AC0AOQBlADkANAAtADEAYgBmAGQAZgAzADEAMABlADYAMwBjAH0AHRxBAHQATABlAGEAcwB0AFYAZQByAHMAaQBvAG4AHhRQAGwAdQBnAGkAbgBHAHUAaQBkAB8WUwB5AHMAdABlAG0ALgBHAHUAaQBkACBIYQBmAGMAZAA1ADQANAA2AC0ANAA5ADEANAAtADQAZgBlADcALQBiAGIANwA4AC0AOQBiAGYAZgBlAGIANwAwAGYAZAAxADcAIRRVAHAAZABhAHQAZQBJAG4AZgBvACJMewBiADAAMwAzADYANgBhADgALQBiADUAYwAwAC0ANABiADkAYQAtAGEAMAAwAGUALQBlAGIAOAA2ADAAMQAxADEAMAA0AGMAMwB9ACMOVQBwAGQAYQB0AGUAcwAkTHsAMQA4ADYAOABmAGYAYwA5AC0AZQA0AGYAYwAtADQANQAzADIALQBhAGMAMAA2AC0AMQBlADMAOQBiAGIANQA1ADcAYgA2ADkAfQAlTHsAYQA1AGIAZAA0ADgAYwAzAC0AMABkADEANwAtADQAMQBiADUALQBiADEANgA0AC0ANQBmAGMANgBhAGQAMgBiADkANgBiADcAfQAmFk8AYgBqAGUAYwB0AHMAVAB5AHAAZQAnVFUAcABkAGEAdABlAEwAYQBuAGcAdQBhAGcAZQBNAG8AZABlAGwARgBvAHIAQwBvAG4AdgBlAHIAdABpAGIAbABlAEwAaQBiAHIAYQByAGkAZQBzACgQTABpAGIAVABpAHQAbABlACkUTABpAGIAQwBvAG0AcABhAG4AeQAqHlUAcABkAGEAdABlAFAAcgBvAHYAaQBkAGUAcgBzACs4UwB5AHMAdABlAG0ALgBDAG8AbABsAGUAYwB0AGkAbwBuAHMALgBIAGEAcwBoAHQAYQBiAGwAZQAsEnYAaQBzAHUAZQBsAGUAbQBzAC1INgBjAGIAMQBjAGQAZQAxAC0AZAA1AGQAYwAtADQAYQAzAGIALQA5ADAANQA0AC0AMgAxAGYAYQA3ADUANgBhADMAZgBhADQALihJAG4AdABlAHIAZgBhAGMAZQBWAGUAcgBzAGkAbwBuAEkAbgBmAG8AL0x7AGMANgAxADEAZQA0ADAAMAAtADcAZgBiADkALQA0AGMAMwA1AC0AYgA5AGEAYwAtADQAZQAzADEANABiADUAOQA5ADYANAAzAH0AMBhNAGEAagBvAHIAVgBlAHIAcwBpAG8AbgAxGE0AaQBuAG8AcgBWAGUAcgBzAGkAbwBuADIMTABlAGcAYQBjAHkAMzBMAGEAbgBnAHUAYQBnAGUATQBvAGQAZQBsAFYAZQByAHMAaQBvAG4ASQBuAGYAbwA0MEwAbwBhAGQATABpAGIAcgBhAHIAaQBlAHMASQBuAHQAbwBQAHIAbwBqAGUAYwB0ADUaQwBvAG0AcABhAHQAaQBiAGkAbABpAHQAeQDQAAIaA9ADAS0E0AUGGgfQBwgaAUUHCQjQAAkaBEUKCwQDAAAABQAAAA0AAAAAAAAA0AwLrQIAAADQDQEtDtAPAS0Q0AAJGgRFCgsEAwAAAAUAAAANAAAAKAAAANAMC60BAAAA0A0BLRHQDwEtENAACRoERQoLBAMAAAAFAAAADQAAAAAAAADQDAutAgAAANANAS0S0A8BLRDQAAkaBEUKCwQDAAAABQAAAA0AAAAUAAAA0AwLrQIAAADQDQEtE9APAS0Q0AAJGgRFCgsEAwAAAAUAAAANAAAAAAAAANAMC60CAAAA0A0BLRTQDwEtENAACRoERQoLBAMAAAAFAAAADQAAAAAAAADQDAutAgAAANANAS0V0A8BLRDQAAkaBEUKCwQDAAAABQAAAA0AAAAAAAAA0AwLrQIAAADQDQEtFtAPAS0X0AAJGgRFCgsEAwAAAAUAAAANAAAAKAAAANAMC60EAAAA0A0BLRjQDwEtENAZGq0BRRscAdAAHBoCRR0LBAMAAAAFAAAADQAAAAAAAADQHh8tINAhIhoCRSMkAtAAJRoFRQoLBAMAAAADAAAAAAAAAAoAAADQJgutAAAAANADAS0n0CgBLRHQKQEtENAAJRoFRQoLBAMAAAADAAAAAAAAAAoAAADQJgutAQAAANADAS0n0CgBLRHQKQEtEJoqKwFFAAEC0AABLSzQAAEtF9AAHy0t0C4vGgPQMAutAQAAANAxC60XAAAA0DIarQDQMy8aA9AwC60CAAAA0DELrQMAAADQMhqtANA0Gq0A0DUarQA="</v>
+          </d>
+        </o>
+        <v>{192FAD59-8248-4824-A8DE-9177C94C195A}</v>
+        <o>
+          <v n="Name">"{192FAD59-8248-4824-A8DE-9177C94C195A}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" />
+        </o>
+        <v>{E709B08B-B6E4-4966-8EED-D793A13114C6}</v>
+        <o>
+          <v n="Name">"{E709B08B-B6E4-4966-8EED-D793A13114C6}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" ckt="String" cvt="Boolean">
+            <v>ReplaceConstants</v>
+            <v>False</v>
+          </d>
+        </o>
+        <v>{F66C7017-BDD8-4114-926C-81D6D687E35F}</v>
+        <o>
+          <v n="Name">"{F66C7017-BDD8-4114-926C-81D6D687E35F}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" />
+        </o>
+        <v>{246001F4-279D-43AC-B241-948EB31120E1}</v>
+        <o>
+          <v n="Name">"{246001F4-279D-43AC-B241-948EB31120E1}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" ckt="String" cvt="String">
+            <v>GlobalVisuImageFilePath</v>
+            <v>%APPLICATIONPATH%</v>
+          </d>
+        </o>
+      </d>
+      <d n="Values" t="Hashtable" />
+    </o>
+        </Data>
+        <TypeList>
+          <Type n="Boolean">System.Boolean</Type>
+          <Type n="Hashtable">System.Collections.Hashtable</Type>
+          <Type n="Int32">System.Int32</Type>
+          <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
+          <Type n="String">System.String</Type>
+        </TypeList>
+      </XmlArchive>
+    </PlcProjectOptions>
+  </ProjectExtensions>
+  <!-- 
+   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Release\</OutputPath>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+-->
+</Project>

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+  <DUT Name="UDT_ManualValveControl" Id="{f9e2a1d4-fdfa-0751-23bd-fd341e09cb8c}">
+    <Declaration><![CDATA[TYPE UDT_ManualValveControl extends UDT_DevManualCtrl:
+STRUCT
+	// Device commands
+	bCmdOpen	: BOOL	; // open valve 
+	bCmdClose	: BOOL	; // Close valve
+	bCmdTeach	: BOOL	; // Teach valve
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

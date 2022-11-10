@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.4">
+  <DUT Name="UDT_AxisData" Id="{586a3a6a-5f94-418f-9c84-34dd9c9dadfd}">
+    <Declaration><![CDATA[TYPE UDT_AxisData:
+STRUCT
+	// ===== Axis name =====
+		AxisName	: STRING 	; // Name of the axis (used for fault handling and identification)
+		AxisNumber	: INT		; // Axis number 
+
+	// ===== Fault data =====
+		Message			: UDT_Fault 	; // Message data from Cylinder
+		MessageActive	: BOOL			; // Message is active
+		ErrorActive 	: BOOL 			;	// Axis in error state
+
+	// ===== Axis Commands =====
+		// ***** Enable command	*****
+			CmdEnable		: BOOL 		; // Command enable axis
+		// ***** Active commands *****
+			AxisCmd			: E_AxisCmd ; // Axis command
+			AxisSafeCmd		: E_AxisCmd	; // Axis safe command
+			AxisAct			: E_AxisCmd ; // Axis Active status
+		// ***** Command Modes *****
+			CmdHomingMode 	: MC_HomingMode ; // Homing Mode ( MC_DefaultHoming, MC_Direct, MC_ForceCallibration, MC_ResetCallibration)
+			CmdJogMode		: E_JogMode 	;
+			CmdBuffermode	: MC_BufferMode	; // Buffermode used for command transition 	 
+	// ===== Axis Safe commands =====
+		SafeCmdLimitVelo: BOOL 	; // safe command limit velocity
+		SafeCmdVelocity	: LREAL ; // Safe command velocity
+		SafeCmdStop		: BOOL 	; // Stop command from safety or collision detection		
+		SafeVeloLimit	: LREAL ; // safe velocity limit (link to FPAR)
+	// ===== Status indication active =====
+		ActHoming	: BOOL ; // Axis is homing
+		ActBusy		: BOOL ; // Axis is Busy 
+		ActMoving	: BOOL ; // Axis is moving
+		ActAtVelo	: BOOL ; // Axis is at command velocity (only when written in Move velocity mode)
+
+	// ===== Status indication done  =====
+		FcoInit		: BOOL ; // Axis is initialised
+		FcoIdle		: BOOL ; // Axis is idle enable required
+		FcoEnabled	: BOOL ; // Axis is enabled
+		FcoHomed	: BOOL ; // Axis is homed
+		FcoGeared	: BOOL ; // Axis is geared to master axis
+		FcoHeld		: BOOL ; // Axis is holding
+		FcoStopped	: BOOL ; // Axis is stopped
+		FcoReset	: BOOL ; // Axis reset done
+		FcoReady 	: BOOL ; // Axis is ready for command
+		FcoAtCmdPos	: BOOL ; // Axis is at command position (tol 0.2 deg)
+		FcoCmdActive: BOOL ; // Axis new command values are active
+		
+	// ===== Move values =====
+		Pos			: UDT_Axval	; // possition values (0 = infinite)
+		Velocity 	: UDT_AxVal	; // Velocity values
+		Accel		: UDT_Axval ; // Aceleration values
+		Decel		: UDT_Axval ; // Deceleration values
+		Torque		: UDT_Axval ; // Torque values
+		EncTurnoverVal	: DINT 	; // Encoder turnover value
+		TimeDisableDelay : TIME ; // Time off delay after axis move command (remove enable)
+		
+	// ===== Config Bits =====
+		IcfCommandSpeedRpm	: BOOL ; // input speeds in Rpm
+		IcfEnableForward 	: BOOL ; // Enable forward motion
+ 		IcfEnablereverse	: BOOL ; // Enable reverse motion
+		IcfContinuous		: BOOL ; // continuous motion possible (no endpoint)
+		IcfAlwaysEnable		: BOOL ; // 1 = Axis always enabled, 0 = Axis disabled at Idle 
+		
+	// ===== Master Axis =====
+		MasterAxisRef	: REFERENCE TO AXIS_REF ; // Master axis reference (if applicable)
+		GearMasterRev	: UINT	:= 1	; // Master Axis Gearing revolutions (Denominator)
+		GearSlaveRev	: LREAL	:= 1	; // Slave Axis gearing revolutions (numerator)	
+		ReverseSlave	: BOOL 	; // Reverse slave axis relative to master
+		 
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>
