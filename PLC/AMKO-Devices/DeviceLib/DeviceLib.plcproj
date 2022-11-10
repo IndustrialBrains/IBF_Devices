@@ -15,80 +15,27 @@
     <Implicit_Jitter_Distribution>{5e9cb390-c73f-49f4-9021-a9c80b5b8c45}</Implicit_Jitter_Distribution>
     <LibraryReferences>{3777a586-3c4b-4e2e-9d45-11447c631d2f}</LibraryReferences>
     <CombineIds>true</CombineIds>
-    <Company>AMKO-Engineering</Company>
+    <Company>Industrial Brains B.V.</Company>
     <Released>false</Released>
-    <Title>Device_Library</Title>
-    <ProjectVersion>2.0.0.0</ProjectVersion>
-    <Description>Device library of AMKO-Engineering.</Description>
-    <Author>AMKO-Engineering</Author>
+    <Title>IBF_Device</Title>
+    <ProjectVersion>0.0.0.0</ProjectVersion>
+    <Description>
+    </Description>
+    <Author>
+    </Author>
     <CompilerDefines>InclSerialCom := 'true'</CompilerDefines>
     <LibraryCategories>
       <LibraryCategory>
-        <Id>{589fe09e-9317-462c-ba3b-ceb72fa5d919}</Id>
+        <Id>{25052fee-a005-47ad-93b2-b0f6630efe72}</Id>
         <Version>1.0.0.0</Version>
-        <DefaultName>AMKO-Engineering</DefaultName>
-      </LibraryCategory>
-      <LibraryCategory>
-        <Id>{9052c1da-2179-403f-9f0a-49f63df589e9}</Id>
-        <Version>1.0.0.0</Version>
-        <ParentCategory>
-          <Id>{589fe09e-9317-462c-ba3b-ceb72fa5d919}</Id>
-        </ParentCategory>
-        <DefaultName>System</DefaultName>
-      </LibraryCategory>
-      <LibraryCategory>
-        <Id>{d69a4e54-3b9a-4ecc-8074-fff937c26a40}</Id>
-        <Version>1.0.0.0</Version>
-        <ParentCategory>
-          <Id>{589fe09e-9317-462c-ba3b-ceb72fa5d919}</Id>
-        </ParentCategory>
-        <DefaultName>Utillities</DefaultName>
-      </LibraryCategory>
-      <LibraryCategory>
-        <Id>{eb954523-a8af-4bd0-a32c-f81936b81c6d}</Id>
-        <Version>1.0.0.0</Version>
-        <ParentCategory>
-          <Id>{589fe09e-9317-462c-ba3b-ceb72fa5d919}</Id>
-        </ParentCategory>
-        <DefaultName>HMI</DefaultName>
-      </LibraryCategory>
-      <LibraryCategory>
-        <Id>{846be616-7077-49df-82d2-98e957c13e93}</Id>
-        <Version>1.0.0.0</Version>
-        <ParentCategory>
-          <Id>{589fe09e-9317-462c-ba3b-ceb72fa5d919}</Id>
-        </ParentCategory>
-        <DefaultName>Machines</DefaultName>
-      </LibraryCategory>
-      <LibraryCategory>
-        <Id>{009e50f4-d2ac-459e-96fa-8b145dea1d14}</Id>
-        <Version>1.0.0.0</Version>
-        <ParentCategory>
-          <Id>{589fe09e-9317-462c-ba3b-ceb72fa5d919}</Id>
-        </ParentCategory>
-        <DefaultName>Devices</DefaultName>
-      </LibraryCategory>
-      <LibraryCategory>
-        <Id>{3ea1b3cc-00d0-4410-912b-09df72d0dc78}</Id>
-        <Version>1.0.0.0</Version>
-        <ParentCategory>
-          <Id>{589fe09e-9317-462c-ba3b-ceb72fa5d919}</Id>
-        </ParentCategory>
-        <DefaultName>MLT</DefaultName>
-      </LibraryCategory>
-      <LibraryCategory>
-        <Id>{7456e3ea-ab98-4ec9-850d-33c9c8b9ad33}</Id>
-        <Version>1.0.0.0</Version>
-        <ParentCategory>
-          <Id>{589fe09e-9317-462c-ba3b-ceb72fa5d919}</Id>
-        </ParentCategory>
-        <DefaultName>Sewinghead</DefaultName>
+        <DefaultName>Industrial Brains B.V.</DefaultName>
       </LibraryCategory>
     </LibraryCategories>
     <SelectedLibraryCategories>
-      <Id>{009e50f4-d2ac-459e-96fa-8b145dea1d14}</Id>
+      <Id>{25052fee-a005-47ad-93b2-b0f6630efe72}</Id>
     </SelectedLibraryCategories>
-    <Placeholder>AMKO-Engineering Devices</Placeholder>
+    <Placeholder>
+    </Placeholder>
     <!--    <OutputType>Exe</OutputType>
     <RootNamespace>MyApplication</RootNamespace>
     <AssemblyName>MyApplication</AssemblyName>-->
@@ -305,6 +252,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <PlaceholderReference Include="IBF_Utilities">
+      <DefaultResolution>IBF_Utilities, * (Industrial Brains B.V.)</DefaultResolution>
+      <Namespace>IBF_Utilities</Namespace>
+    </PlaceholderReference>
     <PlaceholderReference Include="Tc2_Math">
       <DefaultResolution>Tc2_Math, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc2_Math</Namespace>
@@ -320,10 +271,6 @@
     <PlaceholderReference Include="Tc2_Standard">
       <DefaultResolution>Tc2_Standard, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc2_Standard</Namespace>
-    </PlaceholderReference>
-    <PlaceholderReference Include="Utilities_Library">
-      <DefaultResolution>Utilities_Library, * (AMKO-Engineering)</DefaultResolution>
-      <Namespace>Utilities_Library</Namespace>
     </PlaceholderReference>
   </ItemGroup>
   <ItemGroup>
@@ -356,9 +303,6 @@
     </PlaceholderResolution>
     <PlaceholderResolution Include="Tc3_Module">
       <Resolution>Tc3_Module, * (Beckhoff Automation GmbH)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="Utilities_Library">
-      <Resolution>Utilities_Library, * (AMKO-Engineering)</Resolution>
     </PlaceholderResolution>
   </ItemGroup>
   <ItemGroup>
