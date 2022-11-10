@@ -1,3 +1,3 @@
-![build](https://github.com/IndustrialBrains/AMKOLib-Device/actions/workflows/build.yml/badge.svg)
+[![GitIgnore](../../actions/workflows/GitIgnore.yml/badge.svg)](../../actions/workflows/GitIgnore.yml)
 
-AMKOLib-Device
+# Industrial Brainframe - Device library
