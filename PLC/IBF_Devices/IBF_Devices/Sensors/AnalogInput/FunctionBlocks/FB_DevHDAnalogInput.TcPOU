@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_DevHDAnalogInput" Id="{17595e23-620c-00d9-1a3c-cd0af05163c6}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC FB_DevHDAnalogInput EXTENDS FB_DevBase
@@ -11,8 +11,8 @@ VAR_OUTPUT
 	fValue	: LREAL := 0 ; // Analog input value (LREAL)
 END_VAR
 VAR
-	nLimitMin			: DINT := Utilities_Library.GVL_FixedValues.nDINTMINVALUE	; // Initial value is set to integer minimum value for use with normal def analog inputs 
-	nLimitMax 			: DINT := Utilities_Library.GVL_FixedValues.nDINTMAXVALUE 	; // Initial value is set to integer minimum value for use with high def analog inputs
+	nLimitMin			: DINT := IBF_Utilities.GVL_FixedValues.nDINTMINVALUE	; // Initial value is set to integer minimum value for use with normal def analog inputs 
+	nLimitMax 			: DINT := IBF_Utilities.GVL_FixedValues.nDINTMAXVALUE 	; // Initial value is set to integer minimum value for use with high def analog inputs
 	inHwInput 	AT%I* 	: DINT ; // Hardware connection
 	inStatus	AT%I* 	: BYTE; // input card hardware status
 END_VAR
