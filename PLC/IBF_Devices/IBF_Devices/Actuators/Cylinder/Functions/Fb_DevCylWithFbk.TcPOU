@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="Fb_DevCylWithFbk" Id="{4d944a84-dab5-48bc-b450-758ff0ff83b4}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC Fb_DevCylWithFbk EXTENDS FB_DevValve
@@ -269,11 +269,11 @@ END_IF
 
 //======= run timers =======
 	IF bIcfFbkClosedPresent THEN 
-		fbTimerClose(IN := q_Close AND bEnable, PT := T#1M);
+		fbTimerClose(IN := q_Close AND bEnable, PT := LREAL_TO_TIME(stTimesClose.Maximum + 10));
 	END_IF	
 	
 	IF bIcfFbkOpenPresent THEN 
-		fbTimerOpen	(IN := q_Open AND bEnable , PT := T#1M);
+		fbTimerOpen	(IN := q_Open AND bEnable , PT := LREAL_TO_TIME(stTimesClose.Maximum + 10));
 	END_IF
 
 //====== Run timeout checks for cylinder close =======
