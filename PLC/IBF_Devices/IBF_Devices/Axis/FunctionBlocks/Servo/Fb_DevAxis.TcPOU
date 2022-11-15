@@ -250,7 +250,7 @@ END_VAR
 	bExec_GearSlaveDyn 	:= TRUE ;
 	bInternalEnable		:= TRUE ;
 
-// coppy parameters
+// copy parameters
 	fCmdGearRatio 		:= fGearRatio ;
 
 // Set feedback output 
@@ -286,7 +286,7 @@ END_VAR
 	bExec_GearAsSlave 	:= TRUE ;
 	bInternalEnable		:= TRUE ;
 
-// coppy parameters
+// copy parameters
 	fCmdGearRatio 				:= fGearRatio ;
 
 // Set feedback output 
@@ -333,7 +333,7 @@ END_VAR
 bExec_Halt 		:= TRUE ;
 bInternalEnable	:= TRUE ;
 
-// coppy parameters
+// copy parameters
 fbMcHalt.Deceleration	:= fDeceleration;
 fbMcHalt.BufferMode		:= mcBuffermode	;
 
@@ -351,7 +351,7 @@ END_VAR
 bExec_Halt 		:= TRUE ;
 bInternalEnable	:= TRUE ;
 
-// coppy parameters
+// copy parameters
 fbMcHalt.Deceleration	:= 0;
 fbMcHalt.BufferMode		:= 0;
 
@@ -373,7 +373,7 @@ bBlockedCommand := fbMcHalt.Active ;
 bExec_Home 		:= TRUE	; 
 bInternalEnable	:= TRUE ;
 
-// coppy parameters
+// copy parameters
 fbMcHome.Position 	:= fPosition 	;
 
 // Set feedback output
@@ -406,7 +406,7 @@ bBlockedCommand := fbMcHalt.Active ;
 	END_IF
 	bInternalEnable			:= TRUE ;
 
-// coppy parameters
+// copy parameters
 	fbMcJog.Velocity	:= fVelocity 	;
 	fbmcjog.Mode		:= eJogmode		;
 	fbMcJog.Position	:= fPos			;
@@ -653,7 +653,7 @@ bBlockedCommand := fbMcHalt.Active ;
 		bInternalEnable		:= TRUE ;
 	END_IF
 	
-// coppy parameters
+// copy parameters
 	fbMcMoveVelocity.Velocity	:= fVelocity 	;
 	fbMcMoveVelocity.Direction 	:= mcDirection	;
 	fbMcMoveVelocity.BufferMode	:= mcBuffermode	;
@@ -697,7 +697,7 @@ bBlockedCommand := fbMcHalt.Active ;
 		bInternalEnable				:= TRUE ;
 	END_IF
 	
-// coppy parameters
+// copy parameters
 	fbMcMoveVelocity.Velocity	:= fVelocity 	;
 	fbMcMoveVelocity.Direction 	:= mcDirection	;
 	fbMcMoveVelocity.BufferMode	:= mcBuffermode	;
