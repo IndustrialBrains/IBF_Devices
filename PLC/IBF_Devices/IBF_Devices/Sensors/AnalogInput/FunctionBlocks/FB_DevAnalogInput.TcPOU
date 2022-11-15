@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_DevAnalogInput" Id="{438fca26-964b-0408-10a5-3e8ee84a0164}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC FB_DevAnalogInput EXTENDS FB_DevBase
@@ -40,7 +40,7 @@ END_VAR
 IF inStatus.0 THEN // signal under range
 	stFault.Active			:= TRUE 							;
 	stFault.MessageNumber	:= E_MessageNumbers.CF_FeedbackFault 	;
-	stFault.Discription		:= CONCAT( sName, 'Signal under Range' )	;
+	stFault.Description		:= CONCAT( sName, 'Signal under Range' )	;
 	stFault.FaultType		:= E_FaultTypes.CF 					;
 	bErrorActive			:= TRUE 							;
 END_IF
@@ -48,7 +48,7 @@ END_IF
 IF inStatus.1 THEN // signal over range
 	stFault.Active			:= TRUE 							;
 	stFault.MessageNumber	:= E_MessageNumbers.CF_FeedbackFault 	;
-	stFault.Discription		:= CONCAT( sName, 'Signal over Range' )	;
+	stFault.Description		:= CONCAT( sName, 'Signal over Range' )	;
 	stFault.FaultType		:= E_FaultTypes.CF 					;
 	bErrorActive			:= TRUE 							;
 END_IF
@@ -56,7 +56,7 @@ END_IF
 IF inStatus.6 THEN // general Error bit
 	stFault.Active			:= TRUE 							;
 	stFault.MessageNumber	:= E_MessageNumbers.FF_Unknown 	;
-	stFault.Discription		:= CONCAT( sName, 'Hardware General Error' )	;
+	stFault.Description		:= CONCAT( sName, 'Hardware General Error' )	;
 	stFault.FaultType		:= E_FaultTypes.FF 					;
 	bErrorActive			:= TRUE 							;
 END_IF]]></ST>

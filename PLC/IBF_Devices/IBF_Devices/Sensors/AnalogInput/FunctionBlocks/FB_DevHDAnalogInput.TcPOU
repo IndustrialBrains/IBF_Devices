@@ -40,7 +40,7 @@ END_VAR
 IF inStatus.0 THEN // signal under range
 	stFault.Active			:= TRUE 							;
 	stFault.MessageNumber	:= E_MessageNumbers.CF_FeedbackFault 	;
-	stFault.Discription		:= CONCAT( sName, 'Signal under Range' )	;
+	stFault.Description		:= CONCAT( sName, 'Signal under Range' )	;
 	stFault.FaultType		:= E_FaultTypes.CF 					;
 	bErrorActive			:= TRUE 							;
 END_IF
@@ -48,7 +48,7 @@ END_IF
 IF inStatus.1 THEN // signal over range
 	stFault.Active			:= TRUE 							;
 	stFault.MessageNumber	:= E_MessageNumbers.CF_FeedbackFault 	;
-	stFault.Discription		:= CONCAT( sName, 'Signal over Range' )	;
+	stFault.Description		:= CONCAT( sName, 'Signal over Range' )	;
 	stFault.FaultType		:= E_FaultTypes.CF 					;
 	bErrorActive			:= TRUE 							;
 END_IF
@@ -56,7 +56,7 @@ END_IF
 IF inStatus.6 THEN // general Error bit
 	stFault.Active			:= TRUE 							;
 	stFault.MessageNumber	:= E_MessageNumbers.FF_Unknown 	;
-	stFault.Discription		:= CONCAT( sName, 'Hardware General Error' )	;
+	stFault.Description		:= CONCAT( sName, 'Hardware General Error' )	;
 	stFault.FaultType		:= E_FaultTypes.FF 					;
 	bErrorActive			:= TRUE 							;
 END_IF]]></ST>

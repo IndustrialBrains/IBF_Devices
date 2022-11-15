@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_DevHybridAc" Id="{2835e4c9-b10f-0483-2c3e-9715ab7ba1da}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC FB_DevHybridAc EXTENDS Fb_DevAxis
@@ -40,7 +40,7 @@ END_IF
 		bError					:= TRUE							;
 		stFault.Active 			:= TRUE 						;
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
-		stFault.Discription		:= CONCAT('Halt Fault ', UDINT_TO_STRING(fbMcHalt.ErrorID));				;
+		stFault.Description		:= CONCAT('Halt Fault ', UDINT_TO_STRING(fbMcHalt.ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 	END_IF
 ]]></ST>
@@ -98,7 +98,7 @@ END_IF
 		bError					:= TRUE							;
 		stFault.Active 			:= TRUE 						;
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
-		stFault.Discription		:= CONCAT('Reset Fault ', UDINT_TO_STRING(fbMcReset.ErrorID))			;
+		stFault.Description		:= CONCAT('Reset Fault ', UDINT_TO_STRING(fbMcReset.ErrorID))			;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 	END_IF
 ]]></ST>

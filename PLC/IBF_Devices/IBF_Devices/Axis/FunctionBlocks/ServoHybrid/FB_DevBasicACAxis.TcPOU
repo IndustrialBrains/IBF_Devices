@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_DevBasicACAxis" Id="{399212fc-3ad5-0237-1986-954c33e143fb}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC FB_DevBasicACAxis EXTENDS FB_DevBase
@@ -399,7 +399,7 @@ IF fbMcPower.Error THEN
 	bErrorActive			:= TRUE							;
 	stFault.Active 			:= TRUE 						;
 	stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
-	stFault.Discription		:= CONCAT('Enable Fault ', UDINT_TO_STRING(fbMcPower.ErrorID));				;
+	stFault.Description		:= CONCAT('Enable Fault ', UDINT_TO_STRING(fbMcPower.ErrorID));				;
 	stFault.FaultType		:= E_FaultTypes.FF				;
 END_IF
 ]]></ST>
@@ -424,7 +424,7 @@ fbMcHalt (	Axis 		:= AxisRef,
 		bErrorActive			:= TRUE							;
 		stFault.Active 			:= TRUE 						;
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
-		stFault.Discription		:= CONCAT('Halt Fault ', UDINT_TO_STRING(fbMcHalt.ErrorID));				;
+		stFault.Description		:= CONCAT('Halt Fault ', UDINT_TO_STRING(fbMcHalt.ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 	END_IF
 ]]></ST>
@@ -451,7 +451,7 @@ END_VAR
 		bErrorActive			:= TRUE							;
 		stFault.Active 			:= TRUE 						;
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
-		stFault.Discription		:= CONCAT('Homing Fault ', UDINT_TO_STRING(fbMcHome.ErrorID));				;
+		stFault.Description		:= CONCAT('Homing Fault ', UDINT_TO_STRING(fbMcHome.ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 	END_IF
 ]]></ST>
@@ -481,7 +481,7 @@ END_VAR
 		bErrorActive			:= TRUE							;
 		stFault.Active 			:= TRUE 						;
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
-		stFault.Discription		:= CONCAT('Jog Fault ', UDINT_TO_STRING(fbMcJog.ErrorID));				;
+		stFault.Description		:= CONCAT('Jog Fault ', UDINT_TO_STRING(fbMcJog.ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 	END_IF
 ]]></ST>
@@ -517,7 +517,7 @@ FOR i := 0 TO 1 DO
 		bErrorActive			:= TRUE							;
 		stFault.Active 			:= TRUE 						;
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
-		stFault.Discription		:= CONCAT('Move absolute Fault ', UDINT_TO_STRING(fbMcMoveAbsolute[i].ErrorID));				;
+		stFault.Description		:= CONCAT('Move absolute Fault ', UDINT_TO_STRING(fbMcMoveAbsolute[i].ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 	END_IF
 END_FOR 
@@ -554,7 +554,7 @@ FOR i := 0 TO 1 DO
 		bErrorActive			:= TRUE							;
 		stFault.Active 			:= TRUE 						;
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
-		stFault.Discription		:= CONCAT('Move relative Fault ', UDINT_TO_STRING(fbMCMoveRelative[i].ErrorID));				;
+		stFault.Description		:= CONCAT('Move relative Fault ', UDINT_TO_STRING(fbMCMoveRelative[i].ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF			;
 	END_IF
 END_FOR]]></ST>
@@ -582,7 +582,7 @@ IF fbMcHalt.Error THEN
 	bErrorActive			:= TRUE							;
 	stFault.Active 			:= TRUE 						;
 	stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
-	stFault.Discription		:= CONCAT('Move velocity Fault ', UDINT_TO_STRING(fbMcMoveVelocity.ErrorID));				;
+	stFault.Description		:= CONCAT('Move velocity Fault ', UDINT_TO_STRING(fbMcMoveVelocity.ErrorID));				;
 	stFault.FaultType		:= E_FaultTypes.FF				;
 END_IF
 ]]></ST>
@@ -617,7 +617,7 @@ END_IF
 		bErrorActive			:= TRUE							;
 		stFault.Active 			:= TRUE 						;
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
-		stFault.Discription		:= CONCAT('Reset Fault ', UDINT_TO_STRING(fbMcReset.ErrorID))			;
+		stFault.Description		:= CONCAT('Reset Fault ', UDINT_TO_STRING(fbMcReset.ErrorID))			;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 	END_IF
 ]]></ST>
@@ -645,7 +645,7 @@ END_VAR
 		bErrorActive			:= TRUE							;
 		stFault.Active 			:= TRUE 						;
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
-		stFault.Discription		:= CONCAT('Safe stop axis fault ', UDINT_TO_STRING(fbMcStop.ErrorID));				;
+		stFault.Description		:= CONCAT('Safe stop axis fault ', UDINT_TO_STRING(fbMcStop.ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 	END_IF
 

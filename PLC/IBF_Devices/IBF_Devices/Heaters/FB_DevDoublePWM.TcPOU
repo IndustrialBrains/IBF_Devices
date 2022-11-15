@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_DevDoublePWM" Id="{597d6264-d5f7-07b8-20b6-bf7abd467b88}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC FB_DevDoublePWM EXTENDS FB_DevBase // PWM control for 2 outputs that cannot be switchid on simultaniously
@@ -202,13 +202,13 @@ tonBurnTimeB ( IN := bCmdChanelBOn, PT := LREAL_TO_TIME( stMaxTimeOn.fValue));
 
 IF tonBurnTimeA.Q THEN 
 	stFault.Active 			:= TRUE ;
-	stFault.Discription 	:= 'Heater A burn timeout';
+	stFault.Description 	:= 'Heater A burn timeout';
 	stFault.MessageNumber 	:= E_MessageNumbers.CF_MoveToSlow ;
 	stFault.FaultType		:= E_FaultTypes.CF;
 	qbOutputA 				:= FALSE ;
 ELSIF tonBurnTimeB.Q THEN 
 	stFault.Active 			:= TRUE ;
-	stFault.Discription 	:= 'Heater B burn timeout';
+	stFault.Description 	:= 'Heater B burn timeout';
 	stFault.MessageNumber 	:= E_MessageNumbers.CF_MoveToSlow ;
 	stFault.FaultType		:= E_FaultTypes.CF;
 	qbOutputB 				:= FALSE ;

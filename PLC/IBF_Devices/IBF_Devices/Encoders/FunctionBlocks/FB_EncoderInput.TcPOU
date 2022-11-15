@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_EncoderInput" Id="{0f518a76-74dc-4426-927f-5208a6bc0566}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK FB_EncoderInput EXTENDS FB_EncoderBase
@@ -54,22 +54,22 @@ END_VAR
       <Implementation>
         <ST><![CDATA[IF iDataError THEN 
 	stFault.Active 			:= TRUE ;
-	stFault.Discription		:= CONCAT(sName, ' Encoder Data error');
+	stFault.Description		:= CONCAT(sName, ' Encoder Data error');
 	stFault.MessageNumber	:= E_MessageNumbers.FF_ComunicationFault;
 	stFault.FaultType		:= E_FaultTypes.FF;
 ELSIF iFrameError THEN 
 	stFault.Active 			:= TRUE ;
-	stFault.Discription		:= CONCAT(sName, ' Encoder frame error');
+	stFault.Description		:= CONCAT(sName, ' Encoder frame error');
 	stFault.MessageNumber	:= E_MessageNumbers.FF_ComunicationFault;
 	stFault.FaultType		:= E_FaultTypes.FF;
 ELSIF iPowerFailure THEN 
 	stFault.Active 			:= TRUE ;
-	stFault.Discription		:= CONCAT(sName, ' Encoder Power failure');
+	stFault.Description		:= CONCAT(sName, ' Encoder Power failure');
 	stFault.MessageNumber	:= E_MessageNumbers.FF_ComunicationFault;
 	stFault.FaultType		:= E_FaultTypes.FF;
 ELSIF iSyncError THEN 
 	stFault.Active 			:= TRUE ;
-	stFault.Discription		:= CONCAT(sName, ' Encoder synchronisation error');
+	stFault.Description		:= CONCAT(sName, ' Encoder synchronisation error');
 	stFault.MessageNumber	:= E_MessageNumbers.FF_ComunicationFault;
 	stFault.FaultType		:= E_FaultTypes.FF;
 END_IF]]></ST>
