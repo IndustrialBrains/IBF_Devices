@@ -237,7 +237,7 @@ END_VAR
 
 // ======= Reset Error bit ======
 	bErrorActive 	:= FALSE;
-	bBussy			:= FALSE;
+	bBusy			:= FALSE;
 	
 // ===== configure parameters =====
 	stParPeriodLength.fMinimum 		:= 0 		;

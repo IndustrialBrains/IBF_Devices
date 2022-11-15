@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_DevValve" Id="{ba396402-0ac8-4d5d-a8f4-911b90a2c3dc}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC FB_DevValve EXTENDS FB_DevBase
@@ -158,7 +158,7 @@ END_VAR
 	END_IF
 // ======= Reset Error bit ======
 	bErrorActive 	:= FALSE;
-	bBussy			:= FALSE;
+	bBusy			:= FALSE;
 	
 // ======= set feedback =======
 	CmdReset := TRUE ;]]></ST>
@@ -330,7 +330,7 @@ END_VAR]]></Declaration>
 	END_IF
 // ======= Reset Error bit ======
 	bErrorActive 	:= FALSE;
-	bBussy			:= FALSE;
+	bBusy			:= FALSE;
 
 // ===== Set device type for manual control =====
 	eDevType := E_Devices.Valve ;
