@@ -113,9 +113,8 @@ VAR_INPUT
 	// Config Bits
 	bIcfCmdVelocityRpm	: BOOL := FALSE ; // input speeds in Rpm
 	bIcfEnableForward 	: BOOL := TRUE 	; // Enable forward motion
-	bIcfEnablereverse	: BOOL := TRUE 	; // Enable reverse motion
+	bIcfEnableReverse	: BOOL := TRUE 	; // Enable reverse motion
 	bIcfAlwaysEnable	: BOOL := FALSE ; // 1 = Axis always enabled, 0 = Axis disabled at Idle 
-	bIcfSimulationMode	: BOOL := FALSE ; // Simulation mode is active [default set to False] Used for testing without hardware present 
 	bIcfModuloAxis		: BOOL := FALSE ; // Show axis position as modulo
 	bIcfSTOPresent		: BOOL := FALSE ; // Axis safe torque off is present	
 	bIcfNCHomeSensor	: BOOL := FALSE ; // Homing sensor is inverted (NC)	
@@ -175,9 +174,8 @@ END_VAR]]></Declaration>
 	// ***** Config Bits *****
 		THIS^.bIcfCmdVelocityRpm	:= bIcfCmdVelocityRpm	; // Enable speed inputs in Rpm
 		THIS^.bIcfEnableForward 	:= bIcfEnableForward 	; // Enable forward motion
-		THIS^.bIcfEnablereverse		:= bIcfEnablereverse	; // Enable reverse motion
+		THIS^.bIcfEnableReverse		:= bIcfEnableReverse	; // Enable reverse motion
 		THIS^.bIcfAlwaysEnable		:= bIcfAlwaysEnable		; // Always enable motor and brake if safety is ok
-		THIS^.bIcfSimulationMode	:= bIcfSimulationMode 	; // Simulation mode is active [default set to False] 
 
 	// ***** config homing Mode ***** 
  		THIS^.mcHomingMode 			:= mcHomingMode ; // set homing mode
