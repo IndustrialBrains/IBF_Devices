@@ -5,7 +5,7 @@
     <CycleTime>10000</CycleTime>
     <Priority>6</Priority>
     <PouCall>
-      <Name>PRG_TEST</Name>
+      <Name>PRG_TEST_FB_DEVAXIS</Name>
     </PouCall>
     <TaskFBGuid>{00c050a8-5325-4175-8b2b-57e058d6b940}</TaskFBGuid>
     <Fb_init>{c58cc66f-5453-469d-81c3-b371bb5baa94}</Fb_init>

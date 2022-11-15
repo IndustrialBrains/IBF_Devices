@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="PRG_TEST_FB_DEVAXIS" Id="{b0b9f2e5-28eb-44e0-8846-21a78d2e9989}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM INTERNAL PRG_TEST_FB_DEVAXIS
+VAR
+	fbFaultHandler : Fb_FaultHandler;
+	fbDevAxis : Fb_DevAxis;
+	
+	bCallInit : BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fbFaultHandler();
+fbDevAxis(refFbFault := fbFaultHandler);
+
+IF bCallInit THEN
+	bCallInit := FALSE;
+	fbDevAxis.Init(
+		nId					:= 1, 
+		nParentId			:= 0, 
+		bIcfCmdVelocityRpm	:= FALSE, 
+		bIcfEnableForward	:= FALSE, 
+		bIcfEnableReverse	:= FALSE, 
+		bIcfAlwaysEnable	:= FALSE, 
+		bIcfModuloAxis		:= FALSE, 
+		bIcfSTOPresent		:= FALSE, 
+		bIcfNCHomeSensor	:= FALSE, 
+		mcHomingMode		:= MC_HomingMode.MC_DefaultHoming, 
+		fHomePosition		:= 0, 
+		fSafeOverride		:= 20, 
+		nEncTurnoverVal		:= 0,
+		tEnableDelay		:= T#0S, 
+		tDisabledelay		:= T#200MS
+	);
+END_IF
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>
