@@ -5,34 +5,30 @@
 VAR
 	fbFaultHandler : Fb_FaultHandler;
 	fbDevAxis : Fb_DevAxis;
-	
-	bCallInit : BOOL;
+	bInitBusy : BOOL := TRUE;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[fbFaultHandler();
 fbDevAxis(refFbFault := fbFaultHandler);
 
-IF bCallInit THEN
-	bCallInit := FALSE;
-	fbDevAxis.Init(
-		nId					:= 1, 
-		nParentId			:= 0, 
-		bIcfCmdVelocityRpm	:= FALSE, 
-		bIcfEnableForward	:= FALSE, 
-		bIcfEnableReverse	:= FALSE, 
-		bIcfAlwaysEnable	:= FALSE, 
-		bIcfModuloAxis		:= FALSE, 
-		bIcfSTOPresent		:= FALSE, 
-		bIcfNCHomeSensor	:= FALSE, 
-		mcHomingMode		:= MC_HomingMode.MC_DefaultHoming, 
-		fHomePosition		:= 0, 
-		fSafeOverride		:= 20, 
-		nEncTurnoverVal		:= 0,
-		tEnableDelay		:= T#0S, 
-		tDisabledelay		:= T#200MS
-	);
-END_IF
+bInitBusy R= fbDevAxis.Init(
+	nId					:= 1, 
+	nParentId			:= 0, 
+	bIcfCmdVelocityRpm	:= FALSE, 
+	bIcfEnableForward	:= FALSE, 
+	bIcfEnableReverse	:= FALSE, 
+	bIcfAlwaysEnable	:= FALSE, 
+	bIcfModuloAxis		:= FALSE, 
+	bIcfSTOPresent		:= FALSE, 
+	bIcfNCHomeSensor	:= FALSE, 
+	mcHomingMode		:= MC_HomingMode.MC_DefaultHoming, 
+	fHomePosition		:= 0, 
+	fSafeOverride		:= 20, 
+	nEncTurnoverVal		:= 0,
+	tEnableDelay		:= T#0S, 
+	tDisabledelay		:= T#200MS
+);
 ]]></ST>
     </Implementation>
   </POU>
