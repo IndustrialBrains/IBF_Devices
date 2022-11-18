@@ -343,7 +343,7 @@
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
-    <Compile Include="_TESTS\VISU_TEST_UserMgmt.TcVIS">
+    <Compile Include="_TESTS\VISU_TEST_LOGIN.TcVIS">
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>

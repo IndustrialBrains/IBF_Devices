@@ -8,22 +8,6 @@ VAR
 	nNumberOfDevices	: UDINT := 0; // Number of devices in DeviceArray
 	nSelectedDevicePrev : UDINT := 0; // Previously selected device in HMI (array index)
  
-	pDevValve			: POINTER TO FB_DevValve				; // Device pointer to valve
-	pDevCylinder		: POINTER TO Fb_DevCylWithFbk			; // Device pointer to cylinder with feedback 
-	pDevAxis			: POINTER TO Fb_DevAxis 				; // device pointer to Axis 
-	pDevPBL				: POINTER TO FB_DevPushbuttonLight		; // Device pointer to pushbutton light
-	pDevDigitalInput	: POINTER TO Fb_DevDigitalInputFunctions; // device pointer to digital input
-	pDevAnalogInput		: POINTER TO FB_DevAnalogInput			; // Device pointer to analog input
-	pDevAnalogOut		: POINTER TO FB_DevAnalogOutput			; // Device pointer to analog output
-	pDevDigitalOut		: POINTER TO FB_DevDigitalOutput		; // Device pointer to digital output
-	pDevPWMController	: POINTER TO FB_DevPWMGenerator			; // Device pointer to PWM controller
-	pDevDoublePWM		: POINTER TO FB_DevDoublePWM			; // Device pointer to Double PWM controller
-	pDevEncoder			: POINTER TO FB_EncoderBase				; // Device Pointer to encoder Base
-	pDevAnalogAxis		: POINTER TO FB_DevAnalogAxis			; // Device pointer to analog axis control
-	pDevTwoVelocityAxis	: POINTER TO FB_DevTwoVelocityAxis		; // Device pointer to two velocity axis control
-	pDevKL5151			: POINTER TO FB_DevKL5151				; // Device pointer to KL5151 encoder/ counter input card
-	pDevKL1512			: POINTER TO FB_DevKL1512				; // Device pointer to KL1512 counter input card
-	
 	fbNodevice			: FB_DevBase; // Dummy to make all pointers point to a valid device
 	stNoDevice			: UDT_DeviceID := (sName := 'No device', sType := TO_STRING(E_Devices.Undefined), pFunction := ADR(fbNodevice)); 
 
@@ -34,11 +18,12 @@ END_VAR
       <ST><![CDATA[GVL_DevManual.bManualModeActive := stHMI.bEnabled;
 
 IF stHMI.bEnabled THEN
+	// NOTE: The device is responsibe for disabling the manual mode when CmdManual is no longer called
 	stHMI.refSelectedDevice.CmdManual();
 END_IF
 
-IF stHMI.nSelectedDevice <> nSelectedDevicePrev THEN // User changed device selection in the HMI	
-	// Update manual/auto state
+IF stHMI.nSelectedDevice <> nSelectedDevicePrev THEN // User changed device selection in the HMI
+	// Get a reference to the selected device	
 	stHMI.refSelectedDevice REF= arDeviceArray[stHMI.nSelectedDevice].pFunction^;
 	
 	// Remember previous selection
@@ -46,38 +31,36 @@ IF stHMI.nSelectedDevice <> nSelectedDevicePrev THEN // User changed device sele
 
 	// Update HMI frame (contains device specific manual controls)  
 	CASE stHMI.refSelectedDevice.eDevType OF
-		E_Devices.Valve			:
-			pDevValve 			:= ADR(stHMI.refSelectedDevice);
-		E_Devices.Cylinder		:
-			pDevCylinder		:= ADR(stHMI.refSelectedDevice);
-		E_Devices.Axis 			:
-			pDevAxis			:= ADR(stHMI.refSelectedDevice);
-		E_Devices.PushButtonLight :
-			pDevPBL				:= ADR(stHMI.refSelectedDevice);
-		E_Devices.DigitalSensor :
-			pDevDigitalInput	:= ADR(stHMI.refSelectedDevice);
-		E_Devices.AnalogSensor 	:
-			pDevAnalogInput 	:= ADR(stHMI.refSelectedDevice);
-		E_Devices.DigitalOut	:
-			pDevDigitalOut		:= ADR(stHMI.refSelectedDevice);
-		E_Devices.AnalogOut		:
-			pDevAnalogOut		:= ADR(stHMI.refSelectedDevice);
-		E_Devices.PWMController	:
-			pDevPWMController	:= ADR(stHMI.refSelectedDevice);
-		E_Devices.DoublePWMController :
-			pDevDoublePWM		:= ADR(stHMI.refSelectedDevice);
-		E_Devices.Encoder :
-			pDevEncoder			:= ADR(stHMI.refSelectedDevice);
+		E_Devices.Valve:
+			stHMI.pDevValve 			:= ADR(stHMI.refSelectedDevice);
+		E_Devices.Cylinder:
+			stHMI.pDevCylinder			:= ADR(stHMI.refSelectedDevice);
+		E_Devices.Axis:
+			stHMI.pDevAxis				:= ADR(stHMI.refSelectedDevice);
+		E_Devices.PushButtonLight:
+			stHMI.pDevPBL				:= ADR(stHMI.refSelectedDevice);
+		E_Devices.DigitalSensor:
+			stHMI.pDevDigitalInput		:= ADR(stHMI.refSelectedDevice);
+		E_Devices.AnalogSensor:
+			stHMI.pDevAnalogInput 		:= ADR(stHMI.refSelectedDevice);
+		E_Devices.DigitalOut:
+			stHMI.pDevDigitalOut		:= ADR(stHMI.refSelectedDevice);
+		E_Devices.AnalogOut:
+			stHMI.pDevAnalogOut			:= ADR(stHMI.refSelectedDevice);
+		E_Devices.PWMController:
+			stHMI.pDevPWMController		:= ADR(stHMI.refSelectedDevice);
+		E_Devices.DoublePWMController:
+			stHMI.pDevDoublePWM			:= ADR(stHMI.refSelectedDevice);
+		E_Devices.Encoder:
+			stHMI.pDevEncoder			:= ADR(stHMI.refSelectedDevice);
 		E_Devices.AnalogAxis:
-			pDevAnalogAxis		:= ADR(stHMI.refSelectedDevice);
-		E_Devices.TwoVelocityAxis :
-			pDevTwoVelocityAxis := ADR(stHMI.refSelectedDevice);
-		E_Devices.KL5151 :
-			pDevKL5151			:= ADR(stHMI.refSelectedDevice);
-		E_Devices.KL1512 :
-			pDevKL1512			:= ADR(stHMI.refSelectedDevice);
-		ELSE
-			; // TODO: Invalid situation, throw error?
+			stHMI.pDevAnalogAxis		:= ADR(stHMI.refSelectedDevice);
+		E_Devices.TwoVelocityAxis:
+			stHMI.pDevTwoVelocityAxis 	:= ADR(stHMI.refSelectedDevice);
+		E_Devices.KL5151:
+			stHMI.pDevKL5151			:= ADR(stHMI.refSelectedDevice);
+		E_Devices.KL1512:
+			stHMI.pDevKL1512			:= ADR(stHMI.refSelectedDevice);
 	END_CASE
 
 END_IF

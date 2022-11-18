@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <Visu Name="VISU_TEST_UserMgmt" Id="{8eed0362-b648-0b1f-2601-52f470c11427}">
+  <Visu Name="VISU_TEST_LOGIN" Id="{8eed0362-b648-0b1f-2601-52f470c11427}">
     <XmlArchive>
       <Data>
         <o xml:space="preserve" t="VisualObject">

@@ -5,7 +5,7 @@
       <Data>
         <o xml:space="preserve" t="VisualObject">
           <n n="LastVisuLanguageModelEntry" />
-          <v n="UniqueIdGenerator">"14"</v>
+          <v n="UniqueIdGenerator">"17"</v>
           <o n="VisualElemList" t="VisualElemList">
             <l n="VisualElementList" t="VisualElemCollection" cet="GenericVisualElem">
               <o>
@@ -147,7 +147,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">"fbManualControler.pDevKL5151^.stManualControl.nCount"</v>
+                      <v n="Value">"pDev^.stManualControl.nCount"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -308,7 +308,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">"fbManualControler.pDevKL5151^.stManualControl.nManValue"</v>
+                      <v n="Value">"pDev^.stManualControl.nManValue"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -357,7 +357,7 @@
                       <l n="VisualElemMemberList" t="VisualElemMemberCollection" cet="VisualElemMember">
                         <o>
                           <v n="Id">1186196937L</v>
-                          <v n="Value">"fbManualControler.pDevKL5151^.stManualControl.bManSetValue"</v>
+                          <v n="Value">"pDev^.stManualControl.bManSetValue"</v>
                         </o>
                       </l>
                     </o>
@@ -621,10 +621,10 @@
               <d n="FbMethods" t="CaseInsensitiveHashtable" ckt="String" cvt="Guid">
                 <v>FB_Init</v>
                 <v>28dcb118-3ddb-4ed7-93d0-d0fc0bb282e1</v>
-                <v>FB_Reinit</v>
-                <v>63a92da8-6fe3-4730-8843-9444090ef357</v>
                 <v>FB_Exit</v>
                 <v>8f5e8329-1911-4c6e-83c2-b1841ffcd0a1</v>
+                <v>FB_Reinit</v>
+                <v>63a92da8-6fe3-4730-8843-9444090ef357</v>
               </d>
               <v n="FbName">"NotImportant"</v>
               <v n="FbGuid">{a6d5d4af-d4c5-4357-8597-c1e19cfbc901}</v>
@@ -672,14 +672,14 @@
           <o n="TextDocument" t="TextDocument">
             <a n="TextLines" cet="TextLine">
               <o>
-                <v n="Id">13L</v>
+                <v n="Id">15L</v>
                 <n n="Tag" />
                 <v n="Text">"VAR_IN_OUT"</v>
               </o>
               <o>
-                <v n="Id">14L</v>
+                <v n="Id">17L</v>
                 <n n="Tag" />
-                <v n="Text">"	fbManualControler	: FB_ManualController ;"</v>
+                <v n="Text">"	pDev : POINTER TO FB_DevKL5151;"</v>
               </o>
               <o>
                 <v n="Id">1L</v>

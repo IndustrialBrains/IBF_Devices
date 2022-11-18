@@ -5,7 +5,7 @@
       <Data>
         <o xml:space="preserve" t="VisualObject">
           <n n="LastVisuLanguageModelEntry" />
-          <v n="UniqueIdGenerator">"6"</v>
+          <v n="UniqueIdGenerator">"9"</v>
           <o n="VisualElemList" t="VisualElemList">
             <l n="VisualElementList" t="VisualElemCollection" cet="GenericVisualElem">
               <o>
@@ -84,7 +84,7 @@
                     </o>
                     <o>
                       <v n="Id">743958181L</v>
-                      <v n="Value">"fbManualControler.pDevDoublePWM^.qbOutputA"</v>
+                      <v n="Value">"pDev^.qbOutputA"</v>
                     </o>
                   </l>
                 </o>
@@ -110,7 +110,7 @@
                       <l n="VisualElemMemberList" t="VisualElemMemberCollection" cet="VisualElemMember">
                         <o>
                           <v n="Id">1186196937L</v>
-                          <v n="Value">"fbManualControler.pDevDoublePWM^.bCmdPWMOn"</v>
+                          <v n="Value">"pDev^.bCmdPWMOn"</v>
                         </o>
                       </l>
                     </o>
@@ -292,7 +292,7 @@
                       <l n="VisualElemMemberList" t="VisualElemMemberCollection" cet="VisualElemMember">
                         <o>
                           <v n="Id">1186196937L</v>
-                          <v n="Value">"fbManualControler.pDevDoublePWM^.bCmdChanelAOn"</v>
+                          <v n="Value">"pDev^.bCmdChanelAOn"</v>
                         </o>
                       </l>
                     </o>
@@ -605,7 +605,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">"fbManualControler.pDevDoublePWM^.stParPeriodLength.fValue"</v>
+                      <v n="Value">"pDev^.stParPeriodLength.fValue"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -1043,7 +1043,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">"fbManualControler.pDevDoublePWM^.stParDutyCycle.fValue"</v>
+                      <v n="Value">"pDev^.stParDutyCycle.fValue"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -1160,7 +1160,7 @@
                     </o>
                     <o>
                       <v n="Id">743958181L</v>
-                      <v n="Value">"fbManualControler.pDevPWMController^.qbOutput"</v>
+                      <v n="Value">"pDev^.qbOutputB"</v>
                     </o>
                   </l>
                 </o>
@@ -1186,7 +1186,7 @@
                       <l n="VisualElemMemberList" t="VisualElemMemberCollection" cet="VisualElemMember">
                         <o>
                           <v n="Id">1186196937L</v>
-                          <v n="Value">"fbManualControler.pDevDoublePWM^.bCmdChanelBOn"</v>
+                          <v n="Value">"pDev^.bCmdChanelBOn"</v>
                         </o>
                       </l>
                     </o>
@@ -1759,14 +1759,14 @@
           <o n="TextDocument" t="TextDocument">
             <a n="TextLines" cet="TextLine">
               <o>
-                <v n="Id">4L</v>
+                <v n="Id">7L</v>
                 <n n="Tag" />
                 <v n="Text">"VAR_IN_OUT"</v>
               </o>
               <o>
-                <v n="Id">5L</v>
+                <v n="Id">9L</v>
                 <n n="Tag" />
-                <v n="Text">"	fbManualControler	: FB_ManualController ;"</v>
+                <v n="Text">"	pDev : POINTER TO FB_DevDoublePWM;"</v>
               </o>
               <o>
                 <v n="Id">1L</v>

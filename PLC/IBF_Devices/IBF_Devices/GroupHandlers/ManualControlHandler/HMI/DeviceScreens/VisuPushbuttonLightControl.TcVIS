@@ -5,7 +5,7 @@
       <Data>
         <o xml:space="preserve" t="VisualObject">
           <n n="LastVisuLanguageModelEntry" />
-          <v n="UniqueIdGenerator">"4"</v>
+          <v n="UniqueIdGenerator">"7"</v>
           <o n="VisualElemList" t="VisualElemList">
             <l n="VisualElementList" t="VisualElemCollection" cet="GenericVisualElem">
               <o>
@@ -88,7 +88,7 @@
                     </o>
                     <o>
                       <v n="Id">743958181L</v>
-                      <v n="Value">"fbManualControler.pDevPBL^.bFcoInputActive"</v>
+                      <v n="Value">"pDev^.bFcoInputActive"</v>
                     </o>
                     <o>
                       <v n="Id">2597686782L</v>
@@ -118,7 +118,7 @@
                       <l n="VisualElemMemberList" t="VisualElemMemberCollection" cet="VisualElemMember">
                         <o>
                           <v n="Id">1186196937L</v>
-                          <v n="Value">"fbManualControler.pDevPBL^.fbLight.bCmdOn"</v>
+                          <v n="Value">"pDev^.fbLight.bCmdOn"</v>
                         </o>
                       </l>
                     </o>
@@ -300,7 +300,7 @@
                       <l n="VisualElemMemberList" t="VisualElemMemberCollection" cet="VisualElemMember">
                         <o>
                           <v n="Id">1186196937L</v>
-                          <v n="Value">"fbManualControler.pDevPBL^.fbLight.bCmdBlinkFast"</v>
+                          <v n="Value">"pDev^.fbLight.bCmdBlinkFast"</v>
                         </o>
                       </l>
                     </o>
@@ -482,7 +482,7 @@
                       <l n="VisualElemMemberList" t="VisualElemMemberCollection" cet="VisualElemMember">
                         <o>
                           <v n="Id">1186196937L</v>
-                          <v n="Value">"fbManualControler.pDevPBL^.fbLight.bCmdBlinkSlow"</v>
+                          <v n="Value">"pDev^.fbLight.bCmdBlinkSlow"</v>
                         </o>
                       </l>
                     </o>
@@ -746,10 +746,10 @@
               <d n="FbMethods" t="CaseInsensitiveHashtable" ckt="String" cvt="Guid">
                 <v>FB_Init</v>
                 <v>a000205c-50a4-43b1-a7af-5dba565b6206</v>
-                <v>FB_Exit</v>
-                <v>ea587812-5c86-4006-8d66-6d8eda46cbdd</v>
                 <v>FB_Reinit</v>
                 <v>113c6c8c-39f3-4911-bbdd-17a87b11e0c6</v>
+                <v>FB_Exit</v>
+                <v>ea587812-5c86-4006-8d66-6d8eda46cbdd</v>
               </d>
               <v n="FbName">"NotImportant"</v>
               <v n="FbGuid">{ab4c8c47-1123-4155-ada6-769cb5b21f5e}</v>
@@ -797,14 +797,14 @@
           <o n="TextDocument" t="TextDocument">
             <a n="TextLines" cet="TextLine">
               <o>
-                <v n="Id">2L</v>
+                <v n="Id">5L</v>
                 <n n="Tag" />
                 <v n="Text">"VAR_IN_OUT"</v>
               </o>
               <o>
-                <v n="Id">3L</v>
+                <v n="Id">7L</v>
                 <n n="Tag" />
-                <v n="Text">"	fbManualControler	: FB_ManualController ;"</v>
+                <v n="Text">"	pDev : POINTER TO FB_DevPushbuttonLight;"</v>
               </o>
               <o>
                 <v n="Id">1L</v>

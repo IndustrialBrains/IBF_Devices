@@ -5,7 +5,7 @@
       <Data>
         <o xml:space="preserve" t="VisualObject">
           <n n="LastVisuLanguageModelEntry" />
-          <v n="UniqueIdGenerator">"5"</v>
+          <v n="UniqueIdGenerator">"8"</v>
           <o n="VisualElemList" t="VisualElemList">
             <l n="VisualElementList" t="VisualElemCollection" cet="GenericVisualElem">
               <o>
@@ -88,7 +88,7 @@
                     </o>
                     <o>
                       <v n="Id">743958181L</v>
-                      <v n="Value">"fbManualControler.pDevDigitalOut^.bCmdOn"</v>
+                      <v n="Value">"pDev^.bCmdOn"</v>
                     </o>
                     <o>
                       <v n="Id">2597686782L</v>
@@ -200,10 +200,10 @@
               <d n="FbMethods" t="CaseInsensitiveHashtable" ckt="String" cvt="Guid">
                 <v>FB_Init</v>
                 <v>498a62cc-6442-425a-b7b1-c4d8807038d2</v>
-                <v>FB_Exit</v>
-                <v>ebd73aef-68cf-46b5-b0b7-dc0c7ae24772</v>
                 <v>FB_Reinit</v>
                 <v>39a43c21-5903-4907-bbdb-f3411847a9e6</v>
+                <v>FB_Exit</v>
+                <v>ebd73aef-68cf-46b5-b0b7-dc0c7ae24772</v>
               </d>
               <v n="FbName">"NotImportant"</v>
               <v n="FbGuid">{617a8708-c7bd-4fdd-a101-fb3f41c74892}</v>
@@ -251,14 +251,14 @@
           <o n="TextDocument" t="TextDocument">
             <a n="TextLines" cet="TextLine">
               <o>
-                <v n="Id">4L</v>
+                <v n="Id">6L</v>
                 <n n="Tag" />
                 <v n="Text">"VAR_IN_OUT"</v>
               </o>
               <o>
-                <v n="Id">5L</v>
+                <v n="Id">8L</v>
                 <n n="Tag" />
-                <v n="Text">"	fbManualControler	: FB_ManualController ;"</v>
+                <v n="Text">"	pDev : POINTER TO FB_DevDigitalOutput;"</v>
               </o>
               <o>
                 <v n="Id">1L</v>

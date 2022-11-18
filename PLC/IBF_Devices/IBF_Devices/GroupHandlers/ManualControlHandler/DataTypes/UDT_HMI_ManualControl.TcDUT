@@ -7,6 +7,23 @@ STRUCT
 	nSelectedDevice		: UDINT; // Combo box index
 	bReset 				: BOOL;
 	bEnabled			: BOOL;	
+
+	// References to all supported device types
+	pDevValve			: POINTER TO FB_DevValve;
+	pDevCylinder		: POINTER TO Fb_DevCylWithFbk; 
+	pDevAxis			: POINTER TO Fb_DevAxis; 
+	pDevPBL				: POINTER TO FB_DevPushbuttonLight;
+	pDevDigitalInput	: POINTER TO Fb_DevDigitalInputFunctions;
+	pDevAnalogInput		: POINTER TO FB_DevAnalogInput;
+	pDevAnalogOut		: POINTER TO FB_DevAnalogOutput;
+	pDevDigitalOut		: POINTER TO FB_DevDigitalOutput;
+	pDevPWMController	: POINTER TO FB_DevPWMGenerator;
+	pDevDoublePWM		: POINTER TO FB_DevDoublePWM;
+	pDevEncoder			: POINTER TO FB_EncoderBase;
+	pDevAnalogAxis		: POINTER TO FB_DevAnalogAxis;
+	pDevTwoVelocityAxis	: POINTER TO FB_DevTwoVelocityAxis;
+	pDevKL5151			: POINTER TO FB_DevKL5151;
+	pDevKL1512			: POINTER TO FB_DevKL1512;
 END_STRUCT
 END_TYPE
 ]]></Declaration>

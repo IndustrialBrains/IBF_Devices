@@ -5,7 +5,7 @@
       <Data>
         <o xml:space="preserve" t="VisualObject">
           <n n="LastVisuLanguageModelEntry" />
-          <v n="UniqueIdGenerator">"5"</v>
+          <v n="UniqueIdGenerator">"6"</v>
           <o n="VisualElemList" t="VisualElemList">
             <l n="VisualElementList" t="VisualElemCollection" cet="GenericVisualElem">
               <o>
@@ -221,7 +221,7 @@
                                 <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                                   <o>
                                     <v n="Flags">2L</v>
-                                    <v n="BasicTypeNodeValue">"fbManualControler"</v>
+                                    <n n="BasicTypeNodeValue" />
                                     <v n="BasicTypeNodeAcceptsExpression">true</v>
                                     <n n="BasicTypeNodeFastAccess" />
                                     <a n="BasicTypeNodeEnumValues" et="String" />
@@ -232,17 +232,17 @@
                                     <l n="TypeNodeChildren" t="ArrayList" />
                                     <o n="TypeNodeType" t="TypeNodeType">
                                       <v n="TypeClass" t="TypeClass">Reference</v>
-                                      <v n="QualifiedName">"FB_ManualController"</v>
-                                      <v n="Name">"FB_ManualController"</v>
+                                      <v n="QualifiedName">"UDT_HMI_ManualControl"</v>
+                                      <v n="Name">"UDT_HMI_ManualControl"</v>
                                     </o>
-                                    <v n="TypeNodeName">"fbManualControler"</v>
+                                    <v n="TypeNodeName">"stHMI"</v>
                                     <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                                       <v n="AttrFlags">0UL</v>
                                       <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                                       <v n="ConvDone">true</v>
                                     </o>
                                     <v n="TypeNodeId" t="Int16">255</v>
-                                    <v n="TypeNodeIdLong">1911567689L</v>
+                                    <v n="TypeNodeIdLong">157851048L</v>
                                     <n n="LibraryId" />
                                     <n n="DisplayTextId" />
                                     <n n="DescriptionTextID" />
@@ -281,7 +281,7 @@
                                 <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                                   <o>
                                     <v n="Flags">2L</v>
-                                    <v n="BasicTypeNodeValue">"fbManualControler"</v>
+                                    <v n="BasicTypeNodeValue">"stHMI"</v>
                                     <v n="BasicTypeNodeAcceptsExpression">true</v>
                                     <n n="BasicTypeNodeFastAccess" />
                                     <a n="BasicTypeNodeEnumValues" et="String" />
@@ -295,14 +295,14 @@
                                       <v n="QualifiedName">"FB_ManualController"</v>
                                       <v n="Name">"FB_ManualController"</v>
                                     </o>
-                                    <v n="TypeNodeName">"fbManualControler"</v>
+                                    <v n="TypeNodeName">"stHMI"</v>
                                     <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                                       <v n="AttrFlags">0UL</v>
                                       <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                                       <v n="ConvDone">true</v>
                                     </o>
                                     <v n="TypeNodeId" t="Int16">255</v>
-                                    <v n="TypeNodeIdLong">3730405507L</v>
+                                    <v n="TypeNodeIdLong">2280102475L</v>
                                     <n n="LibraryId" />
                                     <n n="DisplayTextId" />
                                     <n n="DescriptionTextID" />
@@ -341,7 +341,7 @@
                                 <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                                   <o>
                                     <v n="Flags">2L</v>
-                                    <v n="BasicTypeNodeValue">"fbManualControler"</v>
+                                    <v n="BasicTypeNodeValue">"stHMI"</v>
                                     <v n="BasicTypeNodeAcceptsExpression">true</v>
                                     <n n="BasicTypeNodeFastAccess" />
                                     <a n="BasicTypeNodeEnumValues" et="String" />
@@ -355,14 +355,14 @@
                                       <v n="QualifiedName">"FB_ManualController"</v>
                                       <v n="Name">"FB_ManualController"</v>
                                     </o>
-                                    <v n="TypeNodeName">"fbManualControler"</v>
+                                    <v n="TypeNodeName">"stHMI"</v>
                                     <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                                       <v n="AttrFlags">0UL</v>
                                       <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                                       <v n="ConvDone">true</v>
                                     </o>
                                     <v n="TypeNodeId" t="Int16">255</v>
-                                    <v n="TypeNodeIdLong">3141419973L</v>
+                                    <v n="TypeNodeIdLong">1263377109L</v>
                                     <n n="LibraryId" />
                                     <n n="DisplayTextId" />
                                     <n n="DescriptionTextID" />
@@ -401,7 +401,7 @@
                                 <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                                   <o>
                                     <v n="Flags">2L</v>
-                                    <v n="BasicTypeNodeValue">"fbManualControler"</v>
+                                    <v n="BasicTypeNodeValue">"stHMI"</v>
                                     <v n="BasicTypeNodeAcceptsExpression">true</v>
                                     <n n="BasicTypeNodeFastAccess" />
                                     <a n="BasicTypeNodeEnumValues" et="String" />
@@ -415,14 +415,14 @@
                                       <v n="QualifiedName">"FB_ManualController"</v>
                                       <v n="Name">"FB_ManualController"</v>
                                     </o>
-                                    <v n="TypeNodeName">"fbManualControler"</v>
+                                    <v n="TypeNodeName">"stHMI"</v>
                                     <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                                       <v n="AttrFlags">0UL</v>
                                       <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                                       <v n="ConvDone">true</v>
                                     </o>
                                     <v n="TypeNodeId" t="Int16">255</v>
-                                    <v n="TypeNodeIdLong">1518003542L</v>
+                                    <v n="TypeNodeIdLong">1099469772L</v>
                                     <n n="LibraryId" />
                                     <n n="DisplayTextId" />
                                     <n n="DescriptionTextID" />
@@ -461,7 +461,7 @@
                                 <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                                   <o>
                                     <v n="Flags">2L</v>
-                                    <v n="BasicTypeNodeValue">"fbManualControler"</v>
+                                    <v n="BasicTypeNodeValue">"stHMI"</v>
                                     <v n="BasicTypeNodeAcceptsExpression">true</v>
                                     <n n="BasicTypeNodeFastAccess" />
                                     <a n="BasicTypeNodeEnumValues" et="String" />
@@ -475,14 +475,14 @@
                                       <v n="QualifiedName">"FB_ManualController"</v>
                                       <v n="Name">"FB_ManualController"</v>
                                     </o>
-                                    <v n="TypeNodeName">"fbManualControler"</v>
+                                    <v n="TypeNodeName">"stHMI"</v>
                                     <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                                       <v n="AttrFlags">0UL</v>
                                       <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                                       <v n="ConvDone">true</v>
                                     </o>
                                     <v n="TypeNodeId" t="Int16">255</v>
-                                    <v n="TypeNodeIdLong">1058922000L</v>
+                                    <v n="TypeNodeIdLong">2367853394L</v>
                                     <n n="LibraryId" />
                                     <n n="DisplayTextId" />
                                     <n n="DescriptionTextID" />
@@ -521,7 +521,7 @@
                                 <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                                   <o>
                                     <v n="Flags">2L</v>
-                                    <v n="BasicTypeNodeValue">"fbManualControler"</v>
+                                    <v n="BasicTypeNodeValue">"stHMI"</v>
                                     <v n="BasicTypeNodeAcceptsExpression">true</v>
                                     <n n="BasicTypeNodeFastAccess" />
                                     <a n="BasicTypeNodeEnumValues" et="String" />
@@ -535,14 +535,14 @@
                                       <v n="QualifiedName">"FB_ManualController"</v>
                                       <v n="Name">"FB_ManualController"</v>
                                     </o>
-                                    <v n="TypeNodeName">"fbManualControler"</v>
+                                    <v n="TypeNodeName">"stHMI"</v>
                                     <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                                       <v n="AttrFlags">0UL</v>
                                       <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                                       <v n="ConvDone">true</v>
                                     </o>
                                     <v n="TypeNodeId" t="Int16">255</v>
-                                    <v n="TypeNodeIdLong">2427753434L</v>
+                                    <v n="TypeNodeIdLong">61707441L</v>
                                     <n n="LibraryId" />
                                     <n n="DisplayTextId" />
                                     <n n="DescriptionTextID" />
@@ -581,7 +581,7 @@
                                 <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                                   <o>
                                     <v n="Flags">2L</v>
-                                    <v n="BasicTypeNodeValue">"fbManualControler"</v>
+                                    <v n="BasicTypeNodeValue">"stHMI"</v>
                                     <v n="BasicTypeNodeAcceptsExpression">true</v>
                                     <n n="BasicTypeNodeFastAccess" />
                                     <a n="BasicTypeNodeEnumValues" et="String" />
@@ -595,14 +595,14 @@
                                       <v n="QualifiedName">"FB_ManualController"</v>
                                       <v n="Name">"FB_ManualController"</v>
                                     </o>
-                                    <v n="TypeNodeName">"fbManualControler"</v>
+                                    <v n="TypeNodeName">"stHMI"</v>
                                     <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                                       <v n="AttrFlags">0UL</v>
                                       <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                                       <v n="ConvDone">true</v>
                                     </o>
                                     <v n="TypeNodeId" t="Int16">255</v>
-                                    <v n="TypeNodeIdLong">4124289180L</v>
+                                    <v n="TypeNodeIdLong">3473380399L</v>
                                     <n n="LibraryId" />
                                     <n n="DisplayTextId" />
                                     <n n="DescriptionTextID" />
@@ -641,7 +641,7 @@
                                 <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                                   <o>
                                     <v n="Flags">2L</v>
-                                    <v n="BasicTypeNodeValue">"fbManualControler"</v>
+                                    <v n="BasicTypeNodeValue">"stHMI"</v>
                                     <v n="BasicTypeNodeAcceptsExpression">true</v>
                                     <n n="BasicTypeNodeFastAccess" />
                                     <a n="BasicTypeNodeEnumValues" et="String" />
@@ -655,14 +655,14 @@
                                       <v n="QualifiedName">"FB_ManualController"</v>
                                       <v n="Name">"FB_ManualController"</v>
                                     </o>
-                                    <v n="TypeNodeName">"fbManualControler"</v>
+                                    <v n="TypeNodeName">"stHMI"</v>
                                     <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                                       <v n="AttrFlags">0UL</v>
                                       <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                                       <v n="ConvDone">true</v>
                                     </o>
                                     <v n="TypeNodeId" t="Int16">255</v>
-                                    <v n="TypeNodeIdLong">2303514813L</v>
+                                    <v n="TypeNodeIdLong">371689091L</v>
                                     <n n="LibraryId" />
                                     <n n="DisplayTextId" />
                                     <n n="DescriptionTextID" />
@@ -701,7 +701,7 @@
                                 <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                                   <o>
                                     <v n="Flags">2L</v>
-                                    <v n="BasicTypeNodeValue">"fbManualControler"</v>
+                                    <v n="BasicTypeNodeValue">"stHMI"</v>
                                     <v n="BasicTypeNodeAcceptsExpression">true</v>
                                     <n n="BasicTypeNodeFastAccess" />
                                     <a n="BasicTypeNodeEnumValues" et="String" />
@@ -715,14 +715,14 @@
                                       <v n="QualifiedName">"FB_ManualController"</v>
                                       <v n="Name">"FB_ManualController"</v>
                                     </o>
-                                    <v n="TypeNodeName">"fbManualControler"</v>
+                                    <v n="TypeNodeName">"stHMI"</v>
                                     <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                                       <v n="AttrFlags">0UL</v>
                                       <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                                       <v n="ConvDone">true</v>
                                     </o>
                                     <v n="TypeNodeId" t="Int16">255</v>
-                                    <v n="TypeNodeIdLong">3962299387L</v>
+                                    <v n="TypeNodeIdLong">3666707997L</v>
                                     <n n="LibraryId" />
                                     <n n="DisplayTextId" />
                                     <n n="DescriptionTextID" />
@@ -761,7 +761,7 @@
                                 <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                                   <o>
                                     <v n="Flags">2L</v>
-                                    <v n="BasicTypeNodeValue">"fbManualControler"</v>
+                                    <v n="BasicTypeNodeValue">"stHMI"</v>
                                     <v n="BasicTypeNodeAcceptsExpression">true</v>
                                     <n n="BasicTypeNodeFastAccess" />
                                     <a n="BasicTypeNodeEnumValues" et="String" />
@@ -775,14 +775,14 @@
                                       <v n="QualifiedName">"FB_ManualController"</v>
                                       <v n="Name">"FB_ManualController"</v>
                                     </o>
-                                    <v n="TypeNodeName">"fbManualControler"</v>
+                                    <v n="TypeNodeName">"stHMI"</v>
                                     <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                                       <v n="AttrFlags">0UL</v>
                                       <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                                       <v n="ConvDone">true</v>
                                     </o>
                                     <v n="TypeNodeId" t="Int16">255</v>
-                                    <v n="TypeNodeIdLong">3909953803L</v>
+                                    <v n="TypeNodeIdLong">1224912365L</v>
                                     <n n="LibraryId" />
                                     <n n="DisplayTextId" />
                                     <n n="DescriptionTextID" />
@@ -821,7 +821,7 @@
                                 <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                                   <o>
                                     <v n="Flags">2L</v>
-                                    <v n="BasicTypeNodeValue">"fbManualControler"</v>
+                                    <v n="BasicTypeNodeValue">"stHMI"</v>
                                     <v n="BasicTypeNodeAcceptsExpression">true</v>
                                     <n n="BasicTypeNodeFastAccess" />
                                     <a n="BasicTypeNodeEnumValues" et="String" />
@@ -835,14 +835,14 @@
                                       <v n="QualifiedName">"FB_ManualController"</v>
                                       <v n="Name">"FB_ManualController"</v>
                                     </o>
-                                    <v n="TypeNodeName">"fbManualControler"</v>
+                                    <v n="TypeNodeName">"stHMI"</v>
                                     <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                                       <v n="AttrFlags">0UL</v>
                                       <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                                       <v n="ConvDone">true</v>
                                     </o>
                                     <v n="TypeNodeId" t="Int16">255</v>
-                                    <v n="TypeNodeIdLong">2355761741L</v>
+                                    <v n="TypeNodeIdLong">2242424179L</v>
                                     <n n="LibraryId" />
                                     <n n="DisplayTextId" />
                                     <n n="DescriptionTextID" />
@@ -881,7 +881,7 @@
                                 <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                                   <o>
                                     <v n="Flags">2L</v>
-                                    <v n="BasicTypeNodeValue">"fbManualControler"</v>
+                                    <v n="BasicTypeNodeValue">"stHMI"</v>
                                     <v n="BasicTypeNodeAcceptsExpression">true</v>
                                     <n n="BasicTypeNodeFastAccess" />
                                     <a n="BasicTypeNodeEnumValues" et="String" />
@@ -895,14 +895,14 @@
                                       <v n="QualifiedName">"FB_ManualController"</v>
                                       <v n="Name">"FB_ManualController"</v>
                                     </o>
-                                    <v n="TypeNodeName">"fbManualControler"</v>
+                                    <v n="TypeNodeName">"stHMI"</v>
                                     <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                                       <v n="AttrFlags">0UL</v>
                                       <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                                       <v n="ConvDone">true</v>
                                     </o>
                                     <v n="TypeNodeId" t="Int16">255</v>
-                                    <v n="TypeNodeIdLong">600006535L</v>
+                                    <v n="TypeNodeIdLong">187148944L</v>
                                     <n n="LibraryId" />
                                     <n n="DisplayTextId" />
                                     <n n="DescriptionTextID" />
@@ -941,7 +941,7 @@
                                 <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                                   <o>
                                     <v n="Flags">2L</v>
-                                    <v n="BasicTypeNodeValue">"fbManualControler"</v>
+                                    <v n="BasicTypeNodeValue">"stHMI"</v>
                                     <v n="BasicTypeNodeAcceptsExpression">true</v>
                                     <n n="BasicTypeNodeFastAccess" />
                                     <a n="BasicTypeNodeEnumValues" et="String" />
@@ -955,14 +955,14 @@
                                       <v n="QualifiedName">"FB_ManualController"</v>
                                       <v n="Name">"FB_ManualController"</v>
                                     </o>
-                                    <v n="TypeNodeName">"fbManualControler"</v>
+                                    <v n="TypeNodeName">"stHMI"</v>
                                     <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                                       <v n="AttrFlags">0UL</v>
                                       <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                                       <v n="ConvDone">true</v>
                                     </o>
                                     <v n="TypeNodeId" t="Int16">255</v>
-                                    <v n="TypeNodeIdLong">1185178817L</v>
+                                    <v n="TypeNodeIdLong">3347950094L</v>
                                     <n n="LibraryId" />
                                     <n n="DisplayTextId" />
                                     <n n="DescriptionTextID" />
@@ -1001,7 +1001,7 @@
                                 <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                                   <o>
                                     <v n="Flags">2L</v>
-                                    <v n="BasicTypeNodeValue">"fbManualControler"</v>
+                                    <v n="BasicTypeNodeValue">"stHMI"</v>
                                     <v n="BasicTypeNodeAcceptsExpression">true</v>
                                     <n n="BasicTypeNodeFastAccess" />
                                     <a n="BasicTypeNodeEnumValues" et="String" />
@@ -1015,14 +1015,14 @@
                                       <v n="QualifiedName">"FB_ManualController"</v>
                                       <v n="Name">"FB_ManualController"</v>
                                     </o>
-                                    <v n="TypeNodeName">"fbManualControler"</v>
+                                    <v n="TypeNodeName">"stHMI"</v>
                                     <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                                       <v n="AttrFlags">0UL</v>
                                       <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                                       <v n="ConvDone">true</v>
                                     </o>
                                     <v n="TypeNodeId" t="Int16">255</v>
-                                    <v n="TypeNodeIdLong">2816524882L</v>
+                                    <v n="TypeNodeIdLong">3444089623L</v>
                                     <n n="LibraryId" />
                                     <n n="DisplayTextId" />
                                     <n n="DescriptionTextID" />
@@ -1061,7 +1061,7 @@
                                 <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                                   <o>
                                     <v n="Flags">2L</v>
-                                    <n n="BasicTypeNodeValue" />
+                                    <v n="BasicTypeNodeValue">"stHMI"</v>
                                     <v n="BasicTypeNodeAcceptsExpression">true</v>
                                     <n n="BasicTypeNodeFastAccess" />
                                     <a n="BasicTypeNodeEnumValues" et="String" />
@@ -1075,14 +1075,14 @@
                                       <v n="QualifiedName">"FB_ManualController"</v>
                                       <v n="Name">"FB_ManualController"</v>
                                     </o>
-                                    <v n="TypeNodeName">"fbManualControler"</v>
+                                    <v n="TypeNodeName">"stHMI"</v>
                                     <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                                       <v n="AttrFlags">0UL</v>
                                       <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                                       <v n="ConvDone">true</v>
                                     </o>
                                     <v n="TypeNodeId" t="Int16">255</v>
-                                    <v n="TypeNodeIdLong">3263691028L</v>
+                                    <v n="TypeNodeIdLong">31630217L</v>
                                     <n n="LibraryId" />
                                     <n n="DisplayTextId" />
                                     <n n="DescriptionTextID" />
@@ -1126,12 +1126,12 @@
                               <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" ckt="String" cvt="String">
                                 <v>Visible</v>
                                 <v>False</v>
-                                <v>ieccodeconversion_array</v>
-                                <v></v>
-                                <v>VisibleChildren</v>
-                                <v>True</v>
                                 <v>DefaultArraySize</v>
                                 <v>5</v>
+                                <v>VisibleChildren</v>
+                                <v>True</v>
+                                <v>ieccodeconversion_array</v>
+                                <v></v>
                                 <v>''NORMAL__COMMENT</v>
                                 <v> We hide this node to prevent having two References nodes
  Nevertheless we want to make sure that the children are displayed</v>
@@ -1187,8 +1187,8 @@
                         <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                           <v n="AttrFlags">81920UL</v>
                           <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" ckt="String" cvt="String">
-                            <v>conditionalshow</v>
-                            <v>visu_elemdev</v>
+                            <v>DisplayFrameReferencesConfiguration</v>
+                            <v></v>
                             <v>DescriptionTextId</v>
                             <v>TL_ElementProperties.Desc_ReferencedVisus</v>
                             <v>SortFlag</v>
@@ -1199,14 +1199,14 @@
                             <v>Simple|Standard</v>
                             <v>DynamicArray</v>
                             <v></v>
-                            <v>DisplayFrameReferencesConfiguration</v>
-                            <v></v>
+                            <v>conditionalshow</v>
+                            <v>visu_elemdev</v>
                             <v>FrameReferences</v>
                             <v></v>
-                            <v>Storable</v>
-                            <v>True</v>
                             <v>DisplayTextId</v>
                             <v>TL_ElementProperties.References</v>
+                            <v>Storable</v>
+                            <v>True</v>
                           </d>
                           <v n="ConvDone">true</v>
                         </o>
@@ -1291,69 +1291,6 @@
                       </o>
                     </o>
                     <o>
-                      <v n="Id">2322814029L</v>
-                      <o n="Value" t="VisualizationNode">
-                        <v n="VisuNodeReferenceGuid">{00000000-0000-0000-0000-000000000000}</v>
-                        <n n="VisuNodeReference" />
-                        <v n="VisNodeRefs33">"VisuValveControl"</v>
-                        <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
-                          <o>
-                            <v n="Flags">2L</v>
-                            <v n="BasicTypeNodeValue">"fbManualController"</v>
-                            <v n="BasicTypeNodeAcceptsExpression">true</v>
-                            <n n="BasicTypeNodeFastAccess" />
-                            <a n="BasicTypeNodeEnumValues" et="String" />
-                            <n n="EnumValueDisplayTextIds" />
-                            <n n="EnumValueVisibilityAttributeValues" />
-                            <n n="EnumValueLibraryId" />
-                            <n n="DynamicEnumMemberVisibilityCheckerTypeGuid" />
-                            <l n="TypeNodeChildren" t="ArrayList" />
-                            <o n="TypeNodeType" t="TypeNodeType">
-                              <v n="TypeClass" t="TypeClass">Reference</v>
-                              <v n="QualifiedName">"FB_ManualController"</v>
-                              <v n="Name">"FB_ManualController"</v>
-                            </o>
-                            <v n="TypeNodeName">"fbManualControler"</v>
-                            <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
-                              <v n="AttrFlags">0UL</v>
-                              <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
-                              <v n="ConvDone">true</v>
-                            </o>
-                            <v n="TypeNodeId" t="Int16">255</v>
-                            <v n="TypeNodeIdLong">1911567689L</v>
-                            <n n="LibraryId" />
-                            <n n="DisplayTextId" />
-                            <n n="DescriptionTextID" />
-                            <v n="DescriptionUseParent">false</v>
-                          </o>
-                        </l>
-                        <o n="TypeNodeType" t="TypeNodeType">
-                          <v n="TypeClass" t="TypeClass">Userdef</v>
-                          <v n="QualifiedName">"IVisualisation"</v>
-                          <v n="Name">"IVisualisation"</v>
-                        </o>
-                        <v n="TypeNodeName">"[1]"</v>
-                        <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
-                          <v n="AttrFlags">0UL</v>
-                          <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" ckt="String" cvt="String">
-                            <v>ieccodeconversion_useexistinginterface</v>
-                            <v>_3S.CoDeSys.VisuGenerated.IVisualisationIEC</v>
-                            <v>conditionalshow</v>
-                            <v>visu_elemdev</v>
-                            <v>''NORMAL__COMMENT</v>
-                            <v> interface contains additional methods to IVisualElement</v>
-                          </d>
-                          <v n="ConvDone">true</v>
-                        </o>
-                        <v n="TypeNodeId" t="Int16">1</v>
-                        <v n="TypeNodeIdLong">2322814029L</v>
-                        <n n="LibraryId" />
-                        <n n="DisplayTextId" />
-                        <n n="DescriptionTextID" />
-                        <v n="DescriptionUseParent">false</v>
-                      </o>
-                    </o>
-                    <o>
                       <v n="Id">2707294094L</v>
                       <o n="Value" t="VisualizationNode">
                         <v n="VisuNodeReferenceGuid">{00000000-0000-0000-0000-000000000000}</v>
@@ -1362,7 +1299,7 @@
                         <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                           <o>
                             <v n="Flags">2L</v>
-                            <v n="BasicTypeNodeValue">"fbManualController"</v>
+                            <v n="BasicTypeNodeValue">"stHMI.pDevCylinder"</v>
                             <v n="BasicTypeNodeAcceptsExpression">true</v>
                             <n n="BasicTypeNodeFastAccess" />
                             <a n="BasicTypeNodeEnumValues" et="String" />
@@ -1373,17 +1310,17 @@
                             <l n="TypeNodeChildren" t="ArrayList" />
                             <o n="TypeNodeType" t="TypeNodeType">
                               <v n="TypeClass" t="TypeClass">Reference</v>
-                              <v n="QualifiedName">"FB_ManualController"</v>
-                              <v n="Name">"FB_ManualController"</v>
+                              <v n="QualifiedName">"POINTER TO Fb_DevCylWithFbk"</v>
+                              <v n="Name">"POINTER TO Fb_DevCylWithFbk"</v>
                             </o>
-                            <v n="TypeNodeName">"fbManualControler"</v>
+                            <v n="TypeNodeName">"pDev"</v>
                             <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                               <v n="AttrFlags">0UL</v>
                               <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                               <v n="ConvDone">true</v>
                             </o>
                             <v n="TypeNodeId" t="Int16">255</v>
-                            <v n="TypeNodeIdLong">3730405507L</v>
+                            <v n="TypeNodeIdLong">1202458699L</v>
                             <n n="LibraryId" />
                             <n n="DisplayTextId" />
                             <n n="DescriptionTextID" />
@@ -1425,7 +1362,7 @@
                         <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                           <o>
                             <v n="Flags">2L</v>
-                            <v n="BasicTypeNodeValue">"fbManualController"</v>
+                            <v n="BasicTypeNodeValue">"stHMI.pDevAxis"</v>
                             <v n="BasicTypeNodeAcceptsExpression">true</v>
                             <n n="BasicTypeNodeFastAccess" />
                             <a n="BasicTypeNodeEnumValues" et="String" />
@@ -1436,17 +1373,17 @@
                             <l n="TypeNodeChildren" t="ArrayList" />
                             <o n="TypeNodeType" t="TypeNodeType">
                               <v n="TypeClass" t="TypeClass">Reference</v>
-                              <v n="QualifiedName">"FB_ManualController"</v>
-                              <v n="Name">"FB_ManualController"</v>
+                              <v n="QualifiedName">"POINTER TO Fb_DevAxis"</v>
+                              <v n="Name">"POINTER TO Fb_DevAxis"</v>
                             </o>
-                            <v n="TypeNodeName">"fbManualControler"</v>
+                            <v n="TypeNodeName">"pDev"</v>
                             <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                               <v n="AttrFlags">0UL</v>
                               <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                               <v n="ConvDone">true</v>
                             </o>
                             <v n="TypeNodeId" t="Int16">255</v>
-                            <v n="TypeNodeIdLong">3141419973L</v>
+                            <v n="TypeNodeIdLong">3789233151L</v>
                             <n n="LibraryId" />
                             <n n="DisplayTextId" />
                             <n n="DescriptionTextID" />
@@ -1488,7 +1425,7 @@
                         <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                           <o>
                             <v n="Flags">2L</v>
-                            <v n="BasicTypeNodeValue">"fbManualController"</v>
+                            <v n="BasicTypeNodeValue">"stHMI.pDevPBL"</v>
                             <v n="BasicTypeNodeAcceptsExpression">true</v>
                             <n n="BasicTypeNodeFastAccess" />
                             <a n="BasicTypeNodeEnumValues" et="String" />
@@ -1499,17 +1436,17 @@
                             <l n="TypeNodeChildren" t="ArrayList" />
                             <o n="TypeNodeType" t="TypeNodeType">
                               <v n="TypeClass" t="TypeClass">Reference</v>
-                              <v n="QualifiedName">"FB_ManualController"</v>
-                              <v n="Name">"FB_ManualController"</v>
+                              <v n="QualifiedName">"POINTER TO FB_DevPushbuttonLight"</v>
+                              <v n="Name">"POINTER TO FB_DevPushbuttonLight"</v>
                             </o>
-                            <v n="TypeNodeName">"fbManualControler"</v>
+                            <v n="TypeNodeName">"pDev"</v>
                             <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                               <v n="AttrFlags">0UL</v>
                               <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                               <v n="ConvDone">true</v>
                             </o>
                             <v n="TypeNodeId" t="Int16">255</v>
-                            <v n="TypeNodeIdLong">1518003542L</v>
+                            <v n="TypeNodeIdLong">612115825L</v>
                             <n n="LibraryId" />
                             <n n="DisplayTextId" />
                             <n n="DescriptionTextID" />
@@ -1551,7 +1488,7 @@
                         <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                           <o>
                             <v n="Flags">2L</v>
-                            <v n="BasicTypeNodeValue">"fbManualController"</v>
+                            <v n="BasicTypeNodeValue">"stHMI.pDevDigitalInput"</v>
                             <v n="BasicTypeNodeAcceptsExpression">true</v>
                             <n n="BasicTypeNodeFastAccess" />
                             <a n="BasicTypeNodeEnumValues" et="String" />
@@ -1562,17 +1499,17 @@
                             <l n="TypeNodeChildren" t="ArrayList" />
                             <o n="TypeNodeType" t="TypeNodeType">
                               <v n="TypeClass" t="TypeClass">Reference</v>
-                              <v n="QualifiedName">"FB_ManualController"</v>
-                              <v n="Name">"FB_ManualController"</v>
+                              <v n="QualifiedName">"POINTER TO Fb_DevDigitalInputFunctions"</v>
+                              <v n="Name">"POINTER TO Fb_DevDigitalInputFunctions"</v>
                             </o>
-                            <v n="TypeNodeName">"fbManualControler"</v>
+                            <v n="TypeNodeName">"pDev"</v>
                             <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                               <v n="AttrFlags">0UL</v>
                               <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                               <v n="ConvDone">true</v>
                             </o>
                             <v n="TypeNodeId" t="Int16">255</v>
-                            <v n="TypeNodeIdLong">1058922000L</v>
+                            <v n="TypeNodeIdLong">2181770949L</v>
                             <n n="LibraryId" />
                             <n n="DisplayTextId" />
                             <n n="DescriptionTextID" />
@@ -1614,7 +1551,7 @@
                         <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                           <o>
                             <v n="Flags">2L</v>
-                            <v n="BasicTypeNodeValue">"fbManualController"</v>
+                            <v n="BasicTypeNodeValue">"stHMI.pDevAnalogInput"</v>
                             <v n="BasicTypeNodeAcceptsExpression">true</v>
                             <n n="BasicTypeNodeFastAccess" />
                             <a n="BasicTypeNodeEnumValues" et="String" />
@@ -1625,17 +1562,17 @@
                             <l n="TypeNodeChildren" t="ArrayList" />
                             <o n="TypeNodeType" t="TypeNodeType">
                               <v n="TypeClass" t="TypeClass">Reference</v>
-                              <v n="QualifiedName">"FB_ManualController"</v>
-                              <v n="Name">"FB_ManualController"</v>
+                              <v n="QualifiedName">"POINTER TO FB_DevAnalogInput"</v>
+                              <v n="Name">"POINTER TO FB_DevAnalogInput"</v>
                             </o>
-                            <v n="TypeNodeName">"fbManualControler"</v>
+                            <v n="TypeNodeName">"pDev"</v>
                             <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                               <v n="AttrFlags">0UL</v>
                               <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                               <v n="ConvDone">true</v>
                             </o>
                             <v n="TypeNodeId" t="Int16">255</v>
-                            <v n="TypeNodeIdLong">2427753434L</v>
+                            <v n="TypeNodeIdLong">3018011736L</v>
                             <n n="LibraryId" />
                             <n n="DisplayTextId" />
                             <n n="DescriptionTextID" />
@@ -1677,7 +1614,7 @@
                         <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                           <o>
                             <v n="Flags">2L</v>
-                            <v n="BasicTypeNodeValue">"fbManualController"</v>
+                            <v n="BasicTypeNodeValue">"stHMI.pDevDigitalOut"</v>
                             <v n="BasicTypeNodeAcceptsExpression">true</v>
                             <n n="BasicTypeNodeFastAccess" />
                             <a n="BasicTypeNodeEnumValues" et="String" />
@@ -1688,17 +1625,17 @@
                             <l n="TypeNodeChildren" t="ArrayList" />
                             <o n="TypeNodeType" t="TypeNodeType">
                               <v n="TypeClass" t="TypeClass">Reference</v>
-                              <v n="QualifiedName">"FB_ManualController"</v>
-                              <v n="Name">"FB_ManualController"</v>
+                              <v n="QualifiedName">"POINTER TO FB_DevDigitalOutput"</v>
+                              <v n="Name">"POINTER TO FB_DevDigitalOutput"</v>
                             </o>
-                            <v n="TypeNodeName">"fbManualControler"</v>
+                            <v n="TypeNodeName">"pDev"</v>
                             <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                               <v n="AttrFlags">0UL</v>
                               <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                               <v n="ConvDone">true</v>
                             </o>
                             <v n="TypeNodeId" t="Int16">255</v>
-                            <v n="TypeNodeIdLong">4124289180L</v>
+                            <v n="TypeNodeIdLong">362037228L</v>
                             <n n="LibraryId" />
                             <n n="DisplayTextId" />
                             <n n="DescriptionTextID" />
@@ -1740,7 +1677,7 @@
                         <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                           <o>
                             <v n="Flags">2L</v>
-                            <v n="BasicTypeNodeValue">"fbManualController"</v>
+                            <v n="BasicTypeNodeValue">"stHMI.pDevAnalogOut"</v>
                             <v n="BasicTypeNodeAcceptsExpression">true</v>
                             <n n="BasicTypeNodeFastAccess" />
                             <a n="BasicTypeNodeEnumValues" et="String" />
@@ -1751,17 +1688,17 @@
                             <l n="TypeNodeChildren" t="ArrayList" />
                             <o n="TypeNodeType" t="TypeNodeType">
                               <v n="TypeClass" t="TypeClass">Reference</v>
-                              <v n="QualifiedName">"FB_ManualController"</v>
-                              <v n="Name">"FB_ManualController"</v>
+                              <v n="QualifiedName">"POINTER TO FB_DevAnalogOutput"</v>
+                              <v n="Name">"POINTER TO FB_DevAnalogOutput"</v>
                             </o>
-                            <v n="TypeNodeName">"fbManualControler"</v>
+                            <v n="TypeNodeName">"pDev"</v>
                             <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                               <v n="AttrFlags">0UL</v>
                               <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                               <v n="ConvDone">true</v>
                             </o>
                             <v n="TypeNodeId" t="Int16">255</v>
-                            <v n="TypeNodeIdLong">2303514813L</v>
+                            <v n="TypeNodeIdLong">3822866181L</v>
                             <n n="LibraryId" />
                             <n n="DisplayTextId" />
                             <n n="DescriptionTextID" />
@@ -1803,7 +1740,7 @@
                         <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                           <o>
                             <v n="Flags">2L</v>
-                            <v n="BasicTypeNodeValue">"fbManualController"</v>
+                            <v n="BasicTypeNodeValue">"stHMI.pDevPWMController"</v>
                             <v n="BasicTypeNodeAcceptsExpression">true</v>
                             <n n="BasicTypeNodeFastAccess" />
                             <a n="BasicTypeNodeEnumValues" et="String" />
@@ -1814,17 +1751,17 @@
                             <l n="TypeNodeChildren" t="ArrayList" />
                             <o n="TypeNodeType" t="TypeNodeType">
                               <v n="TypeClass" t="TypeClass">Reference</v>
-                              <v n="QualifiedName">"FB_ManualController"</v>
-                              <v n="Name">"FB_ManualController"</v>
+                              <v n="QualifiedName">"POINTER TO FB_DevPWMGenerator"</v>
+                              <v n="Name">"POINTER TO FB_DevPWMGenerator"</v>
                             </o>
-                            <v n="TypeNodeName">"fbManualControler"</v>
+                            <v n="TypeNodeName">"pDev"</v>
                             <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                               <v n="AttrFlags">0UL</v>
                               <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                               <v n="ConvDone">true</v>
                             </o>
                             <v n="TypeNodeId" t="Int16">255</v>
-                            <v n="TypeNodeIdLong">3962299387L</v>
+                            <v n="TypeNodeIdLong">1168852145L</v>
                             <n n="LibraryId" />
                             <n n="DisplayTextId" />
                             <n n="DescriptionTextID" />
@@ -1898,7 +1835,7 @@
                         <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                           <o>
                             <v n="Flags">2L</v>
-                            <v n="BasicTypeNodeValue">"fbManualController"</v>
+                            <v n="BasicTypeNodeValue">"stHMI.pDevDoublePWM"</v>
                             <v n="BasicTypeNodeAcceptsExpression">true</v>
                             <n n="BasicTypeNodeFastAccess" />
                             <a n="BasicTypeNodeEnumValues" et="String" />
@@ -1909,17 +1846,17 @@
                             <l n="TypeNodeChildren" t="ArrayList" />
                             <o n="TypeNodeType" t="TypeNodeType">
                               <v n="TypeClass" t="TypeClass">Reference</v>
-                              <v n="QualifiedName">"FB_ManualController"</v>
-                              <v n="Name">"FB_ManualController"</v>
+                              <v n="QualifiedName">"POINTER TO FB_DevDoublePWM"</v>
+                              <v n="Name">"POINTER TO FB_DevDoublePWM"</v>
                             </o>
-                            <v n="TypeNodeName">"fbManualControler"</v>
+                            <v n="TypeNodeName">"pDev"</v>
                             <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                               <v n="AttrFlags">0UL</v>
                               <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                               <v n="ConvDone">true</v>
                             </o>
                             <v n="TypeNodeId" t="Int16">255</v>
-                            <v n="TypeNodeIdLong">3909953803L</v>
+                            <v n="TypeNodeIdLong">3279890748L</v>
                             <n n="LibraryId" />
                             <n n="DisplayTextId" />
                             <n n="DescriptionTextID" />
@@ -1965,7 +1902,7 @@
                         <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                           <o>
                             <v n="Flags">2L</v>
-                            <v n="BasicTypeNodeValue">"fbManualController"</v>
+                            <v n="BasicTypeNodeValue">"stHMI.pDevEncoder"</v>
                             <v n="BasicTypeNodeAcceptsExpression">true</v>
                             <n n="BasicTypeNodeFastAccess" />
                             <a n="BasicTypeNodeEnumValues" et="String" />
@@ -1976,17 +1913,17 @@
                             <l n="TypeNodeChildren" t="ArrayList" />
                             <o n="TypeNodeType" t="TypeNodeType">
                               <v n="TypeClass" t="TypeClass">Reference</v>
-                              <v n="QualifiedName">"FB_ManualController"</v>
-                              <v n="Name">"FB_ManualController"</v>
+                              <v n="QualifiedName">"POINTER TO FB_EncoderBase"</v>
+                              <v n="Name">"POINTER TO FB_EncoderBase"</v>
                             </o>
-                            <v n="TypeNodeName">"fbManualControler"</v>
+                            <v n="TypeNodeName">"pDev"</v>
                             <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                               <v n="AttrFlags">0UL</v>
                               <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                               <v n="ConvDone">true</v>
                             </o>
                             <v n="TypeNodeId" t="Int16">255</v>
-                            <v n="TypeNodeIdLong">2355761741L</v>
+                            <v n="TypeNodeIdLong">1695031944L</v>
                             <n n="LibraryId" />
                             <n n="DisplayTextId" />
                             <n n="DescriptionTextID" />
@@ -2028,7 +1965,7 @@
                         <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                           <o>
                             <v n="Flags">2L</v>
-                            <v n="BasicTypeNodeValue">"fbManualController"</v>
+                            <v n="BasicTypeNodeValue">"stHMI.pDevAnalogAxis"</v>
                             <v n="BasicTypeNodeAcceptsExpression">true</v>
                             <n n="BasicTypeNodeFastAccess" />
                             <a n="BasicTypeNodeEnumValues" et="String" />
@@ -2039,17 +1976,17 @@
                             <l n="TypeNodeChildren" t="ArrayList" />
                             <o n="TypeNodeType" t="TypeNodeType">
                               <v n="TypeClass" t="TypeClass">Reference</v>
-                              <v n="QualifiedName">"FB_ManualController"</v>
-                              <v n="Name">"FB_ManualController"</v>
+                              <v n="QualifiedName">"POINTER TO FB_DevAnalogAxis"</v>
+                              <v n="Name">"POINTER TO FB_DevAnalogAxis"</v>
                             </o>
-                            <v n="TypeNodeName">"fbManualControler"</v>
+                            <v n="TypeNodeName">"pDev"</v>
                             <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                               <v n="AttrFlags">0UL</v>
                               <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                               <v n="ConvDone">true</v>
                             </o>
                             <v n="TypeNodeId" t="Int16">255</v>
-                            <v n="TypeNodeIdLong">600006535L</v>
+                            <v n="TypeNodeIdLong">1423980565L</v>
                             <n n="LibraryId" />
                             <n n="DisplayTextId" />
                             <n n="DescriptionTextID" />
@@ -2083,54 +2020,6 @@
                       </o>
                     </o>
                     <o>
-                      <v n="Id">600006535L</v>
-                      <v n="Value">"fbManualController"</v>
-                    </o>
-                    <o>
-                      <v n="Id">2303514813L</v>
-                      <v n="Value">"fbManualController"</v>
-                    </o>
-                    <o>
-                      <v n="Id">2427753434L</v>
-                      <v n="Value">"fbManualController"</v>
-                    </o>
-                    <o>
-                      <v n="Id">3141419973L</v>
-                      <v n="Value">"fbManualController"</v>
-                    </o>
-                    <o>
-                      <v n="Id">3730405507L</v>
-                      <v n="Value">"fbManualController"</v>
-                    </o>
-                    <o>
-                      <v n="Id">1058922000L</v>
-                      <v n="Value">"fbManualController"</v>
-                    </o>
-                    <o>
-                      <v n="Id">4124289180L</v>
-                      <v n="Value">"fbManualController"</v>
-                    </o>
-                    <o>
-                      <v n="Id">3909953803L</v>
-                      <v n="Value">"fbManualController"</v>
-                    </o>
-                    <o>
-                      <v n="Id">2355761741L</v>
-                      <v n="Value">"fbManualController"</v>
-                    </o>
-                    <o>
-                      <v n="Id">1518003542L</v>
-                      <v n="Value">"fbManualController"</v>
-                    </o>
-                    <o>
-                      <v n="Id">3962299387L</v>
-                      <v n="Value">"fbManualController"</v>
-                    </o>
-                    <o>
-                      <v n="Id">1911567689L</v>
-                      <v n="Value">"fbManualController"</v>
-                    </o>
-                    <o>
                       <v n="Id">876726932L</v>
                       <o n="Value" t="VisualizationNode">
                         <v n="VisuNodeReferenceGuid">{00000000-0000-0000-0000-000000000000}</v>
@@ -2139,7 +2028,7 @@
                         <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                           <o>
                             <v n="Flags">2L</v>
-                            <v n="BasicTypeNodeValue">"fbManualController"</v>
+                            <v n="BasicTypeNodeValue">"stHMI.pDevTwoVelocityAxis"</v>
                             <v n="BasicTypeNodeAcceptsExpression">true</v>
                             <n n="BasicTypeNodeFastAccess" />
                             <a n="BasicTypeNodeEnumValues" et="String" />
@@ -2150,17 +2039,17 @@
                             <l n="TypeNodeChildren" t="ArrayList" />
                             <o n="TypeNodeType" t="TypeNodeType">
                               <v n="TypeClass" t="TypeClass">Reference</v>
-                              <v n="QualifiedName">"FB_ManualController"</v>
-                              <v n="Name">"FB_ManualController"</v>
+                              <v n="QualifiedName">"POINTER TO FB_DevTwoVelocityAxis"</v>
+                              <v n="Name">"POINTER TO FB_DevTwoVelocityAxis"</v>
                             </o>
-                            <v n="TypeNodeName">"fbManualControler"</v>
+                            <v n="TypeNodeName">"pDev"</v>
                             <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                               <v n="AttrFlags">0UL</v>
                               <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                               <v n="ConvDone">true</v>
                             </o>
                             <v n="TypeNodeId" t="Int16">255</v>
-                            <v n="TypeNodeIdLong">1185178817L</v>
+                            <v n="TypeNodeIdLong">4069995425L</v>
                             <n n="LibraryId" />
                             <n n="DisplayTextId" />
                             <n n="DescriptionTextID" />
@@ -2202,7 +2091,7 @@
                         <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                           <o>
                             <v n="Flags">2L</v>
-                            <v n="BasicTypeNodeValue">"fbManualController"</v>
+                            <v n="BasicTypeNodeValue">"stHMI.pDevKL5151"</v>
                             <v n="BasicTypeNodeAcceptsExpression">true</v>
                             <n n="BasicTypeNodeFastAccess" />
                             <a n="BasicTypeNodeEnumValues" et="String" />
@@ -2213,17 +2102,17 @@
                             <l n="TypeNodeChildren" t="ArrayList" />
                             <o n="TypeNodeType" t="TypeNodeType">
                               <v n="TypeClass" t="TypeClass">Reference</v>
-                              <v n="QualifiedName">"FB_ManualController"</v>
-                              <v n="Name">"FB_ManualController"</v>
+                              <v n="QualifiedName">"POINTER TO FB_DevKL5151"</v>
+                              <v n="Name">"POINTER TO FB_DevKL5151"</v>
                             </o>
-                            <v n="TypeNodeName">"fbManualControler"</v>
+                            <v n="TypeNodeName">"pDev"</v>
                             <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                               <v n="AttrFlags">0UL</v>
                               <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                               <v n="ConvDone">true</v>
                             </o>
                             <v n="TypeNodeId" t="Int16">255</v>
-                            <v n="TypeNodeIdLong">2816524882L</v>
+                            <v n="TypeNodeIdLong">925895983L</v>
                             <n n="LibraryId" />
                             <n n="DisplayTextId" />
                             <n n="DescriptionTextID" />
@@ -2257,14 +2146,6 @@
                       </o>
                     </o>
                     <o>
-                      <v n="Id">1185178817L</v>
-                      <v n="Value">"fbManualController"</v>
-                    </o>
-                    <o>
-                      <v n="Id">2816524882L</v>
-                      <v n="Value">"fbManualController"</v>
-                    </o>
-                    <o>
                       <v n="Id">1645964562L</v>
                       <o n="Value" t="VisualizationNode">
                         <v n="VisuNodeReferenceGuid">{00000000-0000-0000-0000-000000000000}</v>
@@ -2273,7 +2154,7 @@
                         <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                           <o>
                             <v n="Flags">2L</v>
-                            <v n="BasicTypeNodeValue">"fbManualController"</v>
+                            <v n="BasicTypeNodeValue">"stHMI.pDevKL1512"</v>
                             <v n="BasicTypeNodeAcceptsExpression">true</v>
                             <n n="BasicTypeNodeFastAccess" />
                             <a n="BasicTypeNodeEnumValues" et="String" />
@@ -2284,17 +2165,17 @@
                             <l n="TypeNodeChildren" t="ArrayList" />
                             <o n="TypeNodeType" t="TypeNodeType">
                               <v n="TypeClass" t="TypeClass">Reference</v>
-                              <v n="QualifiedName">"FB_ManualController"</v>
-                              <v n="Name">"FB_ManualController"</v>
+                              <v n="QualifiedName">"POINTER TO FB_DevKL1512"</v>
+                              <v n="Name">"POINTER TO FB_DevKL1512"</v>
                             </o>
-                            <v n="TypeNodeName">"fbManualControler"</v>
+                            <v n="TypeNodeName">"pDev"</v>
                             <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                               <v n="AttrFlags">0UL</v>
                               <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                               <v n="ConvDone">true</v>
                             </o>
                             <v n="TypeNodeId" t="Int16">255</v>
-                            <v n="TypeNodeIdLong">3263691028L</v>
+                            <v n="TypeNodeIdLong">2437351067L</v>
                             <n n="LibraryId" />
                             <n n="DisplayTextId" />
                             <n n="DescriptionTextID" />
@@ -2328,16 +2209,135 @@
                       </o>
                     </o>
                     <o>
-                      <v n="Id">3263691028L</v>
-                      <v n="Value">"fbManualController"</v>
-                    </o>
-                    <o>
                       <v n="Id">1013868361L</v>
                       <v n="Value">true</v>
                     </o>
                     <o>
                       <v n="Id">1165035537L</v>
                       <v n="Value">true</v>
+                    </o>
+                    <o>
+                      <v n="Id">2322814029L</v>
+                      <o n="Value" t="VisualizationNode">
+                        <v n="VisuNodeReferenceGuid">{00000000-0000-0000-0000-000000000000}</v>
+                        <n n="VisuNodeReference" />
+                        <v n="VisNodeRefs33">"VisuValveControl"</v>
+                        <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
+                          <o>
+                            <v n="Flags">2L</v>
+                            <v n="BasicTypeNodeValue">"stHMI.pDevValve"</v>
+                            <v n="BasicTypeNodeAcceptsExpression">true</v>
+                            <n n="BasicTypeNodeFastAccess" />
+                            <a n="BasicTypeNodeEnumValues" et="String" />
+                            <n n="EnumValueDisplayTextIds" />
+                            <n n="EnumValueVisibilityAttributeValues" />
+                            <n n="EnumValueLibraryId" />
+                            <n n="DynamicEnumMemberVisibilityCheckerTypeGuid" />
+                            <l n="TypeNodeChildren" t="ArrayList" />
+                            <o n="TypeNodeType" t="TypeNodeType">
+                              <v n="TypeClass" t="TypeClass">Reference</v>
+                              <v n="QualifiedName">"POINTER TO FB_DevValve"</v>
+                              <v n="Name">"POINTER TO FB_DevValve"</v>
+                            </o>
+                            <v n="TypeNodeName">"pDev"</v>
+                            <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
+                              <v n="AttrFlags">0UL</v>
+                              <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
+                              <v n="ConvDone">true</v>
+                            </o>
+                            <v n="TypeNodeId" t="Int16">255</v>
+                            <v n="TypeNodeIdLong">1984170710L</v>
+                            <n n="LibraryId" />
+                            <n n="DisplayTextId" />
+                            <n n="DescriptionTextID" />
+                            <v n="DescriptionUseParent">false</v>
+                          </o>
+                        </l>
+                        <o n="TypeNodeType" t="TypeNodeType">
+                          <v n="TypeClass" t="TypeClass">Userdef</v>
+                          <v n="QualifiedName">"IVisualisation"</v>
+                          <v n="Name">"IVisualisation"</v>
+                        </o>
+                        <v n="TypeNodeName">"[1]"</v>
+                        <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
+                          <v n="AttrFlags">0UL</v>
+                          <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" ckt="String" cvt="String">
+                            <v>ieccodeconversion_useexistinginterface</v>
+                            <v>_3S.CoDeSys.VisuGenerated.IVisualisationIEC</v>
+                            <v>conditionalshow</v>
+                            <v>visu_elemdev</v>
+                            <v>''NORMAL__COMMENT</v>
+                            <v> interface contains additional methods to IVisualElement</v>
+                          </d>
+                          <v n="ConvDone">true</v>
+                        </o>
+                        <v n="TypeNodeId" t="Int16">1</v>
+                        <v n="TypeNodeIdLong">2322814029L</v>
+                        <n n="LibraryId" />
+                        <n n="DisplayTextId" />
+                        <n n="DescriptionTextID" />
+                        <v n="DescriptionUseParent">false</v>
+                      </o>
+                    </o>
+                    <o>
+                      <v n="Id">1423980565L</v>
+                      <v n="Value">"stHMI.pDevAnalogAxis"</v>
+                    </o>
+                    <o>
+                      <v n="Id">3822866181L</v>
+                      <v n="Value">"stHMI.pDevAnalogOut"</v>
+                    </o>
+                    <o>
+                      <v n="Id">3018011736L</v>
+                      <v n="Value">"stHMI.pDevAnalogInput"</v>
+                    </o>
+                    <o>
+                      <v n="Id">3789233151L</v>
+                      <v n="Value">"stHMI.pDevAxis"</v>
+                    </o>
+                    <o>
+                      <v n="Id">1202458699L</v>
+                      <v n="Value">"stHMI.pDevCylinder"</v>
+                    </o>
+                    <o>
+                      <v n="Id">2181770949L</v>
+                      <v n="Value">"stHMI.pDevDigitalInput"</v>
+                    </o>
+                    <o>
+                      <v n="Id">362037228L</v>
+                      <v n="Value">"stHMI.pDevDigitalOut"</v>
+                    </o>
+                    <o>
+                      <v n="Id">3279890748L</v>
+                      <v n="Value">"stHMI.pDevDoublePWM"</v>
+                    </o>
+                    <o>
+                      <v n="Id">1695031944L</v>
+                      <v n="Value">"stHMI.pDevEncoder"</v>
+                    </o>
+                    <o>
+                      <v n="Id">2437351067L</v>
+                      <v n="Value">"stHMI.pDevKL1512"</v>
+                    </o>
+                    <o>
+                      <v n="Id">925895983L</v>
+                      <v n="Value">"stHMI.pDevKL5151"</v>
+                    </o>
+                    <o>
+                      <v n="Id">612115825L</v>
+                      <v n="Value">"stHMI.pDevPBL"</v>
+                    </o>
+                    <o>
+                      <v n="Id">1168852145L</v>
+                      <v n="Value">"stHMI.pDevPWMController"</v>
+                    </o>
+                    <o>
+                      <v n="Id">4069995425L</v>
+                      <v n="Value">"stHMI.pDevTwoVelocityAxis"</v>
+                    </o>
+                    <o>
+                      <v n="Id">1984170710L</v>
+                      <v n="Value">"stHMI.pDevValve"</v>
                     </o>
                   </l>
                 </o>
@@ -3647,16 +3647,18 @@
           <o n="GeneratedLMMDescriptions" t="GeneratedLanguageModelEntriesData">
             <o n="GeneratedVisuFbDescription" t="GenericFbDescription">
               <d n="FbMethods" t="CaseInsensitiveHashtable_1" ckt="String" cvt="Guid">
-                <v>GetUpdateRects</v>
-                <v>5fa99572-af1f-471a-8c07-dc05344b33b7</v>
+                <v>HasVisibilityAccess</v>
+                <v>742bd816-ccb2-4e22-b0a4-3b7921cde8e7</v>
                 <v>ContainsPoint</v>
                 <v>94f8fa9b-ae27-493c-96d2-c4a5eaaaa3d1</v>
-                <v>SetStaticState</v>
-                <v>ac4f8fc2-b9d6-4e22-be70-1a51bb790945</v>
+                <v>HasInputAccess</v>
+                <v>8bc116ac-ccf8-4fc1-8e48-40f73656cc9c</v>
                 <v>HasInputAccessIntern</v>
                 <v>17a63b1e-73ea-4b32-b343-a828fa2c5a99</v>
                 <v>GetTooltip</v>
                 <v>990b6e15-7788-4c40-922c-64301a07bc23</v>
+                <v>GetUpdateRects</v>
+                <v>5fa99572-af1f-471a-8c07-dc05344b33b7</v>
                 <v>GetNamespace</v>
                 <v>c23a0ce1-51c5-414b-9a23-ff1713bf19ad</v>
                 <v>GetTranslator</v>
@@ -3669,8 +3671,6 @@
                 <v>922c0aa2-1633-4e10-a70c-60090f26fc24</v>
                 <v>Paint</v>
                 <v>32988b3a-ba29-4d56-b5fd-825c3d8f2132</v>
-                <v>HasVisibilityAccess</v>
-                <v>742bd816-ccb2-4e22-b0a4-3b7921cde8e7</v>
                 <v>GetElementArray</v>
                 <v>7418ed7d-4839-46d7-b03d-f4afc68b4e76</v>
                 <v>SetVisuFlagsInternal</v>
@@ -3683,14 +3683,14 @@
                 <v>31567e20-6706-4a70-a81a-41b039ef4ed5</v>
                 <v>Initialize</v>
                 <v>68937b3f-0a61-48a3-9c60-835a3e40b142</v>
-                <v>HasInputAccess</v>
-                <v>8bc116ac-ccf8-4fc1-8e48-40f73656cc9c</v>
                 <v>HasVisibilityAccessIntern</v>
                 <v>628b6473-3638-46a0-9545-d9eec651ee3b</v>
                 <v>GetSurroundingRect</v>
                 <v>08149353-8483-4833-8938-a96ba10b0bf9</v>
                 <v>ElementInfo</v>
                 <v>4f3c24f2-bf92-4e44-bf2e-4fbf18ee4d3c</v>
+                <v>SetStaticState</v>
+                <v>ac4f8fc2-b9d6-4e22-be70-1a51bb790945</v>
                 <v>GetLocalUsergroup</v>
                 <v>0f0a32ce-cefd-4666-8a64-6c6f46b76aac</v>
                 <v>GetName</v>
@@ -3782,9 +3782,9 @@
                 <v n="Text">"	stHMI : UDT_HMI_ManualControl;"</v>
               </o>
               <o>
-                <v n="Id">4L</v>
+                <v n="Id">6L</v>
                 <n n="Tag" />
-                <v n="Text">"	fbManualController	: FB_ManualController;"</v>
+                <v n="Text">"	fbManualController : FB_ManualController; // Only needed to reference the device array and its size"</v>
               </o>
               <o>
                 <v n="Id">1L</v>

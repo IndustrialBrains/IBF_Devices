@@ -5,7 +5,7 @@
       <Data>
         <o xml:space="preserve" t="VisualObject">
           <n n="LastVisuLanguageModelEntry" />
-          <v n="UniqueIdGenerator">"5"</v>
+          <v n="UniqueIdGenerator">"8"</v>
           <o n="VisualElemList" t="VisualElemList">
             <l n="VisualElementList" t="VisualElemCollection" cet="GenericVisualElem">
               <o>
@@ -16,7 +16,7 @@
                       <l n="VisualElemMemberList" t="VisualElemMemberCollection" cet="VisualElemMember">
                         <o>
                           <v n="Id">1186196937L</v>
-                          <v n="Value">"fbManualControler.pDevTwoVelocityAxis^.stManualControl.bManRunCW"</v>
+                          <v n="Value">"pDev^.stManualControl.bManRunCW"</v>
                         </o>
                       </l>
                     </o>
@@ -198,7 +198,7 @@
                       <l n="VisualElemMemberList" t="VisualElemMemberCollection" cet="VisualElemMember">
                         <o>
                           <v n="Id">1186196937L</v>
-                          <v n="Value">"fbManualControler.pDevTwoVelocityAxis^.stManualControl.bManRunCWFast"</v>
+                          <v n="Value">"pDev^.stManualControl.bManRunCWFast"</v>
                         </o>
                       </l>
                     </o>
@@ -380,7 +380,7 @@
                       <l n="VisualElemMemberList" t="VisualElemMemberCollection" cet="VisualElemMember">
                         <o>
                           <v n="Id">1186196937L</v>
-                          <v n="Value">"fbManualControler.pDevTwoVelocityAxis^.stManualControl.bManRunCCw"</v>
+                          <v n="Value">"pDev^.stManualControl.bManRunCCw"</v>
                         </o>
                       </l>
                     </o>
@@ -562,7 +562,7 @@
                       <l n="VisualElemMemberList" t="VisualElemMemberCollection" cet="VisualElemMember">
                         <o>
                           <v n="Id">1186196937L</v>
-                          <v n="Value">"fbManualControler.pDevTwoVelocityAxis^.stManualControl.bManRunCCWFast"</v>
+                          <v n="Value">"pDev^.stManualControl.bManRunCCWFast"</v>
                         </o>
                       </l>
                     </o>
@@ -1342,10 +1342,10 @@
               <d n="FbMethods" t="CaseInsensitiveHashtable" ckt="String" cvt="Guid">
                 <v>FB_Init</v>
                 <v>20593bd6-00ce-4c6c-941c-5e7e76a8ca39</v>
-                <v>FB_Reinit</v>
-                <v>899bc727-8f27-4d95-a0f8-458ad494d602</v>
                 <v>FB_Exit</v>
                 <v>8ccd6e5d-2fda-42ce-9719-731add784803</v>
+                <v>FB_Reinit</v>
+                <v>899bc727-8f27-4d95-a0f8-458ad494d602</v>
               </d>
               <v n="FbName">"NotImportant"</v>
               <v n="FbGuid">{77a30c89-e055-4c41-8618-2b9c3d49bbd7}</v>
@@ -1393,14 +1393,14 @@
           <o n="TextDocument" t="TextDocument">
             <a n="TextLines" cet="TextLine">
               <o>
-                <v n="Id">4L</v>
+                <v n="Id">6L</v>
                 <n n="Tag" />
                 <v n="Text">"VAR_IN_OUT"</v>
               </o>
               <o>
-                <v n="Id">5L</v>
+                <v n="Id">8L</v>
                 <n n="Tag" />
-                <v n="Text">"	fbManualControler	: FB_ManualController ;"</v>
+                <v n="Text">"	pDev : POINTER TO FB_DevTwoVelocityAxis;"</v>
               </o>
               <o>
                 <v n="Id">1L</v>

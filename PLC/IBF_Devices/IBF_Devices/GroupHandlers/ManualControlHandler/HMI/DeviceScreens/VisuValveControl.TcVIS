@@ -5,7 +5,7 @@
       <Data>
         <o xml:space="preserve" t="VisualObject">
           <n n="LastVisuLanguageModelEntry" />
-          <v n="UniqueIdGenerator">"3"</v>
+          <v n="UniqueIdGenerator">"5"</v>
           <o n="VisualElemList" t="VisualElemList">
             <l n="VisualElementList" t="VisualElemCollection" cet="GenericVisualElem">
               <o>
@@ -16,7 +16,7 @@
                       <l n="VisualElemMemberList" t="VisualElemMemberCollection" cet="VisualElemMember">
                         <o>
                           <v n="Id">1186196937L</v>
-                          <v n="Value">"fbManualControler.pDevValve^.stManualCtrl.bCmdOpen"</v>
+                          <v n="Value">"pDev^.stManualCtrl.bCmdOpen"</v>
                         </o>
                       </l>
                     </o>
@@ -198,7 +198,7 @@
                       <l n="VisualElemMemberList" t="VisualElemMemberCollection" cet="VisualElemMember">
                         <o>
                           <v n="Id">1186196937L</v>
-                          <v n="Value">"fbManualControler.pDevValve^.stManualCtrl.bCmdClose"</v>
+                          <v n="Value">"pDev^.stManualCtrl.bCmdClose"</v>
                         </o>
                       </l>
                     </o>
@@ -448,7 +448,7 @@
                     </o>
                     <o>
                       <v n="Id">743958181L</v>
-                      <v n="Value">"fbManualControler.pDevValve^.bFco_Open"</v>
+                      <v n="Value">"pDev^.bFco_Open"</v>
                     </o>
                   </l>
                 </o>
@@ -474,7 +474,7 @@
                       <l n="VisualElemMemberList" t="VisualElemMemberCollection" cet="VisualElemMember">
                         <o>
                           <v n="Id">1186196937L</v>
-                          <v n="Value">"fbManualControler.pDevValve^.stManualCtrl.bCmdTeach"</v>
+                          <v n="Value">"pDev^.stManualCtrl.bCmdTeach"</v>
                         </o>
                       </l>
                     </o>
@@ -724,7 +724,7 @@
                     </o>
                     <o>
                       <v n="Id">743958181L</v>
-                      <v n="Value">"fbManualControler.pDevValve^.bFco_Closed"</v>
+                      <v n="Value">"pDev^.bFco_Closed"</v>
                     </o>
                   </l>
                 </o>
@@ -758,16 +758,18 @@
           <o n="GeneratedLMMDescriptions" t="GeneratedLanguageModelEntriesData">
             <o n="GeneratedVisuFbDescription" t="GenericFbDescription">
               <d n="FbMethods" t="CaseInsensitiveHashtable" ckt="String" cvt="Guid">
-                <v>GetUpdateRects</v>
-                <v>65611f16-027c-493b-a255-903920ecc574</v>
+                <v>HasVisibilityAccess</v>
+                <v>ea38d4b1-fb15-4619-96ef-a9461810e7fe</v>
                 <v>ContainsPoint</v>
                 <v>45c1ee9c-8541-4391-924c-5074c1af5b03</v>
-                <v>SetStaticState</v>
-                <v>4cb43c0a-aeed-4d2a-a8b5-a4765b1776c5</v>
+                <v>HasInputAccess</v>
+                <v>28818b77-70ad-43ab-84ec-b8f8589a752d</v>
                 <v>HasInputAccessIntern</v>
                 <v>48a1072d-695f-5e9d-93b3-52a6a13d2301</v>
                 <v>GetTooltip</v>
                 <v>d76b8f46-75f8-41a0-b049-d9707d797312</v>
+                <v>GetUpdateRects</v>
+                <v>65611f16-027c-493b-a255-903920ecc574</v>
                 <v>GetNamespace</v>
                 <v>5dc9cbb6-df09-4ae7-8572-dae72451fff1</v>
                 <v>GetTranslator</v>
@@ -780,8 +782,6 @@
                 <v>2627a908-5601-4852-982c-3bb8fe31ae8f</v>
                 <v>Paint</v>
                 <v>f5a6b2e3-989c-4314-bbd9-8542c04adbe4</v>
-                <v>HasVisibilityAccess</v>
-                <v>ea38d4b1-fb15-4619-96ef-a9461810e7fe</v>
                 <v>GetElementArray</v>
                 <v>b0669b44-a2d4-4bcb-a0cc-7c8c10b25c62</v>
                 <v>SetVisuFlagsInternal</v>
@@ -794,14 +794,14 @@
                 <v>695f6de7-13ac-4440-812d-55b23facb658</v>
                 <v>Initialize</v>
                 <v>426439a0-e0b9-4536-83ce-bdb824fd8e12</v>
-                <v>HasInputAccess</v>
-                <v>28818b77-70ad-43ab-84ec-b8f8589a752d</v>
                 <v>HasVisibilityAccessIntern</v>
                 <v>e4de3409-7f7f-5f33-8b03-9acb95868568</v>
                 <v>GetSurroundingRect</v>
                 <v>8e2b9d60-1949-4b5d-9b3f-a0b319f9a9a7</v>
                 <v>ElementInfo</v>
                 <v>be5ae816-113d-45ad-815a-d1c511bcb039</v>
+                <v>SetStaticState</v>
+                <v>4cb43c0a-aeed-4d2a-a8b5-a4765b1776c5</v>
                 <v>GetLocalUsergroup</v>
                 <v>93adbf8c-5572-4b24-8ba7-7a67597f4bce</v>
                 <v>GetName</v>
@@ -832,10 +832,10 @@
               <d n="FbMethods" t="CaseInsensitiveHashtable" ckt="String" cvt="Guid">
                 <v>FB_Init</v>
                 <v>56312952-51b5-47e7-88d2-da30cb0d12d6</v>
-                <v>FB_Reinit</v>
-                <v>fa65aaee-2800-4942-b804-f4df2e25d554</v>
                 <v>FB_Exit</v>
                 <v>c93e030b-3dfb-411f-ba94-bd1e6ca80ebe</v>
+                <v>FB_Reinit</v>
+                <v>fa65aaee-2800-4942-b804-f4df2e25d554</v>
               </d>
               <v n="FbName">"NotImportant"</v>
               <v n="FbGuid">{71cb87c4-6c80-4257-91c4-eea01046db07}</v>
@@ -883,14 +883,14 @@
           <o n="TextDocument" t="TextDocument">
             <a n="TextLines" cet="TextLine">
               <o>
-                <v n="Id">2L</v>
+                <v n="Id">4L</v>
                 <n n="Tag" />
                 <v n="Text">"VAR_IN_OUT"</v>
               </o>
               <o>
-                <v n="Id">3L</v>
+                <v n="Id">5L</v>
                 <n n="Tag" />
-                <v n="Text">"	fbManualControler	: FB_ManualController ;"</v>
+                <v n="Text">"	pDev : POINTER TO FB_DevValve;"</v>
               </o>
               <o>
                 <v n="Id">1L</v>

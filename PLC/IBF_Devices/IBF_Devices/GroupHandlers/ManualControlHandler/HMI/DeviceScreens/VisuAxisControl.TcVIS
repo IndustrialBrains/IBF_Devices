@@ -5,7 +5,7 @@
       <Data>
         <o xml:space="preserve" t="VisualObject">
           <n n="LastVisuLanguageModelEntry" />
-          <v n="UniqueIdGenerator">"3"</v>
+          <v n="UniqueIdGenerator">"6"</v>
           <o n="VisualElemList" t="VisualElemList">
             <l n="VisualElementList" t="VisualElemCollection" cet="GenericVisualElem">
               <o>
@@ -16,7 +16,7 @@
                       <l n="VisualElemMemberList" t="VisualElemMemberCollection" cet="VisualElemMember">
                         <o>
                           <v n="Id">1186196937L</v>
-                          <v n="Value">"fbManualControler.pDevAxis^.stManualCtrl.bCmdJogForward"</v>
+                          <v n="Value">"pDev^.stManualCtrl.bCmdJogForward"</v>
                         </o>
                       </l>
                     </o>
@@ -198,7 +198,7 @@
                       <l n="VisualElemMemberList" t="VisualElemMemberCollection" cet="VisualElemMember">
                         <o>
                           <v n="Id">1186196937L</v>
-                          <v n="Value">"fbManualControler.pDevAxis^.stManualCtrl.bCmdJogReverse"</v>
+                          <v n="Value">"pDev^.stManualCtrl.bCmdJogReverse"</v>
                         </o>
                       </l>
                     </o>
@@ -380,7 +380,7 @@
                       <l n="VisualElemMemberList" t="VisualElemMemberCollection" cet="VisualElemMember">
                         <o>
                           <v n="Id">1186196937L</v>
-                          <v n="Value">"fbManualControler.pDevAxis^.stManualCtrl.bCmdToPos"</v>
+                          <v n="Value">"pDev^.stManualCtrl.bCmdToPos"</v>
                         </o>
                       </l>
                     </o>
@@ -562,7 +562,7 @@
                       <l n="VisualElemMemberList" t="VisualElemMemberCollection" cet="VisualElemMember">
                         <o>
                           <v n="Id">1186196937L</v>
-                          <v n="Value">"fbManualControler.pDevAxis^.stManualCtrl.bCmdHome"</v>
+                          <v n="Value">"pDev^.stManualCtrl.bCmdHome"</v>
                         </o>
                       </l>
                     </o>
@@ -863,7 +863,7 @@
                     </o>
                     <o>
                       <v n="Id">743958181L</v>
-                      <v n="Value">"fbManualControler.pDevAxis^.stManualCtrl.bCmdInching"</v>
+                      <v n="Value">"pDev^.stManualCtrl.bCmdInching"</v>
                     </o>
                     <o>
                       <v n="Id">2597686782L</v>
@@ -1415,7 +1415,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">"fbManualControler.pDevAxis^.stManualCtrl.fVelocity"</v>
+                      <v n="Value">"pDev^.stManualCtrl.fVelocity"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -1595,7 +1595,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">"fbManualControler.pDevAxis^.stManualCtrl.fDistance"</v>
+                      <v n="Value">"pDev^.stManualCtrl.fDistance"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -1775,7 +1775,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">"fbManualControler.pDevAxis^.stManualCtrl.fPosition"</v>
+                      <v n="Value">"pDev^.stManualCtrl.fPosition"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -2213,7 +2213,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">"fbManualControler.pDevAxis^.fActPosition"</v>
+                      <v n="Value">"pDev^.fActPosition"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -2393,7 +2393,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">"fbManualControler.pDevAxis^.fVelocity"</v>
+                      <v n="Value">"pDev^.fVelocity"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -2510,7 +2510,7 @@
                     </o>
                     <o>
                       <v n="Id">743958181L</v>
-                      <v n="Value">"fbManualControler.pDevAxis^.AxisRef.Status.Moving"</v>
+                      <v n="Value">"pDev^.AxisRef.Status.Moving"</v>
                     </o>
                   </l>
                 </o>
@@ -2747,10 +2747,10 @@
               <d n="FbMethods" t="CaseInsensitiveHashtable" ckt="String" cvt="Guid">
                 <v>FB_Init</v>
                 <v>847c7274-7c4a-4754-96c9-a9f98ee0b06a</v>
-                <v>FB_Exit</v>
-                <v>8afa7ea5-6b0c-44d9-898b-2b56cee2d8f6</v>
                 <v>FB_Reinit</v>
                 <v>61c473bf-912e-424a-b550-98e86341d6ec</v>
+                <v>FB_Exit</v>
+                <v>8afa7ea5-6b0c-44d9-898b-2b56cee2d8f6</v>
               </d>
               <v n="FbName">"NotImportant"</v>
               <v n="FbGuid">{77c2f02b-489c-4334-89be-9707a472b02f}</v>
@@ -2798,14 +2798,14 @@
           <o n="TextDocument" t="TextDocument">
             <a n="TextLines" cet="TextLine">
               <o>
-                <v n="Id">2L</v>
+                <v n="Id">4L</v>
                 <n n="Tag" />
                 <v n="Text">"VAR_IN_OUT"</v>
               </o>
               <o>
-                <v n="Id">3L</v>
+                <v n="Id">6L</v>
                 <n n="Tag" />
-                <v n="Text">"	fbManualControler	: FB_ManualController ;"</v>
+                <v n="Text">"	pDev : POINTER TO Fb_DevAxis; "</v>
               </o>
               <o>
                 <v n="Id">1L</v>

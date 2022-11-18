@@ -5,7 +5,7 @@
       <Data>
         <o xml:space="preserve" t="VisualObject">
           <n n="LastVisuLanguageModelEntry" />
-          <v n="UniqueIdGenerator">"3"</v>
+          <v n="UniqueIdGenerator">"5"</v>
           <o n="VisualElemList" t="VisualElemList">
             <l n="VisualElementList" t="VisualElemCollection" cet="GenericVisualElem">
               <o>
@@ -124,7 +124,7 @@
                     </o>
                     <o>
                       <v n="Id">397264524L</v>
-                      <v n="Value">"fbManualControler.pDevAnalogOut^.fCmdValue"</v>
+                      <v n="Value">"pDev^.fCmdValue"</v>
                     </o>
                     <o>
                       <v n="Id">681815230L</v>
@@ -285,7 +285,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">"fbManualControler.pDevAnalogOut^.fCmdValue"</v>
+                      <v n="Value">"pDev^.fCmdValue"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -545,10 +545,10 @@
               <d n="FbMethods" t="CaseInsensitiveHashtable" ckt="String" cvt="Guid">
                 <v>FB_Init</v>
                 <v>dde15e55-43b2-4746-9187-dd123c4b5ba3</v>
-                <v>FB_Exit</v>
-                <v>8b80b0ef-df06-4de9-af2d-4f8a75ad1fc9</v>
                 <v>FB_Reinit</v>
                 <v>101539b9-d52e-46a0-b679-a6e2a894815b</v>
+                <v>FB_Exit</v>
+                <v>8b80b0ef-df06-4de9-af2d-4f8a75ad1fc9</v>
               </d>
               <v n="FbName">"NotImportant"</v>
               <v n="FbGuid">{98124fa1-3298-4d91-90d0-060e9a22d24a}</v>
@@ -596,14 +596,14 @@
           <o n="TextDocument" t="TextDocument">
             <a n="TextLines" cet="TextLine">
               <o>
-                <v n="Id">2L</v>
+                <v n="Id">4L</v>
                 <n n="Tag" />
                 <v n="Text">"VAR_IN_OUT"</v>
               </o>
               <o>
-                <v n="Id">3L</v>
+                <v n="Id">5L</v>
                 <n n="Tag" />
-                <v n="Text">"	fbManualControler	: FB_ManualController ;"</v>
+                <v n="Text">"	pDev : POINTER TO FB_DevAnalogOutput;"</v>
               </o>
               <o>
                 <v n="Id">1L</v>

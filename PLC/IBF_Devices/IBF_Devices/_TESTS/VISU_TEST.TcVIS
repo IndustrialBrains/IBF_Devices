@@ -5,7 +5,7 @@
       <Data>
         <o xml:space="preserve" t="VisualObject">
           <n n="LastVisuLanguageModelEntry" />
-          <v n="UniqueIdGenerator">"3"</v>
+          <v n="UniqueIdGenerator">"5"</v>
           <o n="VisualElemList" t="VisualElemList">
             <l n="VisualElementList" t="VisualElemCollection" cet="GenericVisualElem">
               <o>
@@ -119,7 +119,7 @@
                               <o>
                                 <v n="VisuNodeReferenceGuid">{00000000-0000-0000-0000-000000000000}</v>
                                 <n n="VisuNodeReference" />
-                                <v n="VisNodeRefs33">"VISU_TEST_UserMgmt"</v>
+                                <v n="VisNodeRefs33">"VISU_TEST_LOGIN"</v>
                                 <l n="TypeNodeChildren" t="ArrayList" cet="StructuredTypeNode">
                                   <o>
                                     <v n="StructuredTypeNodeIsAnimation">false</v>
@@ -152,16 +152,16 @@
                                             <v></v>
                                             <v>DisplayTextId</v>
                                             <v>TL_ElementProperties.Heading</v>
-                                            <v>ieccodeconversion_character_array</v>
+                                            <v>Visu_TypeString</v>
                                             <v></v>
-                                            <v>AllocateText</v>
+                                            <v>ieccodeconversion_character_array</v>
                                             <v></v>
                                             <v>''DOCU__COMMENT</v>
                                             <v> The text, the user entered resp. can modify. Therefore this is the
  only visible member of the structure</v>
                                             <v>DirectlyAssignable</v>
                                             <v></v>
-                                            <v>Visu_TypeString</v>
+                                            <v>AllocateText</v>
                                             <v></v>
                                             <v>ieccodeconversion_gettersetter_norecursion</v>
                                             <v></v>
@@ -353,16 +353,16 @@
                                             <v></v>
                                             <v>DisplayTextId</v>
                                             <v>TL_ElementProperties.Heading</v>
-                                            <v>ieccodeconversion_character_array</v>
+                                            <v>Visu_TypeString</v>
                                             <v></v>
-                                            <v>AllocateText</v>
+                                            <v>ieccodeconversion_character_array</v>
                                             <v></v>
                                             <v>''DOCU__COMMENT</v>
                                             <v> The text, the user entered resp. can modify. Therefore this is the
  only visible member of the structure</v>
                                             <v>DirectlyAssignable</v>
                                             <v></v>
-                                            <v>Visu_TypeString</v>
+                                            <v>AllocateText</v>
                                             <v></v>
                                             <v>ieccodeconversion_gettersetter_norecursion</v>
                                             <v></v>
@@ -494,7 +494,36 @@
                                   </o>
                                   <o t="BasicTypeNode">
                                     <v n="Flags">2L</v>
-                                    <v n="BasicTypeNodeValue">"GVL_DevManual.fbManualControler"</v>
+                                    <v n="BasicTypeNodeValue">"PRG_TEST_FB_MANUALCONTROLLER.fbManualController.stHMI"</v>
+                                    <v n="BasicTypeNodeAcceptsExpression">true</v>
+                                    <n n="BasicTypeNodeFastAccess" />
+                                    <a n="BasicTypeNodeEnumValues" et="String" />
+                                    <n n="EnumValueDisplayTextIds" />
+                                    <n n="EnumValueVisibilityAttributeValues" />
+                                    <n n="EnumValueLibraryId" />
+                                    <n n="DynamicEnumMemberVisibilityCheckerTypeGuid" />
+                                    <l n="TypeNodeChildren" t="ArrayList" />
+                                    <o n="TypeNodeType" t="TypeNodeType">
+                                      <v n="TypeClass" t="TypeClass">Reference</v>
+                                      <v n="QualifiedName">"UDT_HMI_ManualControl"</v>
+                                      <v n="Name">"UDT_HMI_ManualControl"</v>
+                                    </o>
+                                    <v n="TypeNodeName">"stHMI"</v>
+                                    <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
+                                      <v n="AttrFlags">0UL</v>
+                                      <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
+                                      <v n="ConvDone">true</v>
+                                    </o>
+                                    <v n="TypeNodeId" t="Int16">255</v>
+                                    <v n="TypeNodeIdLong">157851048L</v>
+                                    <n n="LibraryId" />
+                                    <n n="DisplayTextId" />
+                                    <n n="DescriptionTextID" />
+                                    <v n="DescriptionUseParent">false</v>
+                                  </o>
+                                  <o t="BasicTypeNode">
+                                    <v n="Flags">2L</v>
+                                    <v n="BasicTypeNodeValue">"PRG_TEST_FB_MANUALCONTROLLER.fbManualController"</v>
                                     <v n="BasicTypeNodeAcceptsExpression">true</v>
                                     <n n="BasicTypeNodeFastAccess" />
                                     <a n="BasicTypeNodeEnumValues" et="String" />
@@ -508,14 +537,14 @@
                                       <v n="QualifiedName">"FB_ManualController"</v>
                                       <v n="Name">"FB_ManualController"</v>
                                     </o>
-                                    <v n="TypeNodeName">"fbManualControler"</v>
+                                    <v n="TypeNodeName">"fbManualController"</v>
                                     <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                                       <v n="AttrFlags">0UL</v>
                                       <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                                       <v n="ConvDone">true</v>
                                     </o>
-                                    <v n="TypeNodeId" t="Int16">255</v>
-                                    <v n="TypeNodeIdLong">1911567689L</v>
+                                    <v n="TypeNodeId" t="Int16">256</v>
+                                    <v n="TypeNodeIdLong">1764379013L</v>
                                     <n n="LibraryId" />
                                     <n n="DisplayTextId" />
                                     <n n="DescriptionTextID" />
@@ -559,12 +588,12 @@
                               <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" ckt="String" cvt="String">
                                 <v>Visible</v>
                                 <v>False</v>
-                                <v>ieccodeconversion_array</v>
-                                <v></v>
-                                <v>VisibleChildren</v>
-                                <v>True</v>
                                 <v>DefaultArraySize</v>
                                 <v>5</v>
+                                <v>VisibleChildren</v>
+                                <v>True</v>
+                                <v>ieccodeconversion_array</v>
+                                <v></v>
                                 <v>''NORMAL__COMMENT</v>
                                 <v> We hide this node to prevent having two References nodes
  Nevertheless we want to make sure that the children are displayed</v>
@@ -620,8 +649,8 @@
                         <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                           <v n="AttrFlags">81920UL</v>
                           <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" ckt="String" cvt="String">
-                            <v>conditionalshow</v>
-                            <v>visu_elemdev</v>
+                            <v>DisplayFrameReferencesConfiguration</v>
+                            <v></v>
                             <v>DescriptionTextId</v>
                             <v>TL_ElementProperties.Desc_ReferencedVisus</v>
                             <v>SortFlag</v>
@@ -632,14 +661,14 @@
                             <v>Simple|Standard</v>
                             <v>DynamicArray</v>
                             <v></v>
-                            <v>DisplayFrameReferencesConfiguration</v>
-                            <v></v>
+                            <v>conditionalshow</v>
+                            <v>visu_elemdev</v>
                             <v>FrameReferences</v>
                             <v></v>
-                            <v>Storable</v>
-                            <v>True</v>
                             <v>DisplayTextId</v>
                             <v>TL_ElementProperties.References</v>
+                            <v>Storable</v>
+                            <v>True</v>
                           </d>
                           <v n="ConvDone">true</v>
                         </o>
@@ -723,16 +752,16 @@
                                       <v></v>
                                       <v>DisplayTextId</v>
                                       <v>TL_ElementProperties.Heading</v>
-                                      <v>ieccodeconversion_character_array</v>
+                                      <v>Visu_TypeString</v>
                                       <v></v>
-                                      <v>AllocateText</v>
+                                      <v>ieccodeconversion_character_array</v>
                                       <v></v>
                                       <v>''DOCU__COMMENT</v>
                                       <v> The text, the user entered resp. can modify. Therefore this is the
  only visible member of the structure</v>
                                       <v>DirectlyAssignable</v>
                                       <v></v>
-                                      <v>Visu_TypeString</v>
+                                      <v>AllocateText</v>
                                       <v></v>
                                       <v>ieccodeconversion_gettersetter_norecursion</v>
                                       <v></v>
@@ -894,16 +923,16 @@
                                         <v></v>
                                         <v>DisplayTextId</v>
                                         <v>TL_ElementProperties.Heading</v>
-                                        <v>ieccodeconversion_character_array</v>
+                                        <v>Visu_TypeString</v>
                                         <v></v>
-                                        <v>AllocateText</v>
+                                        <v>ieccodeconversion_character_array</v>
                                         <v></v>
                                         <v>''DOCU__COMMENT</v>
                                         <v> The text, the user entered resp. can modify. Therefore this is the
  only visible member of the structure</v>
                                         <v>DirectlyAssignable</v>
                                         <v></v>
-                                        <v>Visu_TypeString</v>
+                                        <v>AllocateText</v>
                                         <v></v>
                                         <v>ieccodeconversion_gettersetter_norecursion</v>
                                         <v></v>
@@ -1027,7 +1056,7 @@
                                   <v n="ConvDone">true</v>
                                 </o>
                                 <v n="TypeNodeId" t="Int16">1</v>
-                                <v n="TypeNodeIdLong">3342794644L</v>
+                                <v n="TypeNodeIdLong">187975896L</v>
                                 <v n="LibraryId">"visuelems, 3.5.13.40 (system)"</v>
                                 <n n="DisplayTextId" />
                                 <n n="DescriptionTextID" />
@@ -1064,16 +1093,16 @@
                                         <v></v>
                                         <v>DisplayTextId</v>
                                         <v>TL_ElementProperties.Heading</v>
-                                        <v>ieccodeconversion_character_array</v>
+                                        <v>Visu_TypeString</v>
                                         <v></v>
-                                        <v>AllocateText</v>
+                                        <v>ieccodeconversion_character_array</v>
                                         <v></v>
                                         <v>''DOCU__COMMENT</v>
                                         <v> The text, the user entered resp. can modify. Therefore this is the
  only visible member of the structure</v>
                                         <v>DirectlyAssignable</v>
                                         <v></v>
-                                        <v>Visu_TypeString</v>
+                                        <v>AllocateText</v>
                                         <v></v>
                                         <v>ieccodeconversion_gettersetter_norecursion</v>
                                         <v></v>
@@ -1197,7 +1226,7 @@
                                   <v n="ConvDone">true</v>
                                 </o>
                                 <v n="TypeNodeId" t="Int16">1</v>
-                                <v n="TypeNodeIdLong">3727019733L</v>
+                                <v n="TypeNodeIdLong">3648236092L</v>
                                 <v n="LibraryId">"visuelems, 3.5.13.40 (system)"</v>
                                 <n n="DisplayTextId" />
                                 <n n="DescriptionTextID" />
@@ -1344,11 +1373,11 @@
                     </o>
                     <o>
                       <v n="Id">2398909109L</v>
-                      <v n="Value">"User mgmt"</v>
+                      <v n="Value">"Login"</v>
                     </o>
                     <o>
                       <v n="Id">1480420536L</v>
-                      <v n="Value">"344"</v>
+                      <v n="Value">"145"</v>
                     </o>
                     <o>
                       <v n="Id">334730179L</v>
@@ -1404,16 +1433,16 @@
                                     <v></v>
                                     <v>DisplayTextId</v>
                                     <v>TL_ElementProperties.Heading</v>
-                                    <v>ieccodeconversion_character_array</v>
+                                    <v>Visu_TypeString</v>
                                     <v></v>
-                                    <v>AllocateText</v>
+                                    <v>ieccodeconversion_character_array</v>
                                     <v></v>
                                     <v>''DOCU__COMMENT</v>
                                     <v> The text, the user entered resp. can modify. Therefore this is the
  only visible member of the structure</v>
                                     <v>DirectlyAssignable</v>
                                     <v></v>
-                                    <v>Visu_TypeString</v>
+                                    <v>AllocateText</v>
                                     <v></v>
                                     <v>ieccodeconversion_gettersetter_norecursion</v>
                                     <v></v>
@@ -1583,14 +1612,14 @@
                       <o n="Value" t="VisualizationNode">
                         <v n="VisuNodeReferenceGuid">{00000000-0000-0000-0000-000000000000}</v>
                         <n n="VisuNodeReference" />
-                        <v n="VisNodeRefs33">"VISU_TEST_UserMgmt"</v>
+                        <v n="VisNodeRefs33">"VISU_TEST_LOGIN"</v>
                         <l n="TypeNodeChildren" t="ArrayList" cet="StructuredTypeNode">
                           <o>
                             <v n="StructuredTypeNodeIsAnimation">false</v>
                             <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                               <o>
                                 <v n="Flags">16L</v>
-                                <v n="BasicTypeNodeValue">"User mgmt"</v>
+                                <v n="BasicTypeNodeValue">"Login"</v>
                                 <v n="BasicTypeNodeAcceptsExpression">false</v>
                                 <n n="BasicTypeNodeFastAccess" />
                                 <a n="BasicTypeNodeEnumValues" et="String" />
@@ -1616,16 +1645,16 @@
                                     <v></v>
                                     <v>DisplayTextId</v>
                                     <v>TL_ElementProperties.Heading</v>
-                                    <v>ieccodeconversion_character_array</v>
+                                    <v>Visu_TypeString</v>
                                     <v></v>
-                                    <v>AllocateText</v>
+                                    <v>ieccodeconversion_character_array</v>
                                     <v></v>
                                     <v>''DOCU__COMMENT</v>
                                     <v> The text, the user entered resp. can modify. Therefore this is the
  only visible member of the structure</v>
                                     <v>DirectlyAssignable</v>
                                     <v></v>
-                                    <v>Visu_TypeString</v>
+                                    <v>AllocateText</v>
                                     <v></v>
                                     <v>ieccodeconversion_gettersetter_norecursion</v>
                                     <v></v>
@@ -1641,7 +1670,7 @@
                               </o>
                               <o>
                                 <v n="Flags">16L</v>
-                                <v n="BasicTypeNodeValue">"344"</v>
+                                <v n="BasicTypeNodeValue">"145"</v>
                                 <v n="BasicTypeNodeAcceptsExpression">false</v>
                                 <n n="BasicTypeNodeFastAccess" />
                                 <a n="BasicTypeNodeEnumValues" et="String" />
@@ -1820,16 +1849,16 @@
                                     <v></v>
                                     <v>DisplayTextId</v>
                                     <v>TL_ElementProperties.Heading</v>
-                                    <v>ieccodeconversion_character_array</v>
+                                    <v>Visu_TypeString</v>
                                     <v></v>
-                                    <v>AllocateText</v>
+                                    <v>ieccodeconversion_character_array</v>
                                     <v></v>
                                     <v>''DOCU__COMMENT</v>
                                     <v> The text, the user entered resp. can modify. Therefore this is the
  only visible member of the structure</v>
                                     <v>DirectlyAssignable</v>
                                     <v></v>
-                                    <v>Visu_TypeString</v>
+                                    <v>AllocateText</v>
                                     <v></v>
                                     <v>ieccodeconversion_gettersetter_norecursion</v>
                                     <v></v>
@@ -2063,7 +2092,7 @@
                   <l n="ContainedGuids" t="ArrayList" />
                   <l n="ContainedVisualizations" t="ArrayList" />
                   <a n="ContainedVisualizations33" cet="String">
-                    <v>VISU_TEST_UserMgmt</v>
+                    <v>VISU_TEST_LOGIN</v>
                     <v>ManualControl</v>
                   </a>
                 </o>
@@ -2228,12 +2257,12 @@
           <o n="TextDocument" t="TextDocument">
             <a n="TextLines" cet="TextLine">
               <o>
-                <v n="Id">2L</v>
+                <v n="Id">4L</v>
                 <n n="Tag" />
                 <v n="Text">"VAR_IN_OUT"</v>
               </o>
               <o>
-                <v n="Id">3L</v>
+                <v n="Id">5L</v>
                 <n n="Tag" />
                 <v n="Text">"	"</v>
               </o>
