@@ -7,6 +7,9 @@
     <PouCall>
       <Name>PRG_TEST_FB_DEVAXIS</Name>
     </PouCall>
+    <PouCall>
+      <Name>PRG_TEST_FB_MANUALCONTROLLER</Name>
+    </PouCall>
     <TaskFBGuid>{00c050a8-5325-4175-8b2b-57e058d6b940}</TaskFBGuid>
     <Fb_init>{c58cc66f-5453-469d-81c3-b371bb5baa94}</Fb_init>
     <Fb_exit>{a775e9a1-b110-4aee-a60a-bf7f6237f415}</Fb_exit>
