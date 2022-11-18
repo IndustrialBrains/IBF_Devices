@@ -965,7 +965,7 @@ External Setpoint Generation:
 		</DataType>
 	</DataTypes>
 	<Project GUID="{216EB895-F07C-4CBA-AD46-DE79E4A415A0}" Name="IBF_Devices" PrjFilePath="..\..\IBF_Devices\IBF_Devices.plcproj" TmcFilePath="..\..\IBF_Devices\IBF_Devices.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-		<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
+		<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="IBF_Devices\IBF_Devices.tmc">
 			<Name>IBF_Devices Instance</Name>
 			<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 			<Vars VarGrpType="1">
@@ -991,6 +991,16 @@ External Setpoint Generation:
 					<Name>PRG_TEST_FB_DEVAXIS.fbDevAxis.AxisRef.PlcToNc</Name>
 					<Type GUID="{63A84524-72E3-41C8-BEAB-4CCE44690A13}" Namespace="MC">PLCTONC_AXIS_REF</Type>
 				</Var>
+				<Var>
+					<Name>PRG_TEST_FB_MANUALCONTROLLER.fbDevValve.q_Open</Name>
+					<Comment><![CDATA[ Open valve]]></Comment>
+					<Type>BOOL</Type>
+				</Var>
+				<Var>
+					<Name>PRG_TEST_FB_MANUALCONTROLLER.fbDevValve.q_Close</Name>
+					<Comment><![CDATA[ Close valve]]></Comment>
+					<Type>BOOL</Type>
+				</Var>
 			</Vars>
 			<Contexts>
 				<Context>
@@ -1002,9 +1012,19 @@ External Setpoint Generation:
 					<Priority>10</Priority>
 					<CycleTime>10000000</CycleTime>
 				</Context>
+				<Context>
+					<Id NeedCalleeCall="true">1</Id>
+					<Name>VISU_TASK</Name>
+					<ManualConfig>
+						<OTCID>#x02010060</OTCID>
+					</ManualConfig>
+					<Priority>12</Priority>
+					<CycleTime>200000000</CycleTime>
+				</Context>
 			</Contexts>
 			<TaskPouOids>
 				<TaskPouOid Prio="10" OTCID="#x08502001"/>
+				<TaskPouOid Prio="12" OTCID="#x08502002"/>
 			</TaskPouOids>
 		</Instance>
 	</Project>

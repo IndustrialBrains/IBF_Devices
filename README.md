@@ -15,5 +15,7 @@
 	- Fb_DevAxis.Init VAR_INPUT default values have no effect (move defaults to Fb_DevAxis VARs or use PROPERTY)
 	- Add feature: check if online motor parameters match project parameters
 	- When STO is not OK, no fault/error is generated; this is as designed (handled by higher level safety system), but is not very intuitive
+1. `ManualControl`: 
+	- list sometimes contains 1 empty item
 
 

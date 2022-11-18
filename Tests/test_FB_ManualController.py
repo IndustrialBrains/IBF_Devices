@@ -15,7 +15,7 @@ COLD_RESET = True
 class Tests(unittest.TestCase):
 
     PREFIX_DEVICE = "PRG_TEST_FB_MANUALCONTROLLER.FbDevValve"
-    PREFIX_CONTROLLER = "GVL_DevManual.fbManualControler"
+    PREFIX_CONTROLLER = "PRG_TEST_FB_MANUALCONTROLLER.fbManualController"
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -32,33 +32,25 @@ class Tests(unittest.TestCase):
 
         return super().setUp()
 
-    def test_device_added(self) -> None:
+    def test_01_device_added(self) -> None:
         device_name = conn.read_by_name(f"{self.PREFIX_DEVICE}.sName")
-        # Device will be added at index 1, as index 0 is reserved for "No device"
-        # TODO: This is HMI dependency (first item in list is used to fill the combobox),
-        # remove it from the Devices library
+        # NOTE: device will be added at index 1, as index 0 is reserved for a dummy device ("No device")
         device_in_array = conn.read_by_name(
             f"{self.PREFIX_CONTROLLER}.arDeviceArray[1].sName"
         )
         self.assertEqual(device_name, device_in_array)
 
-    def test_enable_manual(self) -> None:
-        # Select device
-        # TODO: nCmdLookupindex should be an actual command, not a direct write to a private var from the HMI
-        conn.write_by_name(f"{self.PREFIX_CONTROLLER}.nCmdLookupindex", 1)
-        # TODO: bManualActive should be an actual command, not a direct write to a private var from the HMI
-        conn.write_by_name(f"{self.PREFIX_CONTROLLER}.bManualActive", True)
-        wait_cycles(1)
-        self.assertTrue(conn.read_by_name(f"{self.PREFIX_DEVICE}.bManual"))
+    def test_02_enable_manual(self) -> None:
+        conn.write_by_name(f"{self.PREFIX_CONTROLLER}.stHMI.nSelectedDevice", 1)
+        conn.write_by_name(f"{self.PREFIX_CONTROLLER}.stHMI.bEnabled", True)
+        self.assertTrue(wait_value(f"{self.PREFIX_DEVICE}.bManual", True, 1))
 
-    def test_disable_manual(self) -> None:
-        conn.write_by_name(f"{self.PREFIX_CONTROLLER}.nCmdLookupindex", 1)
-        conn.write_by_name(f"{self.PREFIX_CONTROLLER}.bManualActive", True)
-        wait_cycles(1)
-        self.assertTrue(conn.read_by_name(f"{self.PREFIX_DEVICE}.bManual"))
-        conn.write_by_name(f"{self.PREFIX_CONTROLLER}.bManualActive", False)
-        wait_cycles(1)
-        self.assertFalse(conn.read_by_name(f"{self.PREFIX_DEVICE}.bManual"))
+    def test_03_disable_manual(self) -> None:
+        conn.write_by_name(f"{self.PREFIX_CONTROLLER}.stHMI.nSelectedDevice", 1)
+        conn.write_by_name(f"{self.PREFIX_CONTROLLER}.stHMI.bEnabled", True)
+        self.assertTrue(wait_value(f"{self.PREFIX_DEVICE}.bManual", True, 1))
+        conn.write_by_name(f"{self.PREFIX_CONTROLLER}.stHMI.bEnabled", False)
+        self.assertTrue(wait_value(f"{self.PREFIX_DEVICE}.bManual", False, 1))
 
 
 if __name__ == "__main__":

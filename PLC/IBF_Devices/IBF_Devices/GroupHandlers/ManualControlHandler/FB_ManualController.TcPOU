@@ -1,27 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_ManualController" Id="{791f33e7-9b25-0d7d-213d-2739874fa7e2}" SpecialFunc="None">
-    <Declaration><![CDATA[{attribute 'reflection'}
-FUNCTION_BLOCK FB_ManualController
-VAR_INPUT
-	bReset 			: BOOL 		:= FALSE ; // (auto linked) reset selected device 
-END_VAR
-VAR_OUTPUT
-	eDevType		: INT		:= E_Devices.Undefined	; // Selected device type
-	bManual			: BOOL 		:= FALSE ; // selected device is in manual state
-	bErroractive	: BOOL 		:= FALSE ; // Device error is active
-	sDeviceState	: STRING	:= '' 	; // Dselected device fault message
-END_VAR
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ManualController
 VAR
-	nNumberOfDevices	: UDINT := 0 	; // number of devices in manual array 
+	stHMI				: UDT_HMI_ManualControl; // Link between FB and HMI
 	
-	bManualActive		: BOOL 	:= FALSE ; // Manual control mode is activated
-	bDisableManualInputs: BOOL 	:= TRUE 	; // disable device manual inputs
-	
+	nNumberOfDevices	: UDINT := 0; // Number of devices in DeviceArray
+	nSelectedDevicePrev : UDINT := 0; // Previously selected device in HMI (array index)
+ 
 	pDevValve			: POINTER TO FB_DevValve				; // Device pointer to valve
-	pDevCylinder		: POINTER TO Fb_DevCylWithFbk 			; // Device pointer to cylinder with manual 
+	pDevCylinder		: POINTER TO Fb_DevCylWithFbk			; // Device pointer to cylinder with feedback 
 	pDevAxis			: POINTER TO Fb_DevAxis 				; // device pointer to Axis 
-	pDevPBL				: POINTER TO FB_DevPushbuttonLight		; // Device pointer to puschbutton light
+	pDevPBL				: POINTER TO FB_DevPushbuttonLight		; // Device pointer to pushbutton light
 	pDevDigitalInput	: POINTER TO Fb_DevDigitalInputFunctions; // device pointer to digital input
 	pDevAnalogInput		: POINTER TO FB_DevAnalogInput			; // Device pointer to analog input
 	pDevAnalogOut		: POINTER TO FB_DevAnalogOutput			; // Device pointer to analog output
@@ -34,31 +24,80 @@ VAR
 	pDevKL5151			: POINTER TO FB_DevKL5151				; // Device pointer to KL5151 encoder/ counter input card
 	pDevKL1512			: POINTER TO FB_DevKL1512				; // Device pointer to KL1512 counter input card
 	
-	{attribute 'analysis' := '-33'} // Disable "Unused Variable" rule
-	fbNodevice			: FB_DevBase ;
-	
+	fbNodevice			: FB_DevBase; // Dummy to make all pointers point to a valid device
 	stNoDevice			: UDT_DeviceID := (sName := 'No device', sType := TO_STRING(E_Devices.Undefined), pFunction := ADR(fbNodevice)); 
-	arDeviceArray		: ARRAY [0..GVL_DevManual.nMAXDEVCOUNT] OF UDT_DeviceID := [stNoDevice]	; // Array of Devices for manual control
-	nCmdLookupindex		: UDINT := 0; // Index number in array
-	i					: UDINT := 0; // Index pointer to array
+
+	arDeviceArray		: ARRAY [0..GVL_DevManual.nMAXDEVCOUNT] OF UDT_DeviceID := [stNoDevice];
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[GVL_DevManual.bManualModeActive := bManualActive ;
-IF bManualActive THEN 
-	// insert a device 
-	ExecSelectDevice();
+      <ST><![CDATA[GVL_DevManual.bManualModeActive := stHMI.bEnabled;
+
+IF stHMI.bEnabled THEN
+	stHMI.refSelectedDevice.CmdManual();
+END_IF
+
+IF stHMI.nSelectedDevice <> nSelectedDevicePrev THEN // User changed device selection in the HMI	
+	// Update manual/auto state
+	stHMI.refSelectedDevice REF= arDeviceArray[stHMI.nSelectedDevice].pFunction^;
+	
+	// Remember previous selection
+	nSelectedDevicePrev := stHMI.nSelectedDevice;
+
+	// Update HMI frame (contains device specific manual controls)  
+	CASE stHMI.refSelectedDevice.eDevType OF
+		E_Devices.Valve			:
+			pDevValve 			:= ADR(stHMI.refSelectedDevice);
+		E_Devices.Cylinder		:
+			pDevCylinder		:= ADR(stHMI.refSelectedDevice);
+		E_Devices.Axis 			:
+			pDevAxis			:= ADR(stHMI.refSelectedDevice);
+		E_Devices.PushButtonLight :
+			pDevPBL				:= ADR(stHMI.refSelectedDevice);
+		E_Devices.DigitalSensor :
+			pDevDigitalInput	:= ADR(stHMI.refSelectedDevice);
+		E_Devices.AnalogSensor 	:
+			pDevAnalogInput 	:= ADR(stHMI.refSelectedDevice);
+		E_Devices.DigitalOut	:
+			pDevDigitalOut		:= ADR(stHMI.refSelectedDevice);
+		E_Devices.AnalogOut		:
+			pDevAnalogOut		:= ADR(stHMI.refSelectedDevice);
+		E_Devices.PWMController	:
+			pDevPWMController	:= ADR(stHMI.refSelectedDevice);
+		E_Devices.DoublePWMController :
+			pDevDoublePWM		:= ADR(stHMI.refSelectedDevice);
+		E_Devices.Encoder :
+			pDevEncoder			:= ADR(stHMI.refSelectedDevice);
+		E_Devices.AnalogAxis:
+			pDevAnalogAxis		:= ADR(stHMI.refSelectedDevice);
+		E_Devices.TwoVelocityAxis :
+			pDevTwoVelocityAxis := ADR(stHMI.refSelectedDevice);
+		E_Devices.KL5151 :
+			pDevKL5151			:= ADR(stHMI.refSelectedDevice);
+		E_Devices.KL1512 :
+			pDevKL1512			:= ADR(stHMI.refSelectedDevice);
+		ELSE
+			; // TODO: Invalid situation, throw error?
+	END_CASE
+
+END_IF
+
+// Reset device 
+IF stHMI.bReset THEN
+	stHMI.bReset R= stHMI.refSelectedDevice.CmdReset();
 END_IF
 ]]></ST>
     </Implementation>
-    <Folder Name="Private" Id="{aa1be144-3e85-00ba-24ed-50747e4a9031}" />
-    <Method Name="CmdAddDevice" Id="{0bc99b03-d325-0236-3e6c-84d8051938b0}">
+    <Folder Name="Private" Id="{003add0f-eb8e-0bc3-313c-a2e164f27b73}" />
+    <Folder Name="Public" Id="{77e9735c-4b7d-0116-2c5b-95e5e96a9466}" />
+    <Method Name="CmdAddDevice" Id="{0bc99b03-d325-0236-3e6c-84d8051938b0}" FolderPath="Public\">
       <Declaration><![CDATA[METHOD PUBLIC CmdAddDevice : BOOL
 VAR_INPUT
 	refToDevice	: REFERENCE TO FB_DevBase ;
 END_VAR
 VAR
-	bDevAdded	: BOOL ;
+	bDevAdded : BOOL ;
+	i : UDINT; // Iterator
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -82,65 +121,16 @@ GVL_DevManual.nGlobalNumberOfDevices := nNumberOfDevices ;
 CmdAddDevice := bDevAdded ; ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="ExecSelectDevice" Id="{f2221552-ec82-0ac1-22a7-ed85ccee3236}" FolderPath="Private\">
-      <Declaration><![CDATA[METHOD PRIVATE ExecSelectDevice : BOOL
+    <Method Name="FB_init" Id="{f8d4c384-b515-0887-3458-fc0269608267}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
 VAR_INPUT
+	bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode : BOOL;  // if TRUE, the instance afterwards gets moved into the copy code (online change)
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// Select active manual device
-bDisableManualInputs := NOT arDeviceArray[nCmdLookupindex].pFunction^.bManual ; 
-IF bManualActive THEN 
-	arDeviceArray[nCmdLookupindex].pFunction^.CmdManual(); 
-END_IF
-
-CASE arDeviceArray[nCmdLookupindex].pFunction^.eDevType OF
-	E_Devices.Valve			:
-		pDevValve 			:= arDeviceArray[nCmdLookupindex].pFunction ;
-	E_Devices.Cylinder		:
-		pDevCylinder		:= arDeviceArray[nCmdLookupindex].pFunction ;
-	E_Devices.Axis 			:
-		pDevAxis			:= arDeviceArray[nCmdLookupindex].pFunction ;
-	E_Devices.PushButtonLight :
-		pDevPBL				:= arDeviceArray[nCmdLookupindex].pFunction ;
-	E_Devices.DigitalSensor :
-		pDevDigitalInput	:= arDeviceArray[nCmdLookupindex].pFunction ;
-	E_Devices.AnalogSensor 	:
-		pDevAnalogInput 	:= arDeviceArray[nCmdLookupindex].pFunction ;
-	E_Devices.DigitalOut	:
-	 	pDevDigitalOut		:= arDeviceArray[nCmdLookupindex].pFunction ;
-	E_Devices.AnalogOut		:
-		pDevAnalogOut		:= arDeviceArray[nCmdLookupindex].pFunction ;
-	E_Devices.PWMController	:
-		pDevPWMController	:= arDeviceArray[nCmdLookupindex].pFunction ;
-	E_Devices.DoublePWMController :
-		pDevDoublePWM		:= arDeviceArray[nCmdLookupindex].pFunction ;
-	E_Devices.Encoder :
-		pDevEncoder			:= arDeviceArray[nCmdLookupindex].pFunction ;
-	E_Devices.AnalogAxis:
-		pDevAnalogAxis		:= arDeviceArray[nCmdLookupindex].pFunction ;
-	E_Devices.TwoVelocityAxis :
-		pDevTwoVelocityAxis := arDeviceArray[nCmdLookupindex].pFunction ;
-	E_Devices.KL5151 :
-		pDevKL5151			:= arDeviceArray[nCmdLookupindex].pFunction ;
-	E_Devices.KL1512 :
-		pDevKL1512			:= arDeviceArray[nCmdLookupindex].pFunction ;
-	ELSE
-		;
-END_CASE
-
-// Set device command 
-IF bReset THEN 
-	bReset R= arDeviceArray[nCmdLookupindex].pFunction^.CmdReset();
-END_IF
-
-// Set device state feedback
-bManual 		:= arDeviceArray[nCmdLookupindex].pFunction^.bManual ;
-bErroractive	:= arDeviceArray[nCmdLookupindex].pFunction^.bErrorActive ;
-sDeviceState	:= arDeviceArray[nCmdLookupindex].pFunction^.sActiveState ;
-
-// Set device screen control 
-eDevType := arDeviceArray[nCmdLookupindex].pFunction^.eDevType ; 
+        <ST><![CDATA[// Assure stHMI always has valid references
+stHMI.refSelectedDevice REF= THIS^.fbNodevice;
 ]]></ST>
       </Implementation>
     </Method>

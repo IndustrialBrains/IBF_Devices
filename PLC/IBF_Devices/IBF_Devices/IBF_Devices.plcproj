@@ -37,6 +37,9 @@
     </SelectedLibraryCategories>
   </PropertyGroup>
   <ItemGroup>
+    <Folder Include="GroupHandlers\ManualControlHandler\HMI" />
+    <Folder Include="GroupHandlers\ManualControlHandler\HMI\DeviceScreens" />
+    <Folder Include="GroupHandlers\ManualControlHandler\DataTypes" />
     <Folder Include="_TESTS" />
     <Folder Include="Actuators\Cylinder\DataTypes\ManualControls" />
     <Folder Include="Axis" />
@@ -92,6 +95,80 @@
   <ItemGroup>
     <Compile Include="GlobalTextList.TcGTLO">
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GroupHandlers\ManualControlHandler\DataTypes\UDT_DeviceID.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GroupHandlers\ManualControlHandler\DataTypes\UDT_HMI_ManualControl.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GroupHandlers\ManualControlHandler\HMI\DeviceScreens\VisuAnalogAxisControl.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="GroupHandlers\ManualControlHandler\HMI\DeviceScreens\VisuAnalogOutControl.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="GroupHandlers\ManualControlHandler\HMI\DeviceScreens\VisuAnlogInputControl.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="GroupHandlers\ManualControlHandler\HMI\DeviceScreens\VisuAxisControl.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="GroupHandlers\ManualControlHandler\HMI\DeviceScreens\VisuCylinderControl.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="GroupHandlers\ManualControlHandler\HMI\DeviceScreens\VisuDigitalInputControl.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="GroupHandlers\ManualControlHandler\HMI\DeviceScreens\VisuDigitalOutControl.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="GroupHandlers\ManualControlHandler\HMI\DeviceScreens\VisuDoublePWMControl.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="GroupHandlers\ManualControlHandler\HMI\DeviceScreens\VisuEncoderInput.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="GroupHandlers\ManualControlHandler\HMI\DeviceScreens\VisuKL15XXControl.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="GroupHandlers\ManualControlHandler\HMI\DeviceScreens\VisuKL5151Control.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="GroupHandlers\ManualControlHandler\HMI\DeviceScreens\VisuPushbuttonLightControl.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="GroupHandlers\ManualControlHandler\HMI\DeviceScreens\VisuPWMControl.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="GroupHandlers\ManualControlHandler\HMI\DeviceScreens\VisuTwoVelocityAxisControl.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="GroupHandlers\ManualControlHandler\HMI\DeviceScreens\VisuUndefinedControl.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="GroupHandlers\ManualControlHandler\HMI\DeviceScreens\VisuValveControl.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="GroupHandlers\ManualControlHandler\HMI\ManualControl.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
     <Compile Include="PlcTask.TcTTO">
       <SubType>Code</SubType>
@@ -196,9 +273,6 @@
     <Compile Include="GroupHandlers\ManualControlHandler\FB_ManualController.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="GroupHandlers\ManualControlHandler\UDT_DeviceID.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="HardwareDiagnostics\FB_ELModuleDiag.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -266,6 +340,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="_TESTS\VISU_TEST.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="_TESTS\VISU_TEST_UserMgmt.TcVIS">
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
@@ -352,6 +430,10 @@
     <PlaceholderReference Include="Tc3_Module">
       <DefaultResolution>Tc3_Module, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc3_Module</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="VisuDialogs">
+      <DefaultResolution>VisuDialogs, * (System)</DefaultResolution>
+      <Namespace>VisuDialogs</Namespace>
     </PlaceholderReference>
     <PlaceholderReference Include="VisuUserManagement">
       <DefaultResolution>VisuUserMgmt, * (System)</DefaultResolution>

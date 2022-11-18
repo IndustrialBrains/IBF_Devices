@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_DevBase" Id="{fd1f0090-6070-4291-b370-d3eae943f30f}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC FB_DevBase EXTENDS FB_FunctionBase
@@ -32,15 +32,6 @@ END_IF
 
 ]]></ST>
     </Implementation>
-    <Method Name="CmdManual" Id="{26ba3ac1-09ba-01dd-32ca-9bbda4886bcd}">
-      <Declaration><![CDATA[METHOD PUBLIC CmdManual : BOOL
-VAR_INPUT
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[bCmdManual := true ;]]></ST>
-      </Implementation>
-    </Method>
     <Method Name="CmdSafeStop" Id="{dec1b3af-006d-0b48-0f79-6a1440a93d4c}">
       <Declaration><![CDATA[METHOD PUBLIC CmdSafeStop : BOOL
 VAR_INPUT
