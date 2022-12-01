@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="Fb_DevAxisDelta" Id="{63a8c96e-3fc0-001c-2116-24486a7558ba}" SpecialFunc="None">
+    <Declaration><![CDATA[// Delta ASDA-A2 servo
+FUNCTION_BLOCK Fb_DevAxisDelta EXTENDS Fb_DevAxis
+VAR
+	// Parameters 
+		stMParMaxAcc : Udt_Parameter := (fMaximum := 999999, fMinimum := 0, fValue := 0)	; // Parameter for maximum acceleration
+		stMParMaxDec : Udt_Parameter := (fMaximum := 999999, fMinimum := 0, fValue := 0)	; // Parameter for maximum Deceleration
+		stMparMaxVelo: Udt_Parameter := (fMaximum := 999999, fMinimum := 0, fValue := 0)	; // Parameter for maximum velocity
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[SUPER^(refFbFault := refFbFault);
+]]></ST>
+    </Implementation>
+    <Folder Name="Command Methods" Id="{6ff04a08-145f-0075-3081-8a253c264400}" />
+    <Folder Name="Private" Id="{411a3c08-0cd0-0279-3d64-90e3acd48f7f}">
+      <Folder Name="Organization" Id="{3dbff440-0f61-0a96-00dd-248ac60e3867}" />
+    </Folder>
+    <Method Name="ExecReset" Id="{2608dc0b-c27b-03ab-2a5f-162cf169c209}" FolderPath="Private\Organization\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecReset : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF AxisRef.Status.Coupled THEN 
+	bResetDone 	:= NOT AxisRef.Status.Error;
+	bExec_Reset	R= bResetDone  ;
+	RETURN;
+END_IF
+
+// ===== reset command =====
+	bError 		:= AxisRef.Status.Error OR AxisRef.Status.DriveDeviceError; 
+	bExec_Reset	R= fbMcReset.Done  ;
+
+// ==== execute reset functions =====
+fbMcReset	( 	Execute	:= bExec_Reset,
+				Axis	:= AxisRef ); 
+				
+// ===== Set feedback =====
+	bResetDone 	S= fbMcReset.Done  ;
+	bResetDone	R= AxisRef.Status.Error ;
+	tonResetDone (IN	:= bResetDone);
+
+// ===== reset limitations =====
+	bCmdSafeSpeed 	:= FALSE ;
+
+	
+// Reset fault handling 
+	IF fbMcReset.Error THEN 
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
+		stFault.Description		:= CONCAT('Reset Fault ', UDINT_TO_STRING(fbMcReset.ErrorID));
+		stFault.Description		:= CONCAT( sName , stfault.Description ) ;
+		stFault.FaultType		:= E_FaultTypes.FF				;
+	END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Init" Id="{2b37d305-8771-08f4-26c5-28ec9072ede6}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
+VAR_INPUT
+	// Message location data
+	nId			: UDINT ; // Identification number of object
+	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
+	
+	// Config Bits
+	bIcfCmdVelocityRpm	: BOOL := FALSE ; // input speeds in Rpm
+	bIcfEnableForward 	: BOOL := TRUE 	; // Enable forward motion
+	bIcfEnableReverse	: BOOL := TRUE 	; // Enable reverse motion
+	bIcfAlwaysEnable	: BOOL := FALSE ; // 1 = Axis always enabled, 0 = Axis disabled at Idle 
+	bIcfModuloAxis		: BOOL := FALSE ; // Show axis position as modulo
+	bIcfSTOPresent		: BOOL := FALSE ; // Axis safe torque off is present
+	bIcfNCHomeSensor	: BOOL := FALSE ; // Homing sensor is inverted (NC)	
+	// Config Values 
+	mcHomingMode 		: MC_HomingMode := MC_HomingMode.MC_DefaultHoming; 
+	fHomePosition		: LREAL := 0 	; // set position at homing
+	fSafeOverride		: LREAL := 10	; // Safe velocity override [%]
+	nEncTurnoverVal 	: LREAL := 360	; // encoder turnover value 
+	tEnableDelay		: time 	:= T#0MS; // Time between axis enable command and motion command execution (0 := no delay active)	
+	tDisabledelay		: TIME 	:= T#100MS; // Axis idle time before axis is disabled 
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ====== Calculate device id =====
+	bInitOk :=	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Axis) AND bInitOk;
+
+// ====== Set manual device type ======
+	eDevType := E_Devices.Axis ;	
+	
+// ===== Message data set =====
+	stFault.ComponentType		:= E_ComponentTypes.Axis ;
+
+// ===== Write parameters =====
+	stMParMaxAcc.nNumber		:= nLocationId + 1;
+	stMParMaxAcc.sDiscription 	:= CONCAT(STR1 := sName, STR2:= ' hardware maximum acceleration (0 = HWMaximum)'); 
+	stMParMaxAcc.sName			:= CONCAT(STR1 := sName, STR2:= 'Hard max aceleration');
+	stMParMaxAcc.sType			:= 'MPar';
+	stMParMaxAcc.sUnit			:= 'Units/Sec^2';
+	
+	stMParMaxDec.nNumber		:= nLocationId + 2;
+	stMParMaxDec.sDiscription 	:= CONCAT(STR1 := sName, STR2:= ' hardware maximum deceleration(0 = HWMaximum)'); 
+	stMParMaxDec.sName			:= CONCAT(STR1 := sName, STR2:= 'Hard max deceleration');
+	stMParMaxDec.sType			:= 'MPar';
+	stMParMaxDec.sUnit			:= 'Units/Sec^2';
+	
+	stMparMaxVelo.nNumber		:= nLocationId + 3;
+	stMparMaxVelo.sDiscription 	:= CONCAT(STR1 := sName, STR2:= ' hardware maximum velocity'); 
+	stMparMaxVelo.sName			:= CONCAT(STR1 := sName, STR2:= 'Hard max velocity');
+	stMparMaxVelo.sType			:= 'MPar';
+	stMparMaxVelo.sUnit			:= 'Units/Sec';
+
+	refFbParHandler.CmdAddParameter(refParameter := stMParMaxAcc);
+	refFbParHandler.CmdAddParameter(refParameter := stMParMaxDec);
+	refFbParHandler.CmdAddParameter(refParameter := stMparMaxVelo);
+
+// ===== set axis configuration =====	
+	fMaxAcc	:= stMParMaxAcc.fValue;
+	fMaxDec	:= stMParMaxDec.fValue;	
+	fMaxVelo:= stMparMaxVelo.fValue;
+
+	fCmdAcc 		:= fMaxAcc;
+	fCmdDecc		:= fMaxDec;
+
+// ===== Configure Axis =====
+	// ***** Config Bits *****
+		THIS^.bIcfCmdVelocityRpm	:= bIcfCmdVelocityRpm	; // Enable speed inputs in Rpm
+		THIS^.bIcfEnableForward 	:= bIcfEnableForward 	; // Enable forward motion
+		THIS^.bIcfEnableReverse		:= bIcfEnableReverse	; // Enable reverse motion
+		THIS^.bIcfAlwaysEnable		:= bIcfAlwaysEnable		; // Always enable motor and brake if safety is ok
+		THIS^.bIcfModuloAxis		:= bIcfModuloAxis		; // show axis position as modulo
+		THIS^.bIcfSTOPresent		:= bIcfSTOPresent		; // Axis has safe torque off function
+		THIS^.bIcfNCHomeSensor		:= bIcfNCHomeSensor		; // Axis homing sensor is NC	
+	// ***** config homing Mode ***** 
+ 		THIS^.mcHomingMode 			:= mcHomingMode ; // set homing mode
+		THIS^.fHomePosition			:= fHomePosition;
+	// ***** Velocity settings *****
+		THIS^.fSafeOverride			:= fSafeOverride	; 	
+	// ***** Encoder values *****
+		THIS^.fEncoderTurnoverValue := nEncTurnoverVal	; // turnover value for encoder = 25.6 mm per rev * 4096 revolutions 
+	// ***** Time delay enable off *****
+		THIS^.tEnableDelay		:= tEnableDelay	;
+		THIS^.tDisableDelay 	:= tDisabledelay ;		
+		
+// ===== configure parameters =====
+	ParAccManualScaling.fMinimum 		:= 1 	;
+	ParAccManualScaling.fMaximum		:= 100 	;
+	ParAccManualScaling.nNumber 		:= nLocationId + 1;
+	ParAccManualScaling.sDiscription  	:= CONCAT( STR1 := sName, STR2 := ' percentage of acceleration used For jogging');
+	ParAccManualScaling.sName			:= CONCAT( STR1 := sName, STR2 := 'Manual acc scaling');
+	ParAccManualScaling.sType			:= 'Mpar';
+	ParAccManualScaling.sUnit			:= '%';
+	refFbParHandler.CmdAddParameter( refParameter := ParAccManualScaling );
+
+	
+	ParDecManualScaling.fMinimum 		:= 1 	;
+	ParDecManualScaling.fMaximum		:= 100 	;
+	ParDecManualScaling.nNumber 		:= nLocationId + 2;
+	ParDecManualScaling.sDiscription  	:= CONCAT( STR1 := sName, STR2 := ' percentage of deceleration used For jogging');
+	ParDecManualScaling.sName			:= CONCAT( STR1 := sName, STR2 := 'Manual dec scaling');
+	ParDecManualScaling.sType			:= 'Mpar';
+	ParDecManualScaling.sUnit			:= '%';
+	refFbParHandler.CmdAddParameter( refParameter := ParAccManualScaling );
+
+// ===== reset axis state indicators ======
+	bError 	:= FALSE;
+
+// ====== Set init to done =======
+	bInitOk := TRUE;
+	Init := bInitOk;	]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

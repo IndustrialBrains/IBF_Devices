@@ -838,7 +838,7 @@ END_IF
 	bDelayedEnable 	:= TonMotionEnable.Q ;	
 
 IF AxisRef.Status.DriveDeviceError 
-AND bCmdEnableAxis THEN
+AND bCmdEnableAxis OR bCmdManual THEN
 	bError					:= TRUE							;
 	stFault.Active 			:= TRUE 						;
 	stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
