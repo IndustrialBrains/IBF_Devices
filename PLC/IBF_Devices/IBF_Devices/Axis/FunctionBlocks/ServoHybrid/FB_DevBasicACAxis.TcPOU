@@ -688,22 +688,22 @@ END_VAR]]></Declaration>
 	
 // ===== Write parameters =====
 	stMParMaxAcc.nNumber		:= nLocationId + 1;
-	stMParMaxAcc.sDiscription 	:= CONCAT(STR1 := sName, STR2:= ' hardware maximum accaleration (0 = HWMaximum)'); 
-	stMParMaxAcc.sName			:= CONCAT(STR1 := sName, STR2:= 'Hard max aceleration');
+	stMParMaxAcc.sDiscription 	:= CONCAT(STR1 := sName, STR2:= ' hardware maximum acceleration (0 = HWMaximum)'); 
+	stMParMaxAcc.sName			:= CONCAT(STR1 := sName, STR2:= 'Hard max acceleration');
 	stMParMaxAcc.sType			:= 'MPar';
-	stMParMaxAcc.sUnit			:= 'Units/Sec^2';
+	stMParMaxAcc.sUnit			:= 'unit/s^2';
 	
 	stMParMaxDec.nNumber		:= nLocationId + 2;
 	stMParMaxDec.sDiscription 	:= CONCAT(STR1 := sName, STR2:= ' hardware maximum deceleration(0 = HWMaximum)'); 
 	stMParMaxDec.sName			:= CONCAT(STR1 := sName, STR2:= 'Hard max deceleration');
 	stMParMaxDec.sType			:= 'MPar';
-	stMParMaxDec.sUnit			:= 'Units/Sec^2';
+	stMParMaxDec.sUnit			:= 'unit/s^2';
 	
 	stMparMaxVelo.nNumber		:= nLocationId + 3;
 	stMparMaxVelo.sDiscription 	:= CONCAT(STR1 := sName, STR2:= ' hardware maximum velocity'); 
 	stMparMaxVelo.sName			:= CONCAT(STR1 := sName, STR2:= 'Hard max velocity');
 	stMparMaxVelo.sType			:= 'MPar';
-	stMparMaxVelo.sUnit			:= 'Units/Sec';
+	stMparMaxVelo.sUnit			:= 'Units/s';
 
 	refFbParHandler.CmdAddParameter(refParameter := stMParMaxAcc);
 	refFbParHandler.CmdAddParameter(refParameter := stMParMaxDec);

@@ -118,7 +118,7 @@ VAR	// =============== Motion status functions ================
 
 	// ===== Move ristrictions ======
 		bCmdLimitVelocity 	: BOOL := FALSE			; // velocity limiting is active 
-		bCmdManualAccDec	: BOOL := FALSE			; // Activate manual aceleration and deceleration settings
+		bCmdManualAccDec	: BOOL := FALSE			; // Activate manual acceleration and deceleration settings
 		fCmdVelocityLimit	: LREAL:= 100			; // Maximum velocity limit when velocity limiting is active  
 		fSafeOverride		: LREAL:= 10 			; // [%] Safe velocity override  
 		
@@ -1502,7 +1502,7 @@ END_VAR]]></Declaration>
 	ParAccManualScaling.fMinimum 		:= 1 	;
 	ParAccManualScaling.fMaximum		:= 100 	;
 	ParAccManualScaling.nNumber 		:= nLocationId + 1;
-	ParAccManualScaling.sDiscription  	:= CONCAT( STR1 := sName, STR2 := 'percantage of acceleration used For jogging');
+	ParAccManualScaling.sDiscription  	:= CONCAT( STR1 := sName, STR2 := ' percentage of acceleration used for jogging');
 	ParAccManualScaling.sName			:= CONCAT( STR1 := sName, STR2 := 'Manual acc scaling');
 	ParAccManualScaling.sType			:= 'Mpar';
 	ParAccManualScaling.sUnit			:= '%';
@@ -1512,7 +1512,7 @@ END_VAR]]></Declaration>
 	ParDecManualScaling.fMinimum 		:= 1 	;
 	ParDecManualScaling.fMaximum		:= 100 	;
 	ParDecManualScaling.nNumber 		:= nLocationId + 2;
-	ParDecManualScaling.sDiscription  	:= CONCAT( STR1 := sName, STR2 := 'percantage of deceleration used For jogging');
+	ParDecManualScaling.sDiscription  	:= CONCAT( STR1 := sName, STR2 := ' percentage of deceleration used for jogging');
 	ParDecManualScaling.sName			:= CONCAT( STR1 := sName, STR2 := 'Manual dec scaling');
 	ParDecManualScaling.sType			:= 'Mpar';
 	ParDecManualScaling.sUnit			:= '%';

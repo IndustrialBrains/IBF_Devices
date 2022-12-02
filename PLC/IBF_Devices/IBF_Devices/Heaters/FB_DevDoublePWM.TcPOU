@@ -243,7 +243,7 @@ END_VAR
 	stParPeriodLength.fMinimum 		:= 0 		;
 	stParPeriodLength.fMaximum		:= 60000 	;
 	stParPeriodLength.nNumber 		:= nLocationId + 1;
-	stParPeriodLength.sDiscription  := CONCAT( STR1 := sName, STR2 := 'Period length of the cycle in miliseconds');
+	stParPeriodLength.sDiscription  := CONCAT( STR1 := sName, STR2 := ' period length of the cycle');
 	stParPeriodLength.sName			:= CONCAT( STR1 := sName, STR2 := 'Period Length');
 	stParPeriodLength.sType			:= 'MPar';
 	stParPeriodLength.sUnit			:= 'ms';
@@ -252,7 +252,7 @@ END_VAR
 	stParDutyCycle.fMinimum 		:= 0 		;
 	stParDutyCycle.fMaximum			:= 50 		;
 	stParDutyCycle.nNumber 			:= nLocationId + 2;
-	stParDutyCycle.sDiscription  	:= CONCAT( STR1 := sName, STR2 := 'Percentage of period length in which an output is active');
+	stParDutyCycle.sDiscription  	:= CONCAT( STR1 := sName, STR2 := ' percentage of period length in which an output is active');
 	stParDutyCycle.sName			:= CONCAT( STR1 := sName, STR2 := 'Duty Cyle');
 	stParDutyCycle.sType			:= 'MPar';
 	stParDutyCycle.sUnit			:= '%';
@@ -262,7 +262,7 @@ END_VAR
 	stParSwitchOverTime.fMinimum 	:= 0 		;
 	stParSwitchOverTime.fMaximum	:= 500 		;
 	stParSwitchOverTime.nNumber 	:= nLocationId + 3;
-	stParSwitchOverTime.sDiscription:= CONCAT( STR1 := sName, STR2 := 'Idle time between output chanel switchover in miliseconds');
+	stParSwitchOverTime.sDiscription:= CONCAT( STR1 := sName, STR2 := ' idle time between output chanel switchover');
 	stParSwitchOverTime.sName		:= CONCAT( STR1 := sName, STR2 := 'Switch Time');
 	stParSwitchOverTime.sType		:= 'CPar';
 	stParSwitchOverTime.sUnit		:= 'ms';
@@ -270,7 +270,7 @@ END_VAR
 	stMaxTimeOn.fMinimum 	:= 0 		;
 	stMaxTimeOn.fMaximum	:= 5000 	;
 	stMaxTimeOn.nNumber 	:= nLocationId + 4;
-	stMaxTimeOn.sDiscription:= CONCAT( STR1 := sName, STR2 := 'Maximum time a heater can be fully on without burning through');
+	stMaxTimeOn.sDiscription:= CONCAT( STR1 := sName, STR2 := ' maximum time a heater can be fully on without burning through');
 	stMaxTimeOn.sName		:= CONCAT( STR1 := sName, STR2 := 'Max heating time');
 	stMaxTimeOn.sType		:= 'MPar';
 	stMaxTimeOn.sUnit		:= 'ms';

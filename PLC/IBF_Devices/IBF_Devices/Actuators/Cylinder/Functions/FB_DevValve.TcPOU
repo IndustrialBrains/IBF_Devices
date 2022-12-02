@@ -339,7 +339,7 @@ END_VAR]]></Declaration>
 	stParTimeToClose.fMinimum 		:= 0 		;
 	stParTimeToClose.fMaximum		:= 60000 	;
 	stParTimeToClose.nNumber 		:= nLocationId + 1;
-	stParTimeToClose.sDiscription  	:= CONCAT( STR1 := sName, STR2 := 'avarage time it takes for the valve to close in miliseconds');
+	stParTimeToClose.sDiscription  	:= CONCAT( STR1 := sName, STR2 := ' average time it takes for the valve to close');
 	stParTimeToClose.sName			:= CONCAT( STR1 := sName, STR2 := 'time to close');
 	stParTimeToClose.sType			:= 'CPar';
 	stParTimeToClose.sUnit			:= 'ms';
@@ -347,7 +347,7 @@ END_VAR]]></Declaration>
 	stParTimeToOpen.fMinimum 		:= 0 		;
 	stParTimeToOpen.fMaximum		:= 60000 	;
 	stParTimeToOpen.nNumber 		:= nLocationId + 2;
-	stParTimeToOpen.sDiscription  	:= CONCAT( STR1 := sName, STR2 := 'avarage time it takes for the valve to open in miliseconds');
+	stParTimeToOpen.sDiscription  	:= CONCAT( STR1 := sName, STR2 := ' average time it takes for the valve to open');
 	stParTimeToOpen.sName			:= CONCAT( STR1 := sName, STR2 := 'time to open');
 	stParTimeToOpen.sType			:= 'CPar';
 	stParTimeToOpen.sUnit			:= 'ms';
