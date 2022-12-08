@@ -125,6 +125,9 @@ VAR	// =============== Motion status functions ================
 	// ===== Internal variables =======
 		fAcceleration		: LREAL := 0 ; // Acceleration used for functions 
 		fDeceleration		: LREAL := 0 ; // Deceleration used for functions
+		fLastCommandPosition: LREAL := 0 ; // Last given position command
+		fLastCommandVelocity: LREAL := 0 ; // Last given Velocity command
+
 END_VAR
 VAR
 	// ===== Loop variables =====
@@ -505,7 +508,9 @@ VAR_INPUT
 	fVelocity	: 	LREAL 	; // Maximum velocity [units/sec]
 	mcBuffermode: 	MC_BufferMode ; // Buffermode defines how the previous command is executed.
 END_VAR
-]]></Declaration>
+VAR
+	bNewCommandRecieved : BOOL ;
+END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[// set blocked command if halt is active 
 bBlockedCommand := fbMcHalt.Active ;
@@ -515,28 +520,33 @@ bBlockedCommand := fbMcHalt.Active ;
 		fVelocity := Rpm_To_DegS(fVelocity);
 	END_IF
 
+// Determine if a new command is geven or previous command is repeated
+bNewCommandRecieved := fPosition <> fLastCommandPosition OR fVelocity <> fLastCommandVelocity;	
+	
 // Determine function for command stacking
-IF NOT AxisRef.Status.CmdBuffered OR mcBuffermode <> MC_Aborting THEN 
-	IF fbMcMoveAbsolute[0].Active THEN 
-		arExec_MoveAbs[1] 				:= (fPosition <> fbMcMoveAbsolute[0].Position OR fVelocity <> fbMcMoveAbsolute[0].Velocity) ;
-		fbMcMoveAbsolute[1].Position 	:= fPosition ;
-		fbMcMoveAbsolute[1].Velocity 	:= fVelocity ; 
-		fbMcMoveAbsolute[1].BufferMode 	:= mcBuffermode ;
-	ELSE
-		arExec_MoveAbs[0] 				:= (fPosition <> fbMcMoveAbsolute[1].Position OR fVelocity <> fbMcMoveAbsolute[1].Velocity) ;
+IF mcBuffermode = MC_Aborting OR NOT AxisRef.Status.CmdBuffered THEN 
+	IF NOT fbMcMoveAbsolute[0].Busy THEN
+		arExec_MoveAbs[0] 				S= bNewCommandRecieved ;
 		fbMcMoveAbsolute[0].Position 	:= fPosition ;
 		fbMcMoveAbsolute[0].Velocity 	:= fVelocity ; 
 		fbMcMoveAbsolute[0].BufferMode 	:= mcBuffermode ;
+	ELSE
+		arExec_MoveAbs[1] 				S= bNewCommandRecieved ;
+		fbMcMoveAbsolute[1].Position 	:= fPosition ;
+		fbMcMoveAbsolute[1].Velocity 	:= fVelocity ; 
+		fbMcMoveAbsolute[1].BufferMode 	:= mcBuffermode ;
 	END_IF
+	fLastCommandPosition := fPosition;
+	fLastCommandVelocity := fVelocity;
 END_IF
 	
 bInternalEnable	:= TRUE ;
 
 // set feedback
-IF arExec_MoveAbs[1] OR fbMcMoveAbsolute[1].Busy THEN 
-	CmdMoveAbs :=	fbMcMoveAbsolute[1].Active ;
-ELSE 
+IF fbMcMoveAbsolute[0].Busy THEN 
 	CmdMoveAbs :=	fbMcMoveAbsolute[0].Active ;
+ELSE 
+	CmdMoveAbs :=	fbMcMoveAbsolute[1].Active ;
 END_IF
 ]]></ST>
       </Implementation>
@@ -1066,21 +1076,21 @@ FOR i := 0 TO 1 DO
 							Deceleration:= fDeceleration );  
 
 	// If function is done then reset command values
-	IF fbMcMoveAbsolute[i].Done OR fbMcMoveAbsolute[i].CommandAborted OR NOT arExec_MoveAbs[i] THEN 
+	IF fbMcMoveAbsolute[i].Done OR fbMcMoveAbsolute[i].CommandAborted THEN 
 		fbMcMoveAbsolute[i].Velocity	:= 0 ;
 		fbMcMoveAbsolute[i].Position	:= 0 ; 
 	END_IF
 
 	// reset Exec command 
-	arExec_MoveAbs[i] := FALSE ; 
+	arExec_MoveAbs[i] R= bDelayedEnable ; 
 	
 	// fault handling 
 	IF fbMcMoveAbsolute[i].Error THEN 
 		bError					:= TRUE							;
 		stFault.Active 			:= TRUE 						;
 		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
-		stFault.Description		:= CONCAT('Move absolute Fault ', UDINT_TO_STRING(fbMcMoveAbsolute[i].ErrorID));
-		stFault.Description		:= CONCAT( sName , stfault.Description ) ;
+		stFault.Discription		:= CONCAT('Move absolute Fault ', UDINT_TO_STRING(fbMcMoveAbsolute[i].ErrorID));
+		stFault.Discription		:= CONCAT( sName , stfault.Discription ) ;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 	END_IF
 END_FOR 
