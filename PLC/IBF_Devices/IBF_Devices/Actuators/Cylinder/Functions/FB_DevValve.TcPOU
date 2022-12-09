@@ -41,7 +41,7 @@ IF eDevType = E_Devices.Undefined THEN
 END_IF
 
 // Call base function
-	SUPER^(refFbFault := refFbFault);
+	SUPER^();
 
 // ===== hold all actions if not initialized ======
 IF NOT bInitOk THEN
@@ -294,7 +294,7 @@ bCmdManual 	:= FALSE ;
       <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
 VAR_INPUT
 	// Messagedata 
-	nId			: UDINT ; // Identification number of object
+	nId			: UINT ; // Identification number of object
 	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
 
 	// Command state
@@ -306,10 +306,7 @@ END_VAR]]></Declaration>
 	bInitOk	:= TRUE ; 
 
 // ====== Calculate device id =====
-	bInitOk :=	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Cylinder) AND bInitOk;
-	
-// ====== Set message information =======
-	stFault.ComponentType	:= E_ComponentTypes.Cylinder 		;
+	bInitOk :=	ExecIdentifyDevice(nId, nParentId, E_ComponentTypes.Cylinder) AND bInitOk;
 	
 // ====== Set outputs according to reset state =======
 	THIS^.eResetState 	:= eResetState 	;
@@ -338,17 +335,17 @@ END_VAR]]></Declaration>
 // ===== configure parameters =====
 	stParTimeToClose.fMinimum 		:= 0 		;
 	stParTimeToClose.fMaximum		:= 60000 	;
-	stParTimeToClose.nNumber 		:= nLocationId + 1;
-	stParTimeToClose.sDiscription  	:= CONCAT( STR1 := sName, STR2 := ' average time it takes for the valve to close');
-	stParTimeToClose.sName			:= CONCAT( STR1 := sName, STR2 := 'time to close');
+	stParTimeToClose.nNumber 		:= stIdentity.nLocationId + 1;
+	stParTimeToClose.sDiscription  	:= CONCAT( STR1 := stIdentity.sName, STR2 := ' average time it takes for the valve to close');
+	stParTimeToClose.sName			:= CONCAT( STR1 := stIdentity.sName, STR2 := 'time to close');
 	stParTimeToClose.sType			:= 'CPar';
 	stParTimeToClose.sUnit			:= 'ms';
 
 	stParTimeToOpen.fMinimum 		:= 0 		;
 	stParTimeToOpen.fMaximum		:= 60000 	;
-	stParTimeToOpen.nNumber 		:= nLocationId + 2;
-	stParTimeToOpen.sDiscription  	:= CONCAT( STR1 := sName, STR2 := ' average time it takes for the valve to open');
-	stParTimeToOpen.sName			:= CONCAT( STR1 := sName, STR2 := 'time to open');
+	stParTimeToOpen.nNumber 		:= stIdentity.nLocationId + 2;
+	stParTimeToOpen.sDiscription  	:= CONCAT( STR1 := stIdentity.sName, STR2 := ' average time it takes for the valve to open');
+	stParTimeToOpen.sName			:= CONCAT( STR1 := stIdentity.sName, STR2 := 'time to open');
 	stParTimeToOpen.sType			:= 'CPar';
 	stParTimeToOpen.sUnit			:= 'ms';
 	

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_DevHMIButton" Id="{976bfa1c-85fd-4d4c-b554-67d8ef93bfe5}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC FB_DevHMIButton EXTENDS FB_DevBase // Button function for HMI 
@@ -24,7 +24,7 @@ END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[// Call base function
-SUPER^(refFbFault := refFbFault);
+SUPER^();
 
 // ***** Direct input when enabled *****
 IF bEnable THEN 

@@ -14,8 +14,9 @@ COLD_RESET = True
 
 class Tests(unittest.TestCase):
 
-    PREFIX_DEVICE = "PRG_TEST_FB_MANUALCONTROLLER.FbDevValve"
-    PREFIX_CONTROLLER = "PRG_TEST_FB_MANUALCONTROLLER.fbManualController"
+    PREFIX = "PRG_TEST_FB_MANUALCONTROLLER"
+    PREFIX_DEVICE = f"{PREFIX}.FbDevValve"
+    PREFIX_CONTROLLER = f"{PREFIX}.fbManualController"
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -29,7 +30,7 @@ class Tests(unittest.TestCase):
     def setUp(self) -> None:
         if COLD_RESET:
             cold_reset()
-
+        conn.write_by_name(f"{self.PREFIX}.bEnableTests", True)
         return super().setUp()
 
     def test_01_device_added(self) -> None:

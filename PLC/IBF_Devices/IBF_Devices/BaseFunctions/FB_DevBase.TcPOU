@@ -17,13 +17,12 @@ VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[SUPER^(refFbFault := refFbFault);
+      <ST><![CDATA[SUPER^();
 
 // Add device to manual screen
 IF NOT bEmbeded THEN 
 	IF bInitOk
 	AND NOT bAddedToManual 
-	AND sName <> '' 
 	AND __ISVALIDREF(refFbManualCtrl)
 	THEN 
 		bAddedToManual S= refFbManualCtrl.CmdAddDevice(THIS^);

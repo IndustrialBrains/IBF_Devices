@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="Fb_DevDigitalInput" Id="{611498ce-bd86-46dc-9066-1bac29019612}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC Fb_DevDigitalInput EXTENDS FB_DevBase 
@@ -24,7 +24,7 @@ IF eDevType = E_Devices.Undefined THEN
 END_IF
 
 // Call base function
-SUPER^(refFbFault := refFbFault);
+SUPER^();
 
 // ***** Direct input when enabled *****
 IF bEnable OR bCmdManual THEN 
@@ -45,7 +45,7 @@ END_IF
       <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
 VAR_INPUT
 	// Location data for messages  
-	nId			: UDINT ; // Identification number of object
+	nId			: UINT ; // Identification number of object
 	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
 END_VAR
 ]]></Declaration>

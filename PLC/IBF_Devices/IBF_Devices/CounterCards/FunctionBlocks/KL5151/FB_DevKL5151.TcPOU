@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_DevKL5151" Id="{df645e77-ad73-00ed-1f06-f5798d21983d}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK FB_DevKL5151 EXTENDS FB_DevBase IMPLEMENTS iCounter
@@ -23,7 +23,7 @@ VAR // Manual control
 	stManualControl : st_ManualCounterControl;
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[SUPER^(refFbFault := refFbFault);]]></ST>
+      <ST><![CDATA[SUPER^();]]></ST>
     </Implementation>
     <Folder Name="Public" Id="{ba5eeb51-f519-0b9d-3b18-512a69522b3c}" />
     <Method Name="CmdManual" Id="{2c4682fb-4abf-0dcb-304c-7d205ffb993f}" FolderPath="Public\">
@@ -96,7 +96,7 @@ END_VAR
       <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
 VAR_INPUT
 	// Message location data
-	nId				: UDINT ; // Identification number of object
+	nId				: UINT ; // Identification number of object
 	nParentId		: UDINT ; // Id of higher level If aplicable (0 = no parent)
 END_VAR
 ]]></Declaration>

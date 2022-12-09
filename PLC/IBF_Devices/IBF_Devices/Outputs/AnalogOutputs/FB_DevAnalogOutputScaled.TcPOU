@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_DevAnalogOutputScaled" Id="{cee2a2e1-53c0-06ca-05d4-b81b54c58bf7}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK FB_DevAnalogOutputScaled EXTENDS FB_DevAnalogOutput
@@ -12,7 +12,7 @@ VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[SUPER^(refFbFault := refFbFault);
+      <ST><![CDATA[SUPER^();
 ]]></ST>
     </Implementation>
     <Folder Name="Private" Id="{a7d14726-308c-0bae-117e-f71220c1140f}" />

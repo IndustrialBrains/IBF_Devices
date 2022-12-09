@@ -1,31 +1,32 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="PRG_TEST_FB_MANUALCONTROLLER" Id="{d21772fb-f5fd-0bd7-23c5-bca9237219d9}" SpecialFunc="None">
-    <Declaration><![CDATA[PROGRAM PRG_TEST_FB_MANUALCONTROLLER
+    <Declaration><![CDATA[PROGRAM INTERNAL PRG_TEST_FB_MANUALCONTROLLER
 VAR
+	bEnableTests : BOOL;
+
 	bInitDone 			: BOOL;
-	fbFaultHandler 		: Fb_FaultHandler;
 	fbManualController 	: FB_ManualController;
 	fbDevValve 			: FB_DevValve;
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[IF NOT bInitDone THEN
-	bInitDone := TRUE;
-	fbDevValve.Init(
-		nId := 1,
-		nParentId := 0,
-		eResetState := E_ValveResetState.Res_Idle,
-		eSafeState := E_ValveResetState.Res_Idle
+      <ST><![CDATA[IF bEnableTests THEN
+	IF NOT bInitDone THEN
+		bInitDone := TRUE;
+		fbDevValve.Init(
+			nId := 1,
+			nParentId := 0,
+			eResetState := E_ValveResetState.Res_Idle,
+			eSafeState := E_ValveResetState.Res_Idle
+		);
+	END_IF
+	
+	fbManualController();
+	fbDevValve(
+		refFbManualCtrl	:= fbManualController,
 	);
 END_IF
-
-fbFaultHandler();
-fbManualController();
-fbDevValve(
-	refFbFault := fbFaultHandler,
-	refFbManualCtrl	:= fbManualController,
-);
 ]]></ST>
     </Implementation>
   </POU>

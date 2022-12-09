@@ -47,7 +47,7 @@ IF eDevType = E_Devices.Undefined THEN
 END_IF
 
 // Call base function
-SUPER^(refFbFault := refFbFault);
+SUPER^();
 
 
 // ===== hold all actions if not initialized ======
@@ -203,13 +203,11 @@ tonBurnTimeB ( IN := bCmdChanelBOn, PT := LREAL_TO_TIME( stMaxTimeOn.fValue));
 IF tonBurnTimeA.Q THEN 
 	stFault.Active 			:= TRUE ;
 	stFault.Description 	:= 'Heater A burn timeout';
-	stFault.MessageNumber 	:= E_MessageNumbers.CF_MoveToSlow ;
 	stFault.FaultType		:= E_FaultTypes.CF;
 	qbOutputA 				:= FALSE ;
 ELSIF tonBurnTimeB.Q THEN 
 	stFault.Active 			:= TRUE ;
 	stFault.Description 	:= 'Heater B burn timeout';
-	stFault.MessageNumber 	:= E_MessageNumbers.CF_MoveToSlow ;
 	stFault.FaultType		:= E_FaultTypes.CF;
 	qbOutputB 				:= FALSE ;
 END_IF
@@ -221,7 +219,7 @@ bCmdHold := FALSE ;]]></ST>
       <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
 VAR_INPUT
 	// Message location data
-	nId			: UDINT ; // Identification number of object
+	nId			: UINT ; // Identification number of object
 	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
 END_VAR
 ]]></Declaration>
@@ -232,9 +230,6 @@ END_VAR
 // ====== Calculate device id =====
 	bInitOk :=	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Heaters) AND bInitOk;
 
-// ====== Set message information =======
-	stFault.ComponentType	:= E_ComponentTypes.Heaters	;
-
 // ======= Reset Error bit ======
 	bErrorActive 	:= FALSE;
 	bBusy			:= FALSE;
@@ -242,18 +237,18 @@ END_VAR
 // ===== configure parameters =====
 	stParPeriodLength.fMinimum 		:= 0 		;
 	stParPeriodLength.fMaximum		:= 60000 	;
-	stParPeriodLength.nNumber 		:= nLocationId + 1;
-	stParPeriodLength.sDiscription  := CONCAT( STR1 := sName, STR2 := ' period length of the cycle');
-	stParPeriodLength.sName			:= CONCAT( STR1 := sName, STR2 := 'Period Length');
+	stParPeriodLength.nNumber 		:= stIdentity.nLocationId + 1;
+	stParPeriodLength.sDiscription  := CONCAT( STR1 := stIdentity.sName, STR2 := ' period length of the cycle');
+	stParPeriodLength.sName			:= CONCAT( STR1 := stIdentity.sName, STR2 := 'Period Length');
 	stParPeriodLength.sType			:= 'MPar';
 	stParPeriodLength.sUnit			:= 'ms';
 	stParPeriodLength.fValue		:= 5000;
 
 	stParDutyCycle.fMinimum 		:= 0 		;
 	stParDutyCycle.fMaximum			:= 50 		;
-	stParDutyCycle.nNumber 			:= nLocationId + 2;
-	stParDutyCycle.sDiscription  	:= CONCAT( STR1 := sName, STR2 := ' percentage of period length in which an output is active');
-	stParDutyCycle.sName			:= CONCAT( STR1 := sName, STR2 := 'Duty Cyle');
+	stParDutyCycle.nNumber 			:= stIdentity.nLocationId + 2;
+	stParDutyCycle.sDiscription  	:= CONCAT( STR1 := stIdentity.sName, STR2 := ' percentage of period length in which an output is active');
+	stParDutyCycle.sName			:= CONCAT( STR1 := stIdentity.sName, STR2 := 'Duty Cyle');
 	stParDutyCycle.sType			:= 'MPar';
 	stParDutyCycle.sUnit			:= '%';
 	stParPeriodLength.fValue		:= 10;
@@ -261,17 +256,17 @@ END_VAR
 	
 	stParSwitchOverTime.fMinimum 	:= 0 		;
 	stParSwitchOverTime.fMaximum	:= 500 		;
-	stParSwitchOverTime.nNumber 	:= nLocationId + 3;
-	stParSwitchOverTime.sDiscription:= CONCAT( STR1 := sName, STR2 := ' idle time between output chanel switchover');
-	stParSwitchOverTime.sName		:= CONCAT( STR1 := sName, STR2 := 'Switch Time');
+	stParSwitchOverTime.nNumber 	:= stIdentity.nLocationId + 3;
+	stParSwitchOverTime.sDiscription:= CONCAT( STR1 := stIdentity.sName, STR2 := ' idle time between output chanel switchover');
+	stParSwitchOverTime.sName		:= CONCAT( STR1 := stIdentity.sName, STR2 := 'Switch Time');
 	stParSwitchOverTime.sType		:= 'CPar';
 	stParSwitchOverTime.sUnit		:= 'ms';
 
 	stMaxTimeOn.fMinimum 	:= 0 		;
 	stMaxTimeOn.fMaximum	:= 5000 	;
-	stMaxTimeOn.nNumber 	:= nLocationId + 4;
-	stMaxTimeOn.sDiscription:= CONCAT( STR1 := sName, STR2 := ' maximum time a heater can be fully on without burning through');
-	stMaxTimeOn.sName		:= CONCAT( STR1 := sName, STR2 := 'Max heating time');
+	stMaxTimeOn.nNumber 	:= stIdentity.nLocationId + 4;
+	stMaxTimeOn.sDiscription:= CONCAT( STR1 := stIdentity.sName, STR2 := ' maximum time a heater can be fully on without burning through');
+	stMaxTimeOn.sName		:= CONCAT( STR1 := stIdentity.sName, STR2 := 'Max heating time');
 	stMaxTimeOn.sType		:= 'MPar';
 	stMaxTimeOn.sUnit		:= 'ms';
 	

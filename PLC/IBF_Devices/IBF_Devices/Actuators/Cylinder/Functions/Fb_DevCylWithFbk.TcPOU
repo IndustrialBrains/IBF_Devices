@@ -51,7 +51,7 @@ END_VAR
 	END_IF
 
 // call base function 
-	SUPER^(refFbFault := refFbFault);
+	SUPER^();
 
 // check for device init
 	IF NOT bInitOk THEN
@@ -191,14 +191,12 @@ END_VAR
         <ST><![CDATA[// ===== Check direction commands =====
  	IF q_Close AND fbSensorOpen.bReStatus AND NOT q_Open THEN
 		stFault.Active			:= TRUE ;
-		stFault.MessageNumber	:= E_MessageNumbers.CF_WrongDirection 	;
-		stFault.Description		:= CONCAT( sName,' Cylinder Opening instead of closing');
+		stFault.Description		:= 'Cylinder opening instead of closing';
 		stFault.FaultType		:= E_FaultTypes.CF 					;
 		bErrorActive			:= TRUE 								;
 	ELSIF q_Open AND fbSensorClosed.bReStatus AND NOT q_close THEN
 		stFault.Active			:= TRUE ;
-		stFault.MessageNumber	:= E_MessageNumbers.CF_WrongDirection 	;
-		stFault.Description		:= CONCAT( sName,' Cylinder closing instead of opening');
+		stFault.Description		:= 'Cylinder closing instead of opening';
 		stFault.FaultType		:= E_FaultTypes.CF 					;
 		bErrorActive			:= TRUE 								;
 	END_IF
@@ -215,7 +213,7 @@ END_VAR
         <ST><![CDATA[{warning disable C0371}
 // ====== Call sensor Open function =======
 	IF bIcfFbkClosedPresent THEN 
-		fbSensorClosed(refFbFault := refFbFault);
+		fbSensorClosed();
 		bFco_Closed := fbSensorClosed.bFcoInputActive ;
 		bFeClosed 	:= fbSensorClosed.bFeStatus ;
 		bReClosed 	:= fbSensorClosed.bReStatus ;
@@ -226,7 +224,7 @@ END_VAR
 
 // ====== Call sensor Close function =======
 	IF bIcfFbkOpenPresent THEN 
-		fbSensorOpen(refFbFault := refFbFault) 	;
+		fbSensorOpen() 	;
 		bFco_open 	:= fbSensorOpen.bFcoInputActive ;
 		bFeOpen		:= fbSensorOpen.bFeStatus;
 		bReOpen		:= fbSensorOpen.bReStatus;
@@ -285,8 +283,7 @@ END_IF
 				IF nTimePassedMs < stTimesClose.Minimal THEN 
 					// send message to HMI 
 					stFault.Active			:= TRUE 							;
-					stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToFast 	;
-					stFault.Description		:= CONCAT( sName, ' Cylinder closing to fast' )	;
+					stFault.Description		:= 'Cylinder closing too fast';
 					stFault.FaultType		:= E_FaultTypes.CF 					;
 					bErrorActive			:= TRUE 							;
 					bReCloseFast			:= TRUE                             ;
@@ -294,8 +291,7 @@ END_IF
 			ELSIF	nTimePassedMs > stTimesClose.Maximum  THEN
 				// send message to HMI 
 				stFault.Active			:= TRUE ;
-				stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToSlow		;
-				stFault.Description		:= CONCAT( sName,' Cylinder closing to Slow')	;
+				stFault.Description		:= 'Cylinder closing too slow';
 				stFault.FaultType		:= E_FaultTypes.CF 						;
 				bErrorActive			:= TRUE 								;
 				bReCloseSlow			:= TRUE                             	;
@@ -312,8 +308,7 @@ END_IF
 				IF nTimePassedMs < stTimesOpen.Minimal THEN 
 					// send message to HMI 
 					stFault.Active			:= TRUE ;
-					stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToFast 	;
-					stFault.Description		:= CONCAT( sName,' Cylinder Opening to fast')		;
+					stFault.Description		:= 'Cylinder opening too fast';
 					stFault.FaultType		:= E_FaultTypes.CF 					;
 					bErrorActive			:= TRUE 							;
 					bReOpenFast 			:= TRUE 							;
@@ -321,8 +316,7 @@ END_IF
 			ELSIF	nTimePassedMs > stTimesOpen.Maximum  THEN
 				// send message to HMI 
 				stFault.Active			:= TRUE ;
-				stFault.MessageNumber	:= E_MessageNumbers.CF_MoveToSlow 	;
-				stFault.Description		:= CONCAT( sName,' Cylinder Opening to Slow')		;
+				stFault.Description		:= 'Cylinder opening to slow';
 				stFault.FaultType		:= E_FaultTypes.CF 					;
 				bErrorActive			:= TRUE 							;
 				bReOpenSlow 			:= TRUE 							;
@@ -336,7 +330,7 @@ END_IF
       <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
 VAR_INPUT
 	// Message location data
-	nId			: UDINT ; // Identification number of object
+	nId			: UINT ; // Identification number of object
 	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
 	// Command state
 	eResetState		: E_ValveResetState := 0		; // Cylinder reset state variable (default is idle) 
@@ -350,12 +344,12 @@ END_VAR
 fbSensorClosed.bEmbeded := TRUE ;
 fbSensorClosed.bEnable	:= TRUE ;
 fbSensorClosed.Init	(	nId 		:= 0,
-						nParentId 	:= nLocationId) ;
+						nParentId 	:= stIdentity.nLocationId) ;
 
 fbSensorOpen.bEmbeded := TRUE ;
 fbSensorOpen.bEnable	:= TRUE ;
 fbSensorOpen.Init	(	nId 		:= 1,
-						nParentId 	:= nLocationId) ;
+						nParentId 	:= stIdentity.nLocationId) ;
 
 // Call feedback sensors 
 ExecSetFeedback(); 

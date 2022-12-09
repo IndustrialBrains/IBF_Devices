@@ -342,6 +342,9 @@
     <Compile Include="_TESTS\PRG_TEST_FB_MANUALCONTROLLER.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="_TESTS\PRG_TEST_GLOBAL.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="_TESTS\VISU_TEST.TcVIS">
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>

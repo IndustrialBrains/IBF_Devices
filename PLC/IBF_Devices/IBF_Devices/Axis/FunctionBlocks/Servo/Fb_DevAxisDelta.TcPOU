@@ -11,7 +11,7 @@ VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[SUPER^(refFbFault := refFbFault);
+      <ST><![CDATA[SUPER^();
 ]]></ST>
     </Implementation>
     <Folder Name="Command Methods" Id="{6ff04a08-145f-0075-3081-8a253c264400}" />
@@ -49,9 +49,7 @@ fbMcReset	( 	Execute	:= bExec_Reset,
 	IF fbMcReset.Error THEN 
 		bError					:= TRUE							;
 		stFault.Active 			:= TRUE 						;
-		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Description		:= CONCAT('Reset Fault ', UDINT_TO_STRING(fbMcReset.ErrorID));
-		stFault.Description		:= CONCAT( sName , stfault.Description ) ;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 	END_IF
 ]]></ST>
@@ -61,7 +59,7 @@ fbMcReset	( 	Execute	:= bExec_Reset,
       <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
 VAR_INPUT
 	// Message location data
-	nId			: UDINT ; // Identification number of object
+	nId			: UINT ; // Identification number of object
 	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
 	
 	// Config Bits
@@ -88,25 +86,22 @@ END_VAR
 // ====== Set manual device type ======
 	eDevType := E_Devices.Axis ;	
 	
-// ===== Message data set =====
-	stFault.ComponentType		:= E_ComponentTypes.Axis ;
-
 // ===== Write parameters =====
-	stMParMaxAcc.nNumber		:= nLocationId + 1;
-	stMParMaxAcc.sDiscription 	:= CONCAT(STR1 := sName, STR2:= ' hardware maximum acceleration (0 = HWMaximum)'); 
-	stMParMaxAcc.sName			:= CONCAT(STR1 := sName, STR2:= 'Hard max acceleration');
+	stMParMaxAcc.nNumber		:= stIdentity.nLocationId + 1;
+	stMParMaxAcc.sDiscription 	:= CONCAT(STR1 := stIdentity.sName, STR2:= ' hardware maximum acceleration (0 = HWMaximum)'); 
+	stMParMaxAcc.sName			:= CONCAT(STR1 := stIdentity.sName, STR2:= 'Hard max acceleration');
 	stMParMaxAcc.sType			:= 'MPar';
 	stMParMaxAcc.sUnit			:= 'unit/s^2';
 	
-	stMParMaxDec.nNumber		:= nLocationId + 2;
-	stMParMaxDec.sDiscription 	:= CONCAT(STR1 := sName, STR2:= ' hardware maximum deceleration (0 = HWMaximum)'); 
-	stMParMaxDec.sName			:= CONCAT(STR1 := sName, STR2:= 'Hard max deceleration');
+	stMParMaxDec.nNumber		:= stIdentity.nLocationId + 2;
+	stMParMaxDec.sDiscription 	:= CONCAT(STR1 := stIdentity.sName, STR2:= ' hardware maximum deceleration (0 = HWMaximum)'); 
+	stMParMaxDec.sName			:= CONCAT(STR1 := stIdentity.sName, STR2:= 'Hard max deceleration');
 	stMParMaxDec.sType			:= 'MPar';
 	stMParMaxDec.sUnit			:= 'unit/s^2';
 	
-	stMparMaxVelo.nNumber		:= nLocationId + 3;
-	stMparMaxVelo.sDiscription 	:= CONCAT(STR1 := sName, STR2:= ' hardware maximum velocity'); 
-	stMparMaxVelo.sName			:= CONCAT(STR1 := sName, STR2:= 'Hard max velocity');
+	stMparMaxVelo.nNumber		:= stIdentity.nLocationId + 3;
+	stMparMaxVelo.sDiscription 	:= CONCAT(STR1 := stIdentity.sName, STR2:= ' hardware maximum velocity'); 
+	stMparMaxVelo.sName			:= CONCAT(STR1 := stIdentity.sName, STR2:= 'Hard max velocity');
 	stMparMaxVelo.sType			:= 'MPar';
 	stMparMaxVelo.sUnit			:= 'Units/s';
 
@@ -145,9 +140,9 @@ END_VAR
 // ===== configure parameters =====
 	ParAccManualScaling.fMinimum 		:= 1 	;
 	ParAccManualScaling.fMaximum		:= 100 	;
-	ParAccManualScaling.nNumber 		:= nLocationId + 1;
-	ParAccManualScaling.sDiscription  	:= CONCAT( STR1 := sName, STR2 := ' percentage of acceleration used for jogging');
-	ParAccManualScaling.sName			:= CONCAT( STR1 := sName, STR2 := 'Manual acc scaling');
+	ParAccManualScaling.nNumber 		:= stIdentity.nLocationId + 1;
+	ParAccManualScaling.sDiscription  	:= CONCAT( STR1 := stIdentity.sName, STR2 := ' percentage of acceleration used for jogging');
+	ParAccManualScaling.sName			:= CONCAT( STR1 := stIdentity.sName, STR2 := 'Manual acc scaling');
 	ParAccManualScaling.sType			:= 'Mpar';
 	ParAccManualScaling.sUnit			:= '%';
 	refFbParHandler.CmdAddParameter( refParameter := ParAccManualScaling );
@@ -155,9 +150,9 @@ END_VAR
 	
 	ParDecManualScaling.fMinimum 		:= 1 	;
 	ParDecManualScaling.fMaximum		:= 100 	;
-	ParDecManualScaling.nNumber 		:= nLocationId + 2;
-	ParDecManualScaling.sDiscription  	:= CONCAT( STR1 := sName, STR2 := ' percentage of deceleration used for jogging');
-	ParDecManualScaling.sName			:= CONCAT( STR1 := sName, STR2 := 'Manual dec scaling');
+	ParDecManualScaling.nNumber 		:= stIdentity.nLocationId + 2;
+	ParDecManualScaling.sDiscription  	:= CONCAT( STR1 := stIdentity.sName, STR2 := ' percentage of deceleration used for jogging');
+	ParDecManualScaling.sName			:= CONCAT( STR1 := stIdentity.sName, STR2 := 'Manual dec scaling');
 	ParDecManualScaling.sType			:= 'Mpar';
 	ParDecManualScaling.sUnit			:= '%';
 	refFbParHandler.CmdAddParameter( refParameter := ParAccManualScaling );

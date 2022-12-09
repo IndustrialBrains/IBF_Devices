@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <Itf Name="iTwoDirectionalMotor" Id="{d32567da-a499-03f5-0571-61631b1f1071}">
     <Declaration><![CDATA[INTERFACE iTwoDirectionalMotor // Two directional motor control
 ]]></Declaration>
@@ -19,7 +19,7 @@ END_VAR
       <Declaration><![CDATA[METHOD Init : BOOL
 VAR_INPUT
 	// Message location data
-	nId				: UDINT ; // Identification number of object
+	nId				: UINT ; // Identification number of object
 	nParentId		: UDINT ; // Id of higher level If aplicable (0 = no parent)
 END_VAR
 ]]></Declaration>

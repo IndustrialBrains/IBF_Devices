@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_DevAnalogAxis" Id="{2d577320-0726-040c-269d-52c0e83d50e7}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC FB_DevAnalogAxis EXTENDS FB_DevBase
 VAR_INPUT
@@ -26,11 +26,10 @@ VAR // Internal commands
 	bInternalEnable : BOOL ;
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[SUPER^(refFbFault := refFbFault);
+      <ST><![CDATA[SUPER^();
 
 // ===== Check inputs =====
-	fbiEnabled( bEmbeded	:= TRUE,
-				refFbFault 	:= refFbFault);
+	fbiEnabled( bEmbeded	:= TRUE);
 
 IF bInitOk THEN 
 	ExecSetOutputs() ;
@@ -132,32 +131,27 @@ ELSE
 	bCmdRunCCW		:= FALSE;
 END_IF 
 
-{warning disable C0371}
 // ====== Set outputs =======
 	fbVelocity	(	bEmbeded 	:= TRUE,
 					bSafetyOk	:= bSafetyOk,
 					bEnable		:= bInternalEnable,
-					fCmdValue	:= fCmdVelocity, 
-					refFbFault	:= refFbFault);
+					fCmdValue	:= fCmdVelocity);
 				
 	fbqRun		(	bEmbeded 	:= TRUE,
 					bSafetyOk	:= bSafetyOk,
 					bEnable		:= bInternalEnable,
-					bCmdOn		:= bCmdRunCW OR bCmdRunCCW,
-					refFbFault	:= refFbFault);
+					bCmdOn		:= bCmdRunCW OR bCmdRunCCW);
 				
 	fbqReverse	(	bEmbeded 	:= TRUE,
 					bSafetyOk	:= bSafetyOk,
 					bEnable		:= bInternalEnable,
-					bCmdOn		:= bCmdRunCCW,
-					refFbFault	:= refFbFault);
+					bCmdOn		:= bCmdRunCCW);
 
 	fbqReset	(	bEmbeded 	:= TRUE,
 					bSafetyOk	:= bSafetyOk,
 					bEnable		:= bInternalEnable,
-					bCmdOn		:= bCmdReset,
-					refFbFault	:= refFbFault);
-{warning restore C0371}
+					bCmdOn		:= bCmdReset);
+
 // ===== reset input commands =====
 	fCmdVelocity 	:= 0;
 	bCmdRunCW		:= FALSE;
@@ -177,7 +171,7 @@ fActVelocity	:= fbVelocity.fOutputValue ;
       <Declaration><![CDATA[METHOD Init : BOOL
 VAR_INPUT
 	// Message location data
-	nId			: UDINT ; // Identification number of object
+	nId			: UINT ; // Identification number of object
 	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
 
 	// Motor settings
@@ -190,32 +184,32 @@ END_VAR
 	bInitOk := TRUE ;
 
 // ====== Calculate device id =====
-	bInitOk :=	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Axis) AND bInitOk;
+	bInitOk :=	ExecIdentifyDevice(nId, nParentId, E_ComponentTypes.Axis) AND bInitOk;
 
 // ====== Set manual device type ======
 	eDevType := E_Devices.AnalogAxis ;	
 
 
 bInitOk := 	fbVelocity.Init	( 	nId 			:= 0,
-								nParentId		:= nLocationId,
+								nParentId		:= stIdentity.nLocationId,
 								benableNegative	:= FALSE )
 								AND bInitOk;
 			fbVelocity.SetScaling	(fMaxValue 		:= fMaxVelocity);
 								
 bInitOk	:= 	fbqRun.Init		( 	nId				:= 1,
-								nParentId		:= nLocationId)
+								nParentId		:= stIdentity.nLocationId)
 								AND bInitOk;
 
 bInitOk	:= 	fbqReset.Init	( 	nId				:= 2,
-								nParentId		:= nLocationId)
+								nParentId		:= stIdentity.nLocationId)
 								AND bInitOk;
 
 bInitOk	:= 	fbqReverse.Init	( 	nId				:= 3,
-								nParentId		:= nLocationId)
+								nParentId		:= stIdentity.nLocationId)
 								AND bInitOk;
 
 bInitOk	:= 	fbiEnabled.Init	( 	nId				:= 4,
-								nParentId		:= nLocationId)
+								nParentId		:= stIdentity.nLocationId)
 								AND bInitOk;
 
 // ====== Set feedback =======

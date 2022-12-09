@@ -15,7 +15,7 @@ VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[SUPER^(refFbFault := refFbFault);
+      <ST><![CDATA[SUPER^();
 ]]></ST>
     </Implementation>
     <Folder Name="Motion" Id="{ce0670ae-bc3b-0910-186c-bb23f73a0e83}" />
@@ -39,7 +39,6 @@ END_IF
 	IF fbMcHalt.Error THEN 
 		bError					:= TRUE							;
 		stFault.Active 			:= TRUE 						;
-		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Description		:= CONCAT('Halt Fault ', UDINT_TO_STRING(fbMcHalt.ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 	END_IF
@@ -97,7 +96,6 @@ END_IF
 	IF fbMcReset.Error THEN 
 		bError					:= TRUE							;
 		stFault.Active 			:= TRUE 						;
-		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Description		:= CONCAT('Reset Fault ', UDINT_TO_STRING(fbMcReset.ErrorID))			;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 	END_IF
@@ -108,7 +106,7 @@ END_IF
       <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
 VAR_INPUT
 	// Message location data
-	nId			: UDINT ; // Identification number of object
+	nId			: UINT ; // Identification number of object
 	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
 	// Config Bits
 	bIcfCmdVelocityRpm	: BOOL := FALSE ; // input speeds in Rpm
@@ -137,25 +135,22 @@ END_VAR]]></Declaration>
         <ST><![CDATA[// Calculate device number
 	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Axis);
 
-// ===== Message data set =====
-	stFault.ComponentType		:= E_ComponentTypes.Axis ;
-	
 // ===== Write parameters =====
-	stMParMaxAcc.nNumber		:= nLocationId + 1;
-	stMParMaxAcc.sDiscription 	:= CONCAT(STR1 := sName, STR2:= ' hardware maximum acceleration (0 = HWMaximum)'); 
-	stMParMaxAcc.sName			:= CONCAT(STR1 := sName, STR2:= 'Hard max acceleration');
+	stMParMaxAcc.nNumber		:= stIdentity.nLocationId + 1;
+	stMParMaxAcc.sDiscription 	:= CONCAT(STR1 := stIdentity.sName, STR2:= ' hardware maximum acceleration (0 = HWMaximum)'); 
+	stMParMaxAcc.sName			:= CONCAT(STR1 := stIdentity.sName, STR2:= 'Hard max acceleration');
 	stMParMaxAcc.sType			:= 'MPar';
 	stMParMaxAcc.sUnit			:= 'unit/s^2';
 	
-	stMParMaxDec.nNumber		:= nLocationId + 2;
-	stMParMaxDec.sDiscription 	:= CONCAT(STR1 := sName, STR2:= ' hardware maximum deceleration(0 = HWMaximum)'); 
-	stMParMaxDec.sName			:= CONCAT(STR1 := sName, STR2:= 'Hard max deceleration');
+	stMParMaxDec.nNumber		:= stIdentity.nLocationId + 2;
+	stMParMaxDec.sDiscription 	:= CONCAT(STR1 := stIdentity.sName, STR2:= ' hardware maximum deceleration(0 = HWMaximum)'); 
+	stMParMaxDec.sName			:= CONCAT(STR1 := stIdentity.sName, STR2:= 'Hard max deceleration');
 	stMParMaxDec.sType			:= 'MPar';
 	stMParMaxDec.sUnit			:= 'unit/s^2';
 	
-	stMparMaxVelo.nNumber		:= nLocationId + 3;
-	stMparMaxVelo.sDiscription 	:= CONCAT(STR1 := sName, STR2:= ' hardware maximum velocity'); 
-	stMparMaxVelo.sName			:= CONCAT(STR1 := sName, STR2:= 'Hard max velocity');
+	stMparMaxVelo.nNumber		:= stIdentity.nLocationId + 3;
+	stMparMaxVelo.sDiscription 	:= CONCAT(STR1 := stIdentity.sName, STR2:= ' hardware maximum velocity'); 
+	stMparMaxVelo.sName			:= CONCAT(STR1 := stIdentity.sName, STR2:= 'Hard max velocity');
 	stMparMaxVelo.sType			:= 'MPar';
 	stMparMaxVelo.sUnit			:= 'Units/s';
 

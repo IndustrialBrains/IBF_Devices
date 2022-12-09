@@ -33,7 +33,7 @@ END_VAR
       <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
 VAR_INPUT
 	// Message location data
-	nId			: UDINT ; // Identification number of object
+	nId			: UINT ; // Identification number of object
 	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
 	// Configuration
 	fPulsesPerUnit	: LREAL	; // Scale factor for output [units/pulse]

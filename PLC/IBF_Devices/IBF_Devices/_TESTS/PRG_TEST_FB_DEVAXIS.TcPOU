@@ -3,8 +3,12 @@
   <POU Name="PRG_TEST_FB_DEVAXIS" Id="{b0b9f2e5-28eb-44e0-8846-21a78d2e9989}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM INTERNAL PRG_TEST_FB_DEVAXIS
 VAR
-	fbFaultHandler : Fb_FaultHandler;
+	bEnableTests : BOOL;
+	
 	fbDevAxis : Fb_DevAxis;
+	
+	// Setpoints
+	fVelocity : LREAL := 100;
 
 	// Public commands
 	bInit : BOOL;
@@ -16,35 +20,36 @@ VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[fbFaultHandler();
-fbDevAxis(refFbFault := fbFaultHandler);
-
-IF bInit THEN
-	bInit R= fbDevAxis.Init(
-		nId					:= 1, 
-		nParentId			:= 0, 
-		bIcfCmdVelocityRpm	:= FALSE, 
-		bIcfEnableForward	:= TRUE, 
-		bIcfEnableReverse	:= TRUE, 
-		bIcfAlwaysEnable	:= FALSE, 
-		bIcfModuloAxis		:= FALSE, 
-		bIcfSTOPresent		:= TRUE, 
-		bIcfNCHomeSensor	:= FALSE, 
-		mcHomingMode		:= MC_HomingMode.MC_DefaultHoming, 
-		fHomePosition		:= 0, 
-		fSafeOverride		:= 20, 
-		nEncTurnoverVal		:= 0,
-		tEnableDelay		:= T#0S, 
-		tDisabledelay		:= T#200MS
-	);
-END_IF
+      <ST><![CDATA[IF bEnableTests THEN
+	fbDevAxis();
 	
-// Trigger commands
-IF bCmdHalt THEN bCmdHalt R= fbDevAxis.CmdHalt(fDeceleration := 100, MC_BufferMode.MC_Aborting); END_IF
-IF bCmdHold THEN bCmdHold R= fbDevAxis.CmdHold(); END_IF
-IF bCmdHome THEN bCmdHome R= fbDevAxis.CmdHome(fPosition := 0); END_IF
-IF bCmdReset THEN bCmdReset R= fbDevAxis.CmdReset(); END_IF
-IF bCmdMoveAbs THEN bCmdMoveAbs R= fbDevAxis.CmdMoveAbs(fPosition := 10000, fVelocity := 100, MC_BufferMode.MC_Buffered); END_IF
+	IF bInit THEN
+		bInit R= fbDevAxis.Init(
+			nId					:= 1, 
+			nParentId			:= 0, 
+			bIcfCmdVelocityRpm	:= FALSE, 
+			bIcfEnableForward	:= TRUE, 
+			bIcfEnableReverse	:= TRUE, 
+			bIcfAlwaysEnable	:= FALSE, 
+			bIcfModuloAxis		:= FALSE, 
+			bIcfSTOPresent		:= TRUE, 
+			bIcfNCHomeSensor	:= FALSE, 
+			mcHomingMode		:= MC_HomingMode.MC_DefaultHoming, 
+			fHomePosition		:= 0, 
+			fSafeOverride		:= 20, 
+			nEncTurnoverVal		:= 0,
+			tEnableDelay		:= T#0S, 
+			tDisabledelay		:= T#200MS
+		);
+	END_IF
+		
+	// Trigger commands
+	IF bCmdHalt THEN bCmdHalt R= fbDevAxis.CmdHalt(fDeceleration := 100, MC_BufferMode.MC_Aborting); END_IF
+	IF bCmdHold THEN bCmdHold R= fbDevAxis.CmdHold(); END_IF
+	IF bCmdHome THEN bCmdHome R= fbDevAxis.CmdHome(fPosition := 0); END_IF
+	IF bCmdReset THEN bCmdReset R= fbDevAxis.CmdReset(); END_IF
+	IF bCmdMoveAbs THEN bCmdMoveAbs R= fbDevAxis.CmdMoveAbs(fPosition := 10000, fVelocity := fVelocity, MC_BufferMode.MC_Aborting); END_IF
+END_IF
 
 ]]></ST>
     </Implementation>

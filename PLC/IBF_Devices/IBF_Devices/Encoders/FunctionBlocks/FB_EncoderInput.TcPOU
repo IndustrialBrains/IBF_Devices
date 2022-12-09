@@ -54,23 +54,19 @@ END_VAR
       <Implementation>
         <ST><![CDATA[IF iDataError THEN 
 	stFault.Active 			:= TRUE ;
-	stFault.Description		:= CONCAT(sName, ' Encoder Data error');
-	stFault.MessageNumber	:= E_MessageNumbers.FF_ComunicationFault;
+	stFault.Description		:= 'Encoder Data error';
 	stFault.FaultType		:= E_FaultTypes.FF;
 ELSIF iFrameError THEN 
 	stFault.Active 			:= TRUE ;
-	stFault.Description		:= CONCAT(sName, ' Encoder frame error');
-	stFault.MessageNumber	:= E_MessageNumbers.FF_ComunicationFault;
+	stFault.Description		:= 'Encoder frame error';
 	stFault.FaultType		:= E_FaultTypes.FF;
 ELSIF iPowerFailure THEN 
 	stFault.Active 			:= TRUE ;
-	stFault.Description		:= CONCAT(sName, ' Encoder Power failure');
-	stFault.MessageNumber	:= E_MessageNumbers.FF_ComunicationFault;
+	stFault.Description		:= 'Encoder Power failure';
 	stFault.FaultType		:= E_FaultTypes.FF;
 ELSIF iSyncError THEN 
 	stFault.Active 			:= TRUE ;
-	stFault.Description		:= CONCAT(sName, ' Encoder synchronisation error');
-	stFault.MessageNumber	:= E_MessageNumbers.FF_ComunicationFault;
+	stFault.Description		:= 'Encoder synchronisation error';
 	stFault.FaultType		:= E_FaultTypes.FF;
 END_IF]]></ST>
       </Implementation>

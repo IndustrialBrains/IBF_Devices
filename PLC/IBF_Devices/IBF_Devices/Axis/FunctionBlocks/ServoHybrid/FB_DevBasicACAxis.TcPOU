@@ -79,7 +79,7 @@ END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[// Call base function
-SUPER^(refFbFault := refFbFault);
+SUPER^();
 
 // ==== Check if axis is initiated =====
 IF NOT bInitOk THEN 
@@ -398,7 +398,6 @@ END_IF
 IF fbMcPower.Error THEN 
 	bErrorActive			:= TRUE							;
 	stFault.Active 			:= TRUE 						;
-	stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 	stFault.Description		:= CONCAT('Enable Fault ', UDINT_TO_STRING(fbMcPower.ErrorID));				;
 	stFault.FaultType		:= E_FaultTypes.FF				;
 END_IF
@@ -423,7 +422,6 @@ fbMcHalt (	Axis 		:= AxisRef,
 	IF fbMcHalt.Error THEN 
 		bErrorActive			:= TRUE							;
 		stFault.Active 			:= TRUE 						;
-		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Description		:= CONCAT('Halt Fault ', UDINT_TO_STRING(fbMcHalt.ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 	END_IF
@@ -450,7 +448,6 @@ END_VAR
 	IF fbMcHome.Error THEN 
 		bErrorActive			:= TRUE							;
 		stFault.Active 			:= TRUE 						;
-		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Description		:= CONCAT('Homing Fault ', UDINT_TO_STRING(fbMcHome.ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 	END_IF
@@ -480,7 +477,6 @@ END_VAR
 	IF fbMcJog.Error THEN 
 		bErrorActive			:= TRUE							;
 		stFault.Active 			:= TRUE 						;
-		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Description		:= CONCAT('Jog Fault ', UDINT_TO_STRING(fbMcJog.ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 	END_IF
@@ -516,7 +512,6 @@ FOR i := 0 TO 1 DO
 	IF fbMcMoveAbsolute[i].Error THEN 
 		bErrorActive			:= TRUE							;
 		stFault.Active 			:= TRUE 						;
-		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Description		:= CONCAT('Move absolute Fault ', UDINT_TO_STRING(fbMcMoveAbsolute[i].ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 	END_IF
@@ -553,7 +548,6 @@ FOR i := 0 TO 1 DO
 	IF fbMCMoveRelative[i].Error THEN 
 		bErrorActive			:= TRUE							;
 		stFault.Active 			:= TRUE 						;
-		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Description		:= CONCAT('Move relative Fault ', UDINT_TO_STRING(fbMCMoveRelative[i].ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF			;
 	END_IF
@@ -581,7 +575,6 @@ bInternalEnable		:= fbMcMoveVelocity.Busy;
 IF fbMcHalt.Error THEN 
 	bErrorActive			:= TRUE							;
 	stFault.Active 			:= TRUE 						;
-	stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 	stFault.Description		:= CONCAT('Move velocity Fault ', UDINT_TO_STRING(fbMcMoveVelocity.ErrorID));				;
 	stFault.FaultType		:= E_FaultTypes.FF				;
 END_IF
@@ -616,7 +609,6 @@ END_IF
 	IF fbSoeReset.Error OR fbMcReset.Error THEN 
 		bErrorActive			:= TRUE							;
 		stFault.Active 			:= TRUE 						;
-		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Description		:= CONCAT('Reset Fault ', UDINT_TO_STRING(fbMcReset.ErrorID))			;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 	END_IF
@@ -644,7 +636,6 @@ END_VAR
 	IF fbMcStop.Error THEN 
 		bErrorActive			:= TRUE							;
 		stFault.Active 			:= TRUE 						;
-		stFault.MessageNumber	:= E_MessageNumbers.FF_AxisFault;
 		stFault.Description		:= CONCAT('Safe stop axis fault ', UDINT_TO_STRING(fbMcStop.ErrorID));				;
 		stFault.FaultType		:= E_FaultTypes.FF				;
 	END_IF
@@ -658,7 +649,7 @@ bIsSafe := NOT bCmdEnableAxis  ;
       <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
 VAR_INPUT
 	// Message location data
-	nId			: UDINT ; // Identification number of object
+	nId			: UINT ; // Identification number of object
 	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
 	// Config Bits
 	bIcfCmdVelocityRpm	: BOOL := FALSE ; // input speeds in Rpm
@@ -683,25 +674,22 @@ END_VAR]]></Declaration>
 // ====== Calculate device id =====
 	bInitOk :=	ExecIdentifyDevice(nId,nParentId, E_ComponentTypes.Axis) AND bInitOk;
 
-// ===== Message data set =====
-	stFault.ComponentType		:= E_ComponentTypes.Axis ;
-	
 // ===== Write parameters =====
-	stMParMaxAcc.nNumber		:= nLocationId + 1;
-	stMParMaxAcc.sDiscription 	:= CONCAT(STR1 := sName, STR2:= ' hardware maximum acceleration (0 = HWMaximum)'); 
-	stMParMaxAcc.sName			:= CONCAT(STR1 := sName, STR2:= 'Hard max acceleration');
+	stMParMaxAcc.nNumber		:= stIdentity.nLocationId + 1;
+	stMParMaxAcc.sDiscription 	:= CONCAT(STR1 := stIdentity.sName, STR2:= ' hardware maximum acceleration (0 = HWMaximum)'); 
+	stMParMaxAcc.sName			:= CONCAT(STR1 := stIdentity.sName, STR2:= 'Hard max acceleration');
 	stMParMaxAcc.sType			:= 'MPar';
 	stMParMaxAcc.sUnit			:= 'unit/s^2';
 	
-	stMParMaxDec.nNumber		:= nLocationId + 2;
-	stMParMaxDec.sDiscription 	:= CONCAT(STR1 := sName, STR2:= ' hardware maximum deceleration(0 = HWMaximum)'); 
-	stMParMaxDec.sName			:= CONCAT(STR1 := sName, STR2:= 'Hard max deceleration');
+	stMParMaxDec.nNumber		:= stIdentity.nLocationId + 2;
+	stMParMaxDec.sDiscription 	:= CONCAT(STR1 := stIdentity.sName, STR2:= ' hardware maximum deceleration(0 = HWMaximum)'); 
+	stMParMaxDec.sName			:= CONCAT(STR1 := stIdentity.sName, STR2:= 'Hard max deceleration');
 	stMParMaxDec.sType			:= 'MPar';
 	stMParMaxDec.sUnit			:= 'unit/s^2';
 	
-	stMparMaxVelo.nNumber		:= nLocationId + 3;
-	stMparMaxVelo.sDiscription 	:= CONCAT(STR1 := sName, STR2:= ' hardware maximum velocity'); 
-	stMparMaxVelo.sName			:= CONCAT(STR1 := sName, STR2:= 'Hard max velocity');
+	stMparMaxVelo.nNumber		:= stIdentity.nLocationId + 3;
+	stMparMaxVelo.sDiscription 	:= CONCAT(STR1 := stIdentity.sName, STR2:= ' hardware maximum velocity'); 
+	stMparMaxVelo.sName			:= CONCAT(STR1 := stIdentity.sName, STR2:= 'Hard max velocity');
 	stMparMaxVelo.sType			:= 'MPar';
 	stMparMaxVelo.sUnit			:= 'Units/s';
 

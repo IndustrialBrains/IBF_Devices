@@ -18,4 +18,6 @@
 1. `ManualControl`: 
 	- list sometimes contains 1 empty item
 
+### Nice to have
 
+1. Many CONCAT operations do not add a space, leading to ugly strings (e.g. "MotorEnable fault" instead of "Motor: Enable fault")

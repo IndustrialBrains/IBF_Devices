@@ -20,7 +20,7 @@ END_VAR
 eDevType := E_Devices.AnalogSensor ;
 
 // Call base function
-SUPER^(refFbFault := refFbFault);
+SUPER^();
 
 // Check Hardware connection
 CheckHardware();
@@ -39,24 +39,21 @@ END_VAR
         <ST><![CDATA[// Check for hardware faults
 IF inStatus.0 THEN // signal under range
 	stFault.Active			:= TRUE 							;
-	stFault.MessageNumber	:= E_MessageNumbers.CF_FeedbackFault 	;
-	stFault.Description		:= CONCAT( sName, 'Signal under Range' )	;
+	stFault.Description		:= 'Signal under range';
 	stFault.FaultType		:= E_FaultTypes.CF 					;
 	bErrorActive			:= TRUE 							;
 END_IF
 
 IF inStatus.1 THEN // signal over range
 	stFault.Active			:= TRUE 							;
-	stFault.MessageNumber	:= E_MessageNumbers.CF_FeedbackFault 	;
-	stFault.Description		:= CONCAT( sName, 'Signal over Range' )	;
+	stFault.Description		:= 'Signal over range';
 	stFault.FaultType		:= E_FaultTypes.CF 					;
 	bErrorActive			:= TRUE 							;
 END_IF
 
-IF inStatus.6 THEN // general Error bit
+IF inStatus.6 THEN // general error bit
 	stFault.Active			:= TRUE 							;
-	stFault.MessageNumber	:= E_MessageNumbers.FF_Unknown 	;
-	stFault.Description		:= CONCAT( sName, 'Hardware General Error' )	;
+	stFault.Description		:= 'Hardware General Error';
 	stFault.FaultType		:= E_FaultTypes.FF 					;
 	bErrorActive			:= TRUE 							;
 END_IF]]></ST>
@@ -81,7 +78,7 @@ ExecSetFeedback := TRUE;]]></ST>
       <Declaration><![CDATA[METHOD PUBLIC Init : BOOL
 VAR_INPUT
 	// Location data for messages  
-	nId			: UDINT ; // Identification number of object
+	nId			: UINT ; // Identification number of object
 	nParentId	: UDINT ; // Id of higher level If aplicable (0 = no parent)
 END_VAR
 ]]></Declaration>

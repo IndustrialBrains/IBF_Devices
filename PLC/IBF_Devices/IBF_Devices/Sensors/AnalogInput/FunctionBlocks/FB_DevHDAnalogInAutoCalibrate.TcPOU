@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_DevHDAnalogInAutoCalibrate" Id="{9489a00d-77df-047c-2429-91aeb238ef70}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC FB_DevHDAnalogInAutoCalibrate EXTENDS FB_DevHDAnalogInputScaled
@@ -11,7 +11,7 @@ VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[SUPER^(refFbFault := refFbFault);
+      <ST><![CDATA[SUPER^();
 ]]></ST>
     </Implementation>
     <Method Name="CmdCalibrateNull" Id="{9162ec7e-6e60-0adc-3c60-c372467ce411}">

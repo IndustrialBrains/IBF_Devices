@@ -26,7 +26,7 @@ class Tests(unittest.TestCase):
     def setUp(self) -> None:
         if COLD_RESET:
             cold_reset()
-
+        conn.write_by_name(f"{self.PREFIX}.bEnableTests", True)
         return super().setUp()
 
     def _init(self):
@@ -66,6 +66,8 @@ class Tests(unittest.TestCase):
     def test_CmdHold_during_movement(self):
         self._home()
         conn.write_by_name(f"{self.PREFIX}.bCmdMoveAbs", True)
+        wait_cycles(50)
+        self.assertGreater(conn.read_by_name(f"{self.PREFIX}.fbDevAxis.fVelocity"), 0)
         wait_cycles(50)
         conn.write_by_name(f"{self.PREFIX}.bCmdHold", True)
         wait_cycles(100)

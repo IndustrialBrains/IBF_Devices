@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_DevPushbuttonLight" Id="{07fab308-52dd-4cfa-88cc-f84e729aee41}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'reflection'}
 FUNCTION_BLOCK PUBLIC FB_DevPushbuttonLight EXTENDS Fb_DevDigitalInputFunctions
@@ -15,11 +15,11 @@ IF eDevType = E_Devices.Undefined THEN
 	eDevType := E_Devices.PushButtonLight ;
 END_IF
 
-SUPER^(refFbFault := refFbFault);
+SUPER^();
 
 // Light commands
 	
-fbLight(bEnable := bEnable, refFbFault := refFbFault);]]></ST>
+fbLight(bEnable := bEnable);]]></ST>
     </Implementation>
     <Method Name="CmdBlinkFast" Id="{833ab54e-998c-06b2-361a-88ca4c5012fa}">
       <Declaration><![CDATA[METHOD PUBLIC CmdBlinkFast : BOOL
