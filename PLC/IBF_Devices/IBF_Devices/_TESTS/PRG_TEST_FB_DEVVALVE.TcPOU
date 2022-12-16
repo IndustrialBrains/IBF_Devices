@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="PRG_TEST_FB_DEVVALVE" Id="{1415a15c-7805-0331-27d8-3dbc82f4a8e7}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM INTERNAL PRG_TEST_FB_DEVVALVE
+VAR
+	bEnableTests : BOOL;
+	
+	fbDevValve : Fb_DevValve;
+	
+	// Settings
+	eResetState : E_ValveResetState;
+	eSafeState : E_ValveResetState;
+	
+	// Public commands
+	bInit : BOOL;
+	bCmdClose : BOOL;
+	bCmdHold : BOOL;
+	bCmdManual : BOOL;
+	bCmdOpen : BOOL;
+	bCmdReset : BOOL;
+	bCmdSafeStop : BOOL;
+	bCmdSafeStop_RetVal : BOOL;
+	bCmdTeach : BOOL;
+	
+//	// Inputs
+//	bFco_Closed	: BOOL;
+//	bFco_Open	: BOOL;
+	
+//	// Outputs
+//	q_Open : BOOL;
+//	q_Close : BOOL;
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF bEnableTests THEN
+	fbDevValve();
+
+	IF bInit THEN
+		bInit R= fbDevValve.Init(
+			nId			:= 1, 
+			nParentId	:= 0,
+			eResetState	:= eResetState,
+			eSafeState	:= eSafeState
+		);
+	END_IF
+
+	IF bCmdClose THEN bCmdClose R= fbDevValve.CmdClose(); END_IF
+	IF bCmdHold THEN fbDevValve.CmdHold(); END_IF
+	IF bCmdManual THEN fbDevValve.CmdManual(); END_IF
+	IF bCmdOpen THEN bCmdOpen R= fbDevValve.CmdOpen(); END_IF
+	IF bCmdReset THEN bCmdReset R= fbDevValve.CmdReset(); END_IF
+	IF bCmdSafeStop THEN bCmdSafeStop_RetVal := fbDevValve.CmdSafeStop(); END_IF
+	IF bCmdTeach THEN fbDevValve.CmdTeach(); END_IF
+END_IF
+
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

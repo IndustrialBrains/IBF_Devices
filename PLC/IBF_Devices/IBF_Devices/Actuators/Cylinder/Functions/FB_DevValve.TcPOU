@@ -25,6 +25,7 @@ VAR
 		bCmdClose 	: BOOL := FALSE ; // close valve 
 		bCmdOpen	: BOOL := FALSE ; // Open valve
 		bCmdHold	: BOOL := FALSE ; // Hold valve status change
+		bCmdSafeStopCallActive : BOOL; // Method CmdSafeStop is being called 
 	// Time functions 
 		fbTOnClose	: TON	; // Timer for valve close
 		FbTOnOpen	: TON 	; // Timer for valve Open
@@ -109,6 +110,9 @@ bCmdManual S= TRUE ;
 		bCmdOpen 	:= FALSE;
 	ELSIF stManualCtrl.bCmdTeach THEN
 		CmdTeach ();
+	ELSE
+		bCmdClose 	:= FALSE;		
+		bCmdOpen 	:= FALSE;
 	END_IF
 ]]></ST>
       </Implementation>
@@ -170,13 +174,14 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[bCmdOpen := FALSE ;
+        <ST><![CDATA[bCmdSafeStopCallActive := TRUE;
+bCmdOpen := FALSE ;
 bCmdClose:= FALSE ;
 
 CASE eSafeState OF 
 	E_ValveResetState.Res_Idle:
-		q_Close := FALSE ;
-		q_Open  := FALSE ;
+		q_Close	:= bFco_Closed;		
+		q_Open 	:= bFco_Open;
 		bIsSafe := TRUE ;
 	E_ValveResetState.Res_Closed:
 		q_Close := TRUE ;
@@ -188,7 +193,8 @@ CASE eSafeState OF
 		bIsSafe := bFco_Open OR NOT bFco_Closed;
 END_CASE
 
-CmdSafeStop := bIsSafe OR NOT bInitOk ;]]></ST>
+CmdSafeStop := bIsSafe OR NOT bInitOk ;
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdTeach" Id="{3f2593c7-29ea-0862-082c-1fa6f192418d}">
@@ -261,32 +267,22 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ======= Set Outputs according to commands and check safety features =======
-IF bSafetyOk THEN
-	IF NOT bCmdHold AND (bEnable OR bCmdManual) THEN  
-		q_Close	:= bCmdClose;
-		q_Open	:= bCmdOpen	;
-	END_IF
-ELSE
-	CASE eSafeState OF 
-		E_ValveResetState.Res_Idle:
-			q_Close	:= bFco_Closed;		
-			q_Open 	:= bFco_Open;
-		E_ValveResetState.Res_Closed:
-			q_Close	:= TRUE	;		
-			q_Open 	:= FALSE;
-		E_ValveResetState.Res_Open:
-			q_Close	:= FALSE;		
-			q_Open 	:= TRUE	;
-	END_CASE
-	bCmdClose 	:= bFco_Closed 	;
-	bCmdOpen	:= bFco_Open	;
-	
+        <ST><![CDATA[// ======= Set Outputs according to commands =======
+IF bSafetyOk
+	AND NOT bCmdSafeStopCallActive
+	AND NOT bCmdHold 
+	AND (bEnable OR bCmdManual) 	
+THEN  
+	q_Close	:= bCmdClose;
+	q_Open	:= bCmdOpen	;
 END_IF
 
 // Reset manual and hold commands
 bCmdHold 	:= FALSE ;
 bCmdManual 	:= FALSE ;
+
+bCmdSafeStopCallActive := FALSE; // Will be set to TRUE if CmdSafeStop is called
+
 ]]></ST>
       </Implementation>
     </Method>

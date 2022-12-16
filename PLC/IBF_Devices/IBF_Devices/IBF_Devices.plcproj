@@ -339,6 +339,9 @@
     <Compile Include="Version\Global_Version.TcGVL">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="_TESTS\PRG_TEST_FB_DEVVALVE.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="_TESTS\PRG_TEST_FB_MANUALCONTROLLER.TcPOU">
       <SubType>Code</SubType>
     </Compile>
