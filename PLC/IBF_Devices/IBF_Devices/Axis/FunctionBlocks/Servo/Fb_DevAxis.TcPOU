@@ -455,11 +455,6 @@ bBlockedCommand := fbMcHalt.Active ;
 // Enable axis for manual control
 bCmdManual := TRUE ;
 
-// check safety 
-IF NOT bSafetyOk THEN 
-	RETURN;
-END_IF
-
 // set jog mode 
 IF stManualCtrl.bCmdInching THEN 
 	eJogmode := E_JogMode.MC_JOGMODE_INCHING ;
@@ -800,12 +795,11 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// ===== Set axis enable ======
-IF NOT bSafetyOk 
-OR NOT bSTOOK 
+IF NOT bSTOOK 
 OR AxisRef.Status.DriveDeviceError
 OR bExec_Reset THEN 
 	bCmdEnableAxis := FALSE ;
-ELSIF bCmdManual AND bSafetyOk THEN 
+ELSIF bCmdManual THEN 
 	bCmdEnableAxis 	:= TRUE ;
 	bInternalEnable S= bCmdManual ;
 	bCmdManual 		:= FALSE ;
@@ -1280,10 +1274,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ==== Stop when safety is not ok =====
-	bCmdSafeStop S= NOT bSafetyOk ;
-
-// ===== Safe torque off function =====
+        <ST><![CDATA[// ===== Safe torque off function =====
 	IF bIcfSTOPresent THEN 
 		tonSTOOK(IN := IAxisSTOOK, PT := T#1000MS);
 		bSTOOK := tonSTOOK.Q AND NOT AxisRef.Status.DriveDeviceError;

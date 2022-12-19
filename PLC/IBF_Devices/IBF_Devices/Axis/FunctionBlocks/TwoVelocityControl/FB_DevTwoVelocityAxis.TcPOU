@@ -98,18 +98,16 @@ CmdSafeStop := bIsSafe;]]></ST>
       <Declaration><![CDATA[METHOD INTERNAL ExecSetOutputs : BOOL
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF bSafetyOk THEN
-	IF bManual THEN
-		qbRunCw			:= stManualControl.bManRunCW;
-		qbRunCWFast		:= stManualControl.bManRunCWFast;
-		qbRunCCW 		:= stManualControl.bManRunCCw;
-		qbRunCCWFast	:= stManualControl.bManRunCCWFast;
-	ELSIF bEnable THEN
-		qbRunCw			:= bCmdRunCW;
-		qbRunCWFast		:= bCmdRunCWFast;
-		qbRunCCW 		:= bCmdRunCCW;
-		qbRunCCWFast	:= bCmdRunCCWFast;
-	END_IF	
+        <ST><![CDATA[IF bManual THEN
+	qbRunCw			:= stManualControl.bManRunCW;
+	qbRunCWFast		:= stManualControl.bManRunCWFast;
+	qbRunCCW 		:= stManualControl.bManRunCCw;
+	qbRunCCWFast	:= stManualControl.bManRunCCWFast;
+ELSIF bEnable THEN
+	qbRunCw			:= bCmdRunCW;
+	qbRunCWFast		:= bCmdRunCWFast;
+	qbRunCCW 		:= bCmdRunCCW;
+	qbRunCCWFast	:= bCmdRunCCWFast;
 ELSE
 	qbRunCw			:= FALSE;
 	qbRunCWFast		:= FALSE;

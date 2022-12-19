@@ -121,8 +121,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// ====== Check safety and enable ======
-IF bSafetyOk 
-AND fbiEnabled.bFcoInputActive 
+IF fbiEnabled.bFcoInputActive 
 AND (bEnable OR bManual) THEN 
 	bInternalEnable := TRUE;
 ELSE
@@ -133,22 +132,18 @@ END_IF
 
 // ====== Set outputs =======
 	fbVelocity	(	bEmbeded 	:= TRUE,
-					bSafetyOk	:= bSafetyOk,
 					bEnable		:= bInternalEnable,
 					fCmdValue	:= fCmdVelocity);
 				
 	fbqRun		(	bEmbeded 	:= TRUE,
-					bSafetyOk	:= bSafetyOk,
 					bEnable		:= bInternalEnable,
 					bCmdOn		:= bCmdRunCW OR bCmdRunCCW);
 				
 	fbqReverse	(	bEmbeded 	:= TRUE,
-					bSafetyOk	:= bSafetyOk,
 					bEnable		:= bInternalEnable,
 					bCmdOn		:= bCmdRunCCW);
 
 	fbqReset	(	bEmbeded 	:= TRUE,
-					bSafetyOk	:= bSafetyOk,
 					bEnable		:= bInternalEnable,
 					bCmdOn		:= bCmdReset);
 

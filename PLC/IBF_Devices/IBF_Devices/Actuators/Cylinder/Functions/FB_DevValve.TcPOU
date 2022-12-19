@@ -268,8 +268,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// ======= Set Outputs according to commands =======
-IF bSafetyOk
-	AND NOT bCmdSafeStopCallActive
+IF NOT bCmdSafeStopCallActive
 	AND NOT bCmdHold 
 	AND (bEnable OR bCmdManual) 	
 THEN  

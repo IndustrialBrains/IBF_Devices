@@ -621,10 +621,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ==== Stop when safety is not ok =====
-	bCmdSafeStop := NOT bSafetyOk ;
-
-// ==== Safe operation functions (overrule all other motion functions) =====
+        <ST><![CDATA[// ==== Safe operation functions (overrule all other motion functions) =====
 	fbMcStop( 	Axis 			:= AxisRef		,
 				Execute 		:= bCmdSafeStop	,
 				Deceleration	:= fMaxDec		);

@@ -27,11 +27,11 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// The hybrid axis is equiped with it's own safety stop system therefore mc halt is no longer needed with an Estop
-IF bSafetyOk THEN 
-	// ==== Execute halt function ===== 
-	fbMcHalt (	Axis 		:= AxisRef,
-				Execute 	:= bExec_Halt );
-END_IF
+
+// ==== Execute halt function ===== 
+fbMcHalt (	Axis 		:= AxisRef,
+			Execute 	:= bExec_Halt );
+
 // ===== reset command =====
 	bExec_Halt := FALSE ;
 	

@@ -102,7 +102,7 @@ ELSE
 END_IF
 
 // set output 
-IF bSafetyOk AND (bEnable OR bCmdManual) THEN 
+IF (bEnable OR bCmdManual) THEN 
 	qbOutput := bCycleOutput OR bCmdOn ;
 ELSE
 	qbOutput := FALSE ;

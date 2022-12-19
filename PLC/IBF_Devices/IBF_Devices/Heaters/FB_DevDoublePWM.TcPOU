@@ -183,7 +183,7 @@ END_VAR
       <Implementation>
         <ST><![CDATA[
 // Set main output
-qbOutputMain := (bEnable OR bManual) AND bSafetyOk AND NOT bCmdHold ;
+qbOutputMain := (bEnable OR bManual) AND NOT bCmdHold ;
 
 // Set outputs
 qbOutputA := bCmdChanelAOn AND NOT tofOutputB.Q AND NOT tonBurnTimeA.Q;
