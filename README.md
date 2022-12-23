@@ -16,6 +16,8 @@
 	- Add feature: check if online motor parameters match project parameters
 	- When STO is not OK, no fault/error is generated; this is as designed (handled by higher level safety system), but is not very intuitive
 	- Axis fault is only active for 1 PLC cycle
+	- Unnecessary homing faults when interrupting Homing in manual mode
+	- Entering manual mode before system has enabled gives Halt errors
 1. `ManualControl`: 
 	- list sometimes contains 1 empty item
 

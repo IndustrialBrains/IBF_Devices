@@ -809,7 +809,8 @@ END_VAR
 IF NOT bSTOOK 
 OR AxisRef.Status.DriveDeviceError
 OR bExec_Reset THEN 
-	bCmdEnableAxis := FALSE ;
+	bCmdEnableAxis 	:= FALSE ;
+	bCmdManual 		:= FALSE ;
 ELSIF bCmdManual THEN 
 	bCmdEnableAxis 	:= TRUE ;
 	bInternalEnable S= bCmdManual ;

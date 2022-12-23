@@ -15,9 +15,9 @@ VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[GVL_DevManual.bManualModeActive := stHMI.bEnabled;
+      <ST><![CDATA[GVL_DevManual.bManualModeActive := stHMI.bEnabled AND GVL_DevManual.bAllowManualMode;
 
-IF stHMI.bEnabled THEN
+IF GVL_DevManual.bManualModeActive THEN
 	// NOTE: The device is responsibe for disabling the manual mode when CmdManual is no longer called
 	stHMI.refSelectedDevice.CmdManual();
 END_IF
