@@ -9,7 +9,7 @@
 1. Add build action
 1. Add automatic tests
 
-### Improvements
+### Must have
 
 1. `Fb_DevAxis`:
 	- Fb_DevAxis.Init VAR_INPUT default values have no effect (move defaults to Fb_DevAxis VARs or use PROPERTY)
@@ -18,6 +18,10 @@
 	- Axis fault is only active for 1 PLC cycle
 	- Unnecessary homing faults when interrupting Homing in manual mode
 	- Entering manual mode before system has enabled gives Halt errors
+	- Homing in manual mode should reset the Homed bit, but system still thinks drive is homed
+	- Homing stays active even after CmdHold is no longer called
+	- ExecWriteParameter is disabled (excluded from build), possible residue from added Delta servo
+	- Delta bReverseHomingDirection BOOL is tie wrapped/duct taped in the lib, needs to be cleaned up
 1. `ManualControl`: 
 	- list sometimes contains 1 empty item
 

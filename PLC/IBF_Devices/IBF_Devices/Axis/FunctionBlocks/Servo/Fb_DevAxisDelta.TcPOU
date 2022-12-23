@@ -8,6 +8,9 @@ VAR
 		stMParMaxAcc : Udt_Parameter := (fMaximum := 999999, fMinimum := 0, fValue := 0)	; // Parameter for maximum acceleration
 		stMParMaxDec : Udt_Parameter := (fMaximum := 999999, fMinimum := 0, fValue := 0)	; // Parameter for maximum Deceleration
 		stMparMaxVelo: Udt_Parameter := (fMaximum := 999999, fMinimum := 0, fValue := 0)	; // Parameter for maximum velocity
+
+	mcHomingOptions : ST_HomingOptions;
+
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -16,8 +19,39 @@ END_VAR
     </Implementation>
     <Folder Name="Command Methods" Id="{6ff04a08-145f-0075-3081-8a253c264400}" />
     <Folder Name="Private" Id="{411a3c08-0cd0-0279-3d64-90e3acd48f7f}">
+      <Folder Name="Motion" Id="{cad6bb55-9b0a-0e36-0c74-975f6a7e12b1}" />
       <Folder Name="Organization" Id="{3dbff440-0f61-0a96-00dd-248ac60e3867}" />
     </Folder>
+    <Method Name="ExecHome" Id="{752eb1b7-7a7d-06a4-0819-ef5438cb8aad}" FolderPath="Private\Motion\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecHome : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// ==== execute homing function =====
+	IF bIcfNCHomeSensor THEN 
+		fbmchome.bCalibrationCam	:= NOT IAxisHome;
+	ELSE
+		fbmchome.bCalibrationCam	:= IAxisHome;
+	END_IF		
+	
+	fbMcHome(	Axis			:= AxisRef,
+				Execute			:= bExec_Home AND bDelayedEnable,
+				HomingMode		:= mcHomingMode,
+				Options := mcHomingOptions ); 
+			
+// Reset exec command 
+	bExec_Home 	:= FALSE ;
+	bHomed		S= fbMcHome.Done ;	
+				
+// fault handling 
+	IF fbMcHome.Error THEN 
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.Description		:= CONCAT('Homing Fault ', UDINT_TO_STRING(fbMcHome.ErrorID));
+		stFault.FaultType		:= E_FaultTypes.FF				;
+	END_IF
+]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="ExecReset" Id="{2608dc0b-c27b-03ab-2a5f-162cf169c209}" FolderPath="Private\Organization\">
       <Declaration><![CDATA[METHOD INTERNAL ExecReset : BOOL
 ]]></Declaration>
@@ -72,6 +106,7 @@ VAR_INPUT
 	bIcfNCHomeSensor	: BOOL := FALSE ; // Homing sensor is inverted (NC)	
 	// Config Values 
 	mcHomingMode 		: MC_HomingMode := MC_HomingMode.MC_DefaultHoming; 
+	bReverseHomingDirection : BOOL;
 	fHomePosition		: LREAL := 0 	; // set position at homing
 	fSafeOverride		: LREAL := 10	; // Safe velocity override [%]
 	nEncTurnoverVal 	: LREAL := 360	; // encoder turnover value 
@@ -129,6 +164,11 @@ END_VAR
 	// ***** config homing Mode ***** 
  		THIS^.mcHomingMode 			:= mcHomingMode ; // set homing mode
 		THIS^.fHomePosition			:= fHomePosition;
+		IF bReverseHomingDirection THEN
+			mcHomingOptions.SyncDirection := MC_Direction.MC_Positive_Direction;
+		ELSE
+			mcHomingOptions.SyncDirection := MC_Direction.MC_Negative_Direction;
+		END_IF
 	// ***** Velocity settings *****
 		THIS^.fSafeOverride			:= fSafeOverride	; 	
 	// ***** Encoder values *****
