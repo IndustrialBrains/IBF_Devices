@@ -1389,7 +1389,6 @@ VAR_INPUT
 	bIcfNCHomeSensor	: BOOL := FALSE ; // Homing sensor is inverted (NC)	
 	// Config Values 
 	mcHomingMode 		: MC_HomingMode := MC_HomingMode.MC_DefaultHoming; 
-	bReverseHomingDirection : BOOL; // ONLY USED BY DELTA AXIS!
 	fHomePosition		: LREAL := 0 	; // set position at homing
 	fSafeOverride		: LREAL := 10	; // Safe velocity override [%]
 	nEncTurnoverVal 	: LREAL := 360	; // encoder turnover value 
