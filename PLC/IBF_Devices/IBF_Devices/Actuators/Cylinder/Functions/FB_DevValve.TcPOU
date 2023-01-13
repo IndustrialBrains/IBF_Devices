@@ -64,7 +64,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF bCmdManual THEN 
+        <ST><![CDATA[IF bManual THEN 
 	RETURN;
 END_IF
 
@@ -123,7 +123,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF bCmdManual THEN 
+        <ST><![CDATA[IF bManual THEN 
 	RETURN;
 END_IF
 
@@ -270,7 +270,7 @@ END_VAR
         <ST><![CDATA[// ======= Set Outputs according to commands =======
 IF NOT bCmdSafeStopCallActive
 	AND NOT bCmdHold 
-	AND (bEnable OR bCmdManual) 	
+	AND (bEnable OR bManual) 	
 THEN  
 	q_Close	:= bCmdClose;
 	q_Open	:= bCmdOpen	;
