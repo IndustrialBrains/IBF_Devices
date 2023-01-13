@@ -997,7 +997,7 @@ END_VAR
 			
 // Reset exec command 
 	bExec_Home 	:= FALSE ;
-	bHomed		S= fbMcHome.Done ;	
+	bHomed		S= fbMcHome.Done;
 				
 // fault handling 
 	IF fbMcHome.Error THEN 

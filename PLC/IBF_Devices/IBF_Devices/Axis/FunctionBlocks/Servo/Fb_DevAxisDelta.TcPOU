@@ -8,16 +8,93 @@ VAR
 		stMParMaxAcc : Udt_Parameter := (fMaximum := 999999, fMinimum := 0, fValue := 0)	; // Parameter for maximum acceleration
 		stMParMaxDec : Udt_Parameter := (fMaximum := 999999, fMinimum := 0, fValue := 0)	; // Parameter for maximum Deceleration
 		stMparMaxVelo: Udt_Parameter := (fMaximum := 999999, fMinimum := 0, fValue := 0)	; // Parameter for maximum velocity
+
+		
+	bResetCalibrationFlag : BOOL := TRUE; // When TRUE, the calibration bit (homing OK) will be reset. Set to TRUE on homing faults.
+	fbHomeResetCalibrationFlag:MC_Home;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[SUPER^();
+
+fbHomeResetCalibrationFlag(
+  Execute:=bResetCalibrationFlag,
+  HomingMode:=MC_ResetCalibration,
+  Axis:=AxisRef
+);
+bResetCalibrationFlag R= fbHomeResetCalibrationFlag.Done;
+
+IF bHomed AND (NOT AxisRef.NcToPlc.StateDWord.1) THEN
+	bHomed := FALSE;
+	bError					:= TRUE							;
+	stFault.Active 			:= TRUE 						;
+	stFault.Description		:= 'Axis no longer homed';
+	stFault.FaultType		:= E_FaultTypes.FF				;	
+END_IF
 ]]></ST>
     </Implementation>
     <Folder Name="Command Methods" Id="{6ff04a08-145f-0075-3081-8a253c264400}" />
     <Folder Name="Private" Id="{411a3c08-0cd0-0279-3d64-90e3acd48f7f}">
+      <Folder Name="Motion" Id="{6c2d68a6-87c9-02f7-38fa-57b088d1fb56}" />
       <Folder Name="Organization" Id="{3dbff440-0f61-0a96-00dd-248ac60e3867}" />
     </Folder>
+    <Method Name="CmdHome" Id="{c659379d-7a9a-0709-3350-5e8b08b834ec}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdHome : BOOL
+VAR_INPUT
+	fPosition 		: LREAL := 0 ; // Homing position
+END_VAR
+
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// set blocked command if halt is active 
+bBlockedCommand := fbMcHalt.Active ;
+
+// Enable drive 
+bExec_Home 		:= NOT bResetCalibrationFlag; 
+bInternalEnable	:= TRUE ;
+
+// copy parameters
+fbMcHome.Position 	:= fPosition 	;
+
+// Set feedback output
+CmdHome := fbMcHome.Done ;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CmdMoveAbs" Id="{a54c6e1a-38da-0009-0a84-54aa7056f5c4}" FolderPath="Command Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC CmdMoveAbs : BOOL
+VAR_INPUT
+	fPosition	:	LREAL 	; // target position
+	fVelocity	: 	LREAL 	; // Maximum velocity [units/sec]
+	mcBuffermode: 	MC_BufferMode ; // Buffermode defines how the previous command is executed.
+END_VAR
+VAR
+	bNewCommandReceived : BOOL ;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF (NOT AxisRef.NcToPlc.StateDWord.1) THEN
+	bError					:= TRUE							;
+	stFault.Active 			:= TRUE 						;
+	stFault.Description		:= 'Unable to execute move command, axis not homed';
+	stFault.FaultType		:= E_FaultTypes.FF				;	
+ELSE
+	CmdMoveAbs := SUPER^.CmdMoveAbs(fPosition := fPosition, fVelocity := fVelocity, mcBuffermode := mcBuffermode);
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecHome" Id="{46e109e7-8a56-0014-319d-132073728766}" FolderPath="Private\Motion\">
+      <Declaration><![CDATA[METHOD INTERNAL ExecHome : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.ExecHome();
+
+bResetCalibrationFlag S= fbMcHome.Error;
+
+]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="ExecReset" Id="{2608dc0b-c27b-03ab-2a5f-162cf169c209}" FolderPath="Private\Organization\">
       <Declaration><![CDATA[METHOD INTERNAL ExecReset : BOOL
 ]]></Declaration>
