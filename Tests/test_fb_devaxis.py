@@ -13,6 +13,7 @@ COLD_RESET = True
 class Tests(unittest.TestCase):
 
     PREFIX = "PRG_TEST_FB_DEVAXIS"
+    MOVING = f"{PREFIX}.fbDevAxis.AxisRef.Status.Moving"
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -45,7 +46,7 @@ class Tests(unittest.TestCase):
         self._init()
         conn.write_by_name(f"{self.PREFIX}.fbDevAxis.IAxisHome", True)
         conn.write_by_name(f"{self.PREFIX}.bCmdHome", True)
-        wait_cycles(100)
+        self.assertTrue(wait_value(self.MOVING, True, 1))
         conn.write_by_name(f"{self.PREFIX}.fbDevAxis.IAxisHome", False)
         self.assertTrue(wait_value(f"{self.PREFIX}.bCmdHome", False, 2))
 
@@ -58,20 +59,34 @@ class Tests(unittest.TestCase):
     def test_CmdHold_during_homing(self):
         self._init()
         conn.write_by_name(f"{self.PREFIX}.bCmdHome", True)
-        wait_cycles(100)
+        self.assertTrue(wait_value(self.MOVING, True, 1))
         conn.write_by_name(f"{self.PREFIX}.bCmdHold", True)
-        wait_cycles(100)
-        self.assertEqual(conn.read_by_name(f"{self.PREFIX}.fbDevAxis.fVelocity"), 0)
+        self.assertTrue(wait_value(self.MOVING, False, 1))
 
     def test_CmdHold_during_movement(self):
         self._home()
         conn.write_by_name(f"{self.PREFIX}.bCmdMoveAbs", True)
-        wait_cycles(50)
-        self.assertGreater(conn.read_by_name(f"{self.PREFIX}.fbDevAxis.fVelocity"), 0)
-        wait_cycles(50)
+        self.assertTrue(wait_value(self.MOVING, True, 1))
         conn.write_by_name(f"{self.PREFIX}.bCmdHold", True)
-        wait_cycles(100)
-        self.assertEqual(conn.read_by_name(f"{self.PREFIX}.fbDevAxis.fVelocity"), 0)
+        self.assertTrue(wait_value(self.MOVING, False, 1))
+
+    def test_CmdHalt_during_movement(self):
+        self._home()
+        conn.write_by_name(f"{self.PREFIX}.bCmdMoveAbs", True)
+        self.assertTrue(wait_value(self.MOVING, True, 1))
+        conn.write_by_name(f"{self.PREFIX}.bCmdHalt", True)
+        self.assertTrue(wait_value(self.MOVING, False, 1))
+
+    def test_invalid_setpoint(self):
+        self._home()
+        # act: move to invalid position (outside software limit switch)
+        conn.write_by_name(f"{self.PREFIX}.fPosition", 10000)
+        conn.write_by_name(f"{self.PREFIX}.bCmdMoveAbs", True)
+        wait_cycles(50)
+        self.assertTrue(wait_value(self.MOVING, False, 1))
+        # act: update to correct setpoint
+        conn.write_by_name(f"{self.PREFIX}.fPosition", 500)
+        self.assertTrue(wait_value(self.MOVING, True, 1))
 
 
 if __name__ == "__main__":

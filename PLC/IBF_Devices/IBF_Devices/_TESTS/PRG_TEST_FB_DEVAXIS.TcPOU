@@ -9,6 +9,7 @@ VAR
 	
 	// Setpoints
 	fVelocity : LREAL := 100;
+	fPosition : LREAL := 500; // NOTE: software limit switch is at 1000 (/Axes/Axis 1/Enc/ Parameters)
 
 	// Public commands
 	bInit : BOOL;
@@ -44,11 +45,11 @@ END_VAR
 	END_IF
 		
 	// Trigger commands
-	IF bCmdHalt THEN bCmdHalt R= fbDevAxis.CmdHalt(fDeceleration := 100, MC_BufferMode.MC_Aborting); END_IF
+	IF bCmdHalt THEN bCmdHalt R= fbDevAxis.CmdHalt(fDeceleration := 1000, MC_BufferMode.MC_Aborting); END_IF
 	IF bCmdHold THEN bCmdHold R= fbDevAxis.CmdHold(); END_IF
 	IF bCmdHome THEN bCmdHome R= fbDevAxis.CmdHome(fPosition := 0); END_IF
 	IF bCmdReset THEN bCmdReset R= fbDevAxis.CmdReset(); END_IF
-	IF bCmdMoveAbs THEN bCmdMoveAbs R= fbDevAxis.CmdMoveAbs(fPosition := 10000, fVelocity := fVelocity, MC_BufferMode.MC_Aborting); END_IF
+	IF bCmdMoveAbs THEN bCmdMoveAbs R= fbDevAxis.CmdMoveAbs(fPosition := fPosition, fVelocity := fVelocity, MC_BufferMode.MC_Aborting); END_IF
 END_IF
 
 ]]></ST>
