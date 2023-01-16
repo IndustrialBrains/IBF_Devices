@@ -2,6 +2,12 @@
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_ManualController" Id="{791f33e7-9b25-0d7d-213d-2739874fa7e2}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_ManualController
+VAR_INPUT
+	bBlockManualMode : BOOL; // Block (do not allow) manual mode 
+END_VAR
+VAR_OUTPUT
+	bActive : BOOL; // TRUE if manual control is active
+END_VAR
 VAR
 	stHMI				: UDT_HMI_ManualControl; // Link between FB and HMI
 	
@@ -11,13 +17,18 @@ VAR
 	fbNodevice			: FB_DevBase; // Dummy to make all pointers point to a valid device
 	stNoDevice			: UDT_DeviceID := (sName := 'No device', sType := TO_STRING(E_Devices.Undefined), pFunction := ADR(fbNodevice)); 
 
-	arDeviceArray		: ARRAY [0..GVL_DevManual.nMAXDEVCOUNT] OF UDT_DeviceID := [stNoDevice];
+	arDeviceArray		: ARRAY [0..100] OF UDT_DeviceID := [stNoDevice];
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[GVL_DevManual.bManualModeActive := stHMI.bEnabled AND GVL_DevManual.bAllowManualMode;
+      <ST><![CDATA[stHMI.bBlocked := bBlockManualMode;
+IF bBlockManualMode THEN
+	stHMI.bEnabled := FALSE;
+	stHMI.bReset := FALSE;
+END_IF
 
-IF GVL_DevManual.bManualModeActive THEN
+bActive := stHMI.bEnabled;
+IF bActive THEN
 	// NOTE: The device is responsibe for disabling the manual mode when CmdManual is no longer called
 	stHMI.refSelectedDevice.CmdManual();
 END_IF
@@ -81,6 +92,7 @@ END_VAR
 VAR
 	bDevAdded : BOOL ;
 	i : UDINT; // Iterator
+	nArraySize : UINT;
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -93,14 +105,14 @@ END_FOR
 
 // If device is not found add device to the list
 IF NOT bDevAdded THEN 
-	nNumberOfDevices := LIMIT(0, nNumberOfDevices + 1 ,GVL_DevManual.nMAXDEVCOUNT)	;
+	nArraySize := SIZEOF(arDeviceArray) / SIZEOF(arDeviceArray[0]);
+	nNumberOfDevices := LIMIT(0, nNumberOfDevices + 1, nArraySize);
 	arDeviceArray[nNumberOfDevices].sType 		:= TO_STRING(refToDevice.eDevType)	;
 	arDeviceArray[nNumberOfDevices].sName		:= refToDevice.stIdentity.sName	;
 	arDeviceArray[nNumberOfDevices].pFunction 	:= ADR(refToDevice)		;	
 	bDevAdded := TRUE ;
 END_IF
 
-GVL_DevManual.nGlobalNumberOfDevices := nNumberOfDevices ;
 CmdAddDevice := bDevAdded ; ]]></ST>
       </Implementation>
     </Method>

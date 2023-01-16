@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="GVL_Devices" Id="{f2d1b194-01a6-0e4d-04d9-21646c078137}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+	fbManualController : FB_ManualController;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

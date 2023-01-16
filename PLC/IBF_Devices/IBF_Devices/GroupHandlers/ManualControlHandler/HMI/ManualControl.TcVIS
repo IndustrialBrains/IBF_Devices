@@ -2695,7 +2695,7 @@
                     </o>
                     <o>
                       <v n="Id">1337389588L</v>
-                      <v n="Value">"FROM_STYLE"</v>
+                      <v n="Value">"NONE"</v>
                     </o>
                     <o>
                       <v n="Id">2678395525L</v>
@@ -2894,6 +2894,10 @@
                     <o>
                       <v n="Id">2597686782L</v>
                       <v n="Value">false</v>
+                    </o>
+                    <o>
+                      <v n="Id">2496894244L</v>
+                      <v n="Value">"NOT stHMI.bEnabled"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -3256,7 +3260,7 @@
                     <o>
                       <v n="Id">3234392039L</v>
                       <o n="Value" t="DataVariableInformation">
-                        <v n="DataArrayType">"ARRAY [0..GVL_DevManual.nMAXDEVCOUNT] OF UDT_DeviceID"</v>
+                        <v n="DataArrayType">"ARRAY [0..100] OF UDT_DeviceID"</v>
                         <v n="ColumnCount">3</v>
                         <v n="RowCount">101</v>
                         <v n="FirstColumnIndex">0</v>
@@ -3272,12 +3276,7 @@
                           <v>fbManualController.arDeviceArray[INDEX].pFunction^</v>
                         </a>
                         <v n="BaseType">false</v>
-                        <a n="Bounds" cet="ArrayBound">
-                          <o>
-                            <v n="Identifier">"GVL_DevManual.nMAXDEVCOUNT"</v>
-                            <v n="Value">100</v>
-                          </o>
-                        </a>
+                        <n n="Bounds" />
                         <v n="ArrayType" t="EArrayType">Invalid</v>
                       </o>
                     </o>
@@ -3591,6 +3590,10 @@
                       <v n="Value">""</v>
                     </o>
                     <o>
+                      <v n="Id">2496894244L</v>
+                      <v n="Value">"stHMI.bBlocked"</v>
+                    </o>
+                    <o>
                       <v n="Id">823443203L</v>
                       <v n="Value">"422"</v>
                     </o>
@@ -3647,16 +3650,18 @@
           <o n="GeneratedLMMDescriptions" t="GeneratedLanguageModelEntriesData">
             <o n="GeneratedVisuFbDescription" t="GenericFbDescription">
               <d n="FbMethods" t="CaseInsensitiveHashtable_1" ckt="String" cvt="Guid">
-                <v>GetUpdateRects</v>
-                <v>5fa99572-af1f-471a-8c07-dc05344b33b7</v>
+                <v>HasVisibilityAccess</v>
+                <v>742bd816-ccb2-4e22-b0a4-3b7921cde8e7</v>
                 <v>ContainsPoint</v>
                 <v>94f8fa9b-ae27-493c-96d2-c4a5eaaaa3d1</v>
-                <v>SetStaticState</v>
-                <v>ac4f8fc2-b9d6-4e22-be70-1a51bb790945</v>
+                <v>HasInputAccess</v>
+                <v>8bc116ac-ccf8-4fc1-8e48-40f73656cc9c</v>
                 <v>HasInputAccessIntern</v>
                 <v>17a63b1e-73ea-4b32-b343-a828fa2c5a99</v>
                 <v>GetTooltip</v>
                 <v>990b6e15-7788-4c40-922c-64301a07bc23</v>
+                <v>GetUpdateRects</v>
+                <v>5fa99572-af1f-471a-8c07-dc05344b33b7</v>
                 <v>GetNamespace</v>
                 <v>c23a0ce1-51c5-414b-9a23-ff1713bf19ad</v>
                 <v>GetTranslator</v>
@@ -3669,8 +3674,6 @@
                 <v>922c0aa2-1633-4e10-a70c-60090f26fc24</v>
                 <v>Paint</v>
                 <v>32988b3a-ba29-4d56-b5fd-825c3d8f2132</v>
-                <v>HasVisibilityAccess</v>
-                <v>742bd816-ccb2-4e22-b0a4-3b7921cde8e7</v>
                 <v>GetElementArray</v>
                 <v>7418ed7d-4839-46d7-b03d-f4afc68b4e76</v>
                 <v>SetVisuFlagsInternal</v>
@@ -3683,14 +3686,14 @@
                 <v>31567e20-6706-4a70-a81a-41b039ef4ed5</v>
                 <v>Initialize</v>
                 <v>68937b3f-0a61-48a3-9c60-835a3e40b142</v>
-                <v>HasInputAccess</v>
-                <v>8bc116ac-ccf8-4fc1-8e48-40f73656cc9c</v>
                 <v>HasVisibilityAccessIntern</v>
                 <v>628b6473-3638-46a0-9545-d9eec651ee3b</v>
                 <v>GetSurroundingRect</v>
                 <v>08149353-8483-4833-8938-a96ba10b0bf9</v>
                 <v>ElementInfo</v>
                 <v>4f3c24f2-bf92-4e44-bf2e-4fbf18ee4d3c</v>
+                <v>SetStaticState</v>
+                <v>ac4f8fc2-b9d6-4e22-be70-1a51bb790945</v>
                 <v>GetLocalUsergroup</v>
                 <v>0f0a32ce-cefd-4666-8a64-6c6f46b76aac</v>
                 <v>GetName</v>
@@ -3721,10 +3724,10 @@
               <d n="FbMethods" t="CaseInsensitiveHashtable_1" ckt="String" cvt="Guid">
                 <v>FB_Init</v>
                 <v>44e0d94d-1640-464b-b5bf-91355a8dd12d</v>
-                <v>FB_Reinit</v>
-                <v>af9a7ea5-2b76-4d85-a988-c89cb46c3f13</v>
                 <v>FB_Exit</v>
                 <v>e761871c-0bef-4cfe-b278-bbacc34b8426</v>
+                <v>FB_Reinit</v>
+                <v>af9a7ea5-2b76-4d85-a988-c89cb46c3f13</v>
               </d>
               <v n="FbName">"NotImportant"</v>
               <v n="FbGuid">{0ad81901-2562-4dba-bcfc-ea8ec20a606b}</v>
@@ -3824,7 +3827,6 @@
         </o>
       </Data>
       <TypeList>
-        <Type n="ArrayBound">{ef0fabca-c7d4-4f23-8350-10fa7b208ac1}</Type>
         <Type n="ArrayList">System.Collections.ArrayList</Type>
         <Type n="BackgroundSettings">{1038f12c-dd4b-4f96-87a3-a350fe8f3552}</Type>
         <Type n="BasicTypeNode">{f7e1e748-ea0f-4fcb-b563-94837ee17e8d}</Type>

@@ -7,6 +7,7 @@ STRUCT
 	nSelectedDevice		: UDINT; // Combo box index
 	bReset 				: BOOL;
 	bEnabled			: BOOL;	
+	bBlocked			: BOOL;
 
 	// References to all supported device types
 	pDevValve			: POINTER TO FB_DevValve;

@@ -40,6 +40,7 @@
     <Folder Include="GroupHandlers\ManualControlHandler\HMI" />
     <Folder Include="GroupHandlers\ManualControlHandler\HMI\DeviceScreens" />
     <Folder Include="GroupHandlers\ManualControlHandler\DataTypes" />
+    <Folder Include="GVL" />
     <Folder Include="_TESTS" />
     <Folder Include="Actuators\Cylinder\DataTypes\ManualControls" />
     <Folder Include="Axis" />
@@ -173,6 +174,10 @@
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
+    <Compile Include="GVL\GVL_Devices.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
     <Compile Include="PlcTask.TcTTO">
       <SubType>Code</SubType>
     </Compile>
@@ -268,10 +273,6 @@
     </Compile>
     <Compile Include="Encoders\FunctionBlocks\FB_EncoderInput.TcPOU">
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="GroupHandlers\GVL_DevManual.TcGVL">
-      <SubType>Code</SubType>
-      <LinkAlways>true</LinkAlways>
     </Compile>
     <Compile Include="GroupHandlers\ManualControlHandler\FB_ManualController.TcPOU">
       <SubType>Code</SubType>
