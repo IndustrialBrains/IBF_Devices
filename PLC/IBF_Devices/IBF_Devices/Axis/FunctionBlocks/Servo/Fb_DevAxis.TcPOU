@@ -999,12 +999,19 @@ END_VAR
 	bExec_Home 	:= FALSE ;
 	bHomed		S= fbMcHome.Done;
 				
-// fault handling 
-	IF fbMcHome.Error THEN 
+// fault handling
+// In manual mode, releasing the "Home" button before homing is finished
+// will immediately trigger a 19210 homing error, setting the system to Fault state.
+// Therefore, when in manual mode, the level of the error will be reduced to a warning.
+	IF fbMcHome.Error THEN
 		bError					:= TRUE							;
 		stFault.Active 			:= TRUE 						;
 		stFault.Description		:= CONCAT('Homing Fault ', UDINT_TO_STRING(fbMcHome.ErrorID));
-		stFault.FaultType		:= E_FaultTypes.FF				;
+		IF bManual THEN
+			stFault.FaultType		:= E_FaultTypes.OW				;
+		ELSE
+			stFault.FaultType		:= E_FaultTypes.FF				;
+		END_IF
 	END_IF
 ]]></ST>
       </Implementation>
