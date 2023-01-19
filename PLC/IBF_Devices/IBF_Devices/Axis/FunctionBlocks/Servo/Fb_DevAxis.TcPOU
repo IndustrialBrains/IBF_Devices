@@ -49,8 +49,6 @@ VAR // Axis configuration
 		bIcfModuloAxis		: BOOL := FALSE ; // Show axis position as modulo
 		bIcfSTOPresent		: BOOL := FALSE ; // Axis Safe torque off is present
 		bIcfNCHomeSensor	: BOOL := FALSE ; // Homing sensor is inverted (NC)	
-	// ===== Internal motion values ======
-		fHomePosition		: LREAL := 0 ; // set position at homing
 	// Command Modes
 		mcHomingMode 		: MC_HomingMode := MC_direct ; // Homing Mode ( MC_DefaultHoming, MC_Direct, MC_ForceCallibration, MC_ResetCallibration)
 	// Values from system
@@ -144,6 +142,7 @@ END_VAR
 VAR // Parameters 
 	ParAccManualScaling	: Udt_Parameter := (fValue := 50, fFactory := 50, bTeachable := FALSE)  ; // Acceleration scaling factor for manual functions 
 	ParDecManualScaling	: Udt_Parameter := (fValue := 50, fFactory := 50, bTeachable := FALSE)	; // Deceleration scaling factor for manual functions 
+	ParHomeOffset		: Udt_Parameter := (fValue := 0, fFactory := 0, bTeachable := FALSE)	; // Home position offset
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -172,10 +171,12 @@ bResetCalibrationFlag R= fbHomeResetCalibrationFlag.Done;
 
 IF bHomed AND (NOT AxisRef.NcToPlc.StateDWord.1) THEN
 	bHomed := FALSE;
-	bError					:= TRUE							;
-	stFault.Active 			:= TRUE 						;
-	stFault.Description		:= 'Axis no longer homed';
-	stFault.FaultType		:= E_FaultTypes.FF				;	
+	IF NOT bManual THEN // Ignore homing error when in manual mode
+		bError					:= TRUE							;
+		stFault.Active 			:= TRUE 						;
+		stFault.Description		:= 'Axis no longer homed';
+		stFault.FaultType		:= E_FaultTypes.FF				;	
+	END_IF
 END_IF
 ]]></ST>
     </Implementation>
@@ -384,9 +385,6 @@ CmdHold := fbMchalt.Active OR fbMcHalt.Done ;]]></ST>
     </Method>
     <Method Name="CmdHome" Id="{9156a5be-9684-4b33-891a-938949533f96}" FolderPath="Command Methods\">
       <Declaration><![CDATA[METHOD PUBLIC CmdHome : BOOL // start axis homing procedure
-VAR_INPUT
-	fPosition 		: LREAL := 0 ; // Homing position
-END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// set blocked command if halt is active 
@@ -397,7 +395,7 @@ bExec_Home 		:= NOT bResetCalibrationFlag;
 bInternalEnable	:= TRUE ;
 
 // copy parameters
-fbMcHome.Position 	:= fPosition 	;
+fbMcHome.Position 	:= ParHomeOffset.fValue;
 
 // Set feedback output
 CmdHome := fbMcHome.Done ;
@@ -497,7 +495,7 @@ ELSIF stManualCtrl.bCmdToPos THEN
 				fVelocity := stManualCtrl.fVelocity, 
 				mcBuffermode := MC_BufferMode.MC_Aborting);
 ELSIF stManualCtrl.bCmdHome THEN 
-	CmdHome( fPosition := 0);
+	CmdHome();
 ELSE 
 	CmdHalt( 	fDeceleration := fMaxDec * 0.9, 
 				mcBuffermode := MC_BufferMode.MC_Aborting) ; 
@@ -1423,7 +1421,6 @@ VAR_INPUT
 	bIcfNCHomeSensor	: BOOL := FALSE ; // Homing sensor is inverted (NC)	
 	// Config Values 
 	mcHomingMode 		: MC_HomingMode := MC_HomingMode.MC_DefaultHoming; 
-	fHomePosition		: LREAL := 0 	; // set position at homing
 	fSafeOverride		: LREAL := 10	; // Safe velocity override [%]
 	nEncTurnoverVal 	: LREAL := 360	; // encoder turnover value 
 	tEnableDelay		: time 	:= T#0MS; // Time between axis enable command and motion command execution (0 := no delay active)	
@@ -1499,7 +1496,6 @@ END_VAR]]></Declaration>
 		THIS^.bIcfNCHomeSensor		:= bIcfNCHomeSensor		; // Axis homing sensor is NC	
 	// ***** config homing Mode ***** 
  		THIS^.mcHomingMode 			:= mcHomingMode ; // set homing mode
-		THIS^.fHomePosition			:= fHomePosition;
 	// ***** Velocity settings *****
 		THIS^.fSafeOverride			:= fSafeOverride	; 	
 	// ***** Encoder values *****
@@ -1527,6 +1523,15 @@ END_VAR]]></Declaration>
 	ParDecManualScaling.sType			:= 'Mpar';
 	ParDecManualScaling.sUnit			:= '%';
 	refFbParHandler.CmdAddParameter( refParameter := ParAccManualScaling );
+
+	ParHomeOffset.fMinimum 		:= -1E7;
+	ParHomeOffset.fMaximum		:= 1E7;
+	ParHomeOffset.nNumber 		:= stIdentity.nLocationId + 3;
+	ParHomeOffset.sDiscription  := CONCAT( STR1 := stIdentity.sName, STR2 := ' home position offset');
+	ParHomeOffset.sName			:= CONCAT( STR1 := stIdentity.sName, STR2 := ' Home position offset');
+	ParHomeOffset.sType			:= 'Mpar';
+	ParHomeOffset.sUnit			:= 'unit';
+	refFbParHandler.CmdAddParameter( refParameter := ParHomeOffset );
 
 // ===== reset axis state indicators ======
 	bError 	:= FALSE;

@@ -36,7 +36,6 @@ END_VAR
 			bIcfSTOPresent		:= TRUE, 
 			bIcfNCHomeSensor	:= FALSE, 
 			mcHomingMode		:= MC_HomingMode.MC_DefaultHoming, 
-			fHomePosition		:= 0, 
 			fSafeOverride		:= 20, 
 			nEncTurnoverVal		:= 0,
 			tEnableDelay		:= T#0S, 
@@ -47,7 +46,7 @@ END_VAR
 	// Trigger commands
 	IF bCmdHalt THEN bCmdHalt R= fbDevAxis.CmdHalt(fDeceleration := 1000, MC_BufferMode.MC_Aborting); END_IF
 	IF bCmdHold THEN bCmdHold R= fbDevAxis.CmdHold(); END_IF
-	IF bCmdHome THEN bCmdHome R= fbDevAxis.CmdHome(fPosition := 0); END_IF
+	IF bCmdHome THEN bCmdHome R= fbDevAxis.CmdHome(); END_IF
 	IF bCmdReset THEN bCmdReset R= fbDevAxis.CmdReset(); END_IF
 	IF bCmdMoveAbs THEN bCmdMoveAbs R= fbDevAxis.CmdMoveAbs(fPosition := fPosition, fVelocity := fVelocity, MC_BufferMode.MC_Aborting); END_IF
 END_IF
