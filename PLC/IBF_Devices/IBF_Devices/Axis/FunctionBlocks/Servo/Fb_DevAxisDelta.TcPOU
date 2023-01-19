@@ -142,7 +142,7 @@ END_VAR
 	ParAccManualScaling.fMaximum		:= 100 	;
 	ParAccManualScaling.nNumber 		:= stIdentity.nLocationId + 1;
 	ParAccManualScaling.sDiscription  	:= CONCAT( STR1 := stIdentity.sName, STR2 := ' percentage of acceleration used for jogging');
-	ParAccManualScaling.sName			:= CONCAT( STR1 := stIdentity.sName, STR2 := 'Manual acc scaling');
+	ParAccManualScaling.sName			:= CONCAT( STR1 := stIdentity.sName, STR2 := ' Manual acc scaling');
 	ParAccManualScaling.sType			:= 'Mpar';
 	ParAccManualScaling.sUnit			:= '%';
 	refFbParHandler.CmdAddParameter( refParameter := ParAccManualScaling );
@@ -152,7 +152,7 @@ END_VAR
 	ParDecManualScaling.fMaximum		:= 100 	;
 	ParDecManualScaling.nNumber 		:= stIdentity.nLocationId + 2;
 	ParDecManualScaling.sDiscription  	:= CONCAT( STR1 := stIdentity.sName, STR2 := ' percentage of deceleration used for jogging');
-	ParDecManualScaling.sName			:= CONCAT( STR1 := stIdentity.sName, STR2 := 'Manual dec scaling');
+	ParDecManualScaling.sName			:= CONCAT( STR1 := stIdentity.sName, STR2 := ' Manual dec scaling');
 	ParDecManualScaling.sType			:= 'Mpar';
 	ParDecManualScaling.sUnit			:= '%';
 	refFbParHandler.CmdAddParameter( refParameter := ParAccManualScaling );

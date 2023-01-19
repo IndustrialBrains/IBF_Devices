@@ -138,19 +138,19 @@ END_VAR]]></Declaration>
 // ===== Write parameters =====
 	stMParMaxAcc.nNumber		:= stIdentity.nLocationId + 1;
 	stMParMaxAcc.sDiscription 	:= CONCAT(STR1 := stIdentity.sName, STR2:= ' hardware maximum acceleration (0 = HWMaximum)'); 
-	stMParMaxAcc.sName			:= CONCAT(STR1 := stIdentity.sName, STR2:= 'Hard max acceleration');
+	stMParMaxAcc.sName			:= CONCAT(STR1 := stIdentity.sName, STR2:= ' Hard max acceleration');
 	stMParMaxAcc.sType			:= 'MPar';
 	stMParMaxAcc.sUnit			:= 'unit/s^2';
 	
 	stMParMaxDec.nNumber		:= stIdentity.nLocationId + 2;
 	stMParMaxDec.sDiscription 	:= CONCAT(STR1 := stIdentity.sName, STR2:= ' hardware maximum deceleration(0 = HWMaximum)'); 
-	stMParMaxDec.sName			:= CONCAT(STR1 := stIdentity.sName, STR2:= 'Hard max deceleration');
+	stMParMaxDec.sName			:= CONCAT(STR1 := stIdentity.sName, STR2:= ' Hard max deceleration');
 	stMParMaxDec.sType			:= 'MPar';
 	stMParMaxDec.sUnit			:= 'unit/s^2';
 	
 	stMparMaxVelo.nNumber		:= stIdentity.nLocationId + 3;
 	stMparMaxVelo.sDiscription 	:= CONCAT(STR1 := stIdentity.sName, STR2:= ' hardware maximum velocity'); 
-	stMparMaxVelo.sName			:= CONCAT(STR1 := stIdentity.sName, STR2:= 'Hard max velocity');
+	stMparMaxVelo.sName			:= CONCAT(STR1 := stIdentity.sName, STR2:= ' Hard max velocity');
 	stMparMaxVelo.sType			:= 'MPar';
 	stMparMaxVelo.sUnit			:= 'Units/s';
 
