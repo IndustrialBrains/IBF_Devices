@@ -79,6 +79,8 @@ VAR	// =============== Motion status functions ================
 		fbMcReset 			: MC_Reset		;		// FB to reset axis
 		fbSoeReset			: FB_SoEReset	; 		// FB to reset axis hardware
 		fbMcHome			: MC_Home		;		// Fb to home Axis
+		fbHomeResetCalibrationFlag:MC_Home;			// Fb to clear calibration (homed) bit
+		bResetCalibrationFlag : BOOL := FALSE; // When TRUE, the calibration bit (homing OK) will be reset. Set to TRUE on homing faults.
 		fbMcStop 			: MC_Stop		;		// FB to stop axis
 		fbMcHalt			: MC_Halt		;		// FB to halt axis
 		fbMcJog				: MC_Jog		;		// FB to Jog axis
@@ -159,6 +161,22 @@ END_IF
 	CallOrganizationFunctions();
 // ==== execute motion functions =====
 	CallMotionFunctions();
+
+// ==== reset calibration ("homed") flag =====
+fbHomeResetCalibrationFlag(
+  Execute:=bResetCalibrationFlag,
+  HomingMode:=MC_ResetCalibration,
+  Axis:=AxisRef
+);
+bResetCalibrationFlag R= fbHomeResetCalibrationFlag.Done;
+
+IF bHomed AND (NOT AxisRef.NcToPlc.StateDWord.1) THEN
+	bHomed := FALSE;
+	bError					:= TRUE							;
+	stFault.Active 			:= TRUE 						;
+	stFault.Description		:= 'Axis no longer homed';
+	stFault.FaultType		:= E_FaultTypes.FF				;	
+END_IF
 ]]></ST>
     </Implementation>
     <Folder Name="Command Methods" Id="{e50539d8-81cc-4181-8633-d48ea6a3afe6}" />
@@ -374,8 +392,8 @@ END_VAR
         <ST><![CDATA[// set blocked command if halt is active 
 bBlockedCommand := fbMcHalt.Active ;
 
-// set command to true 
-bExec_Home 		:= TRUE	; 
+// Enable drive 
+bExec_Home 		:= NOT bResetCalibrationFlag; 
 bInternalEnable	:= TRUE ;
 
 // copy parameters
@@ -509,7 +527,15 @@ VAR
 	bNewCommandReceived : BOOL ;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// set blocked command if halt is active 
+        <ST><![CDATA[IF (NOT AxisRef.NcToPlc.StateDWord.1) THEN
+	bError					:= TRUE							;
+	stFault.Active 			:= TRUE 						;
+	stFault.Description		:= 'Unable to execute move command, axis not homed';
+	stFault.FaultType		:= E_FaultTypes.FF				;	
+	RETURN;
+END_IF
+
+// set blocked command if halt is active 
 bBlockedCommand := fbMcHalt.Active ;
 
 // Velocity conversion from RPM to deg/sec
@@ -1004,6 +1030,7 @@ END_VAR
 // will immediately trigger a 19210 homing error, setting the system to Fault state.
 // Therefore, when in manual mode, the level of the error will be reduced to a warning.
 	IF fbMcHome.Error THEN
+		bResetCalibrationFlag	:= TRUE;
 		bError					:= TRUE							;
 		stFault.Active 			:= TRUE 						;
 		stFault.Description		:= CONCAT('Homing Fault ', UDINT_TO_STRING(fbMcHome.ErrorID));
