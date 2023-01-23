@@ -6,7 +6,8 @@ FUNCTION_BLOCK PUBLIC Fb_DevCylWithFbk EXTENDS FB_DevValve
 VAR_INPUT
 	bIcfFbkOpenPresent 	: BOOL := FALSE ; // Feedback for cylinder open is present 
 	bIcfFbkClosedPresent: BOOL := FALSE ; // Feedback for Cylinder closed is present
-	bIcfTimeChecked		: BOOL := TRUE 	; // Cylinder timing is checked = default true
+	bIcfCheckTooSlow	: BOOL := TRUE 	; // Check if cylinder is moving too slow
+	bIcfCheckTooFast	: BOOL := TRUE 	; // Check if cylinder is moving too fast
 	nMargin				: LREAL:= 10	; // % of tollerance in move speed 
 END_VAR
 VAR_OUTPUT
@@ -30,18 +31,14 @@ VAR
 	fbSensorClosed	: Fb_DevDigitalInputFunctions ; // Digital sensor function closed detection
 	fbSensorOpen	: Fb_DevDigitalInputFunctions ; // Digital sensor function open detection
 	
-	fbTimerOpen		: TON ; // Timer for cylinder to open
-	fbTimerClose 	: TON ; // Timer for cylinder to close
-	fbTimerTeach	: TON ; // timer for teachin cylinder 
+	fbTimerOpen		: TON ; // Timer measuring cylinder open output has been active
+	fbTimerClose 	: TON ; // Timer measuring cylinder close output has been active
+	fbTimerTeach	: TON ; // Timer for teaching cylinder 
 
 	rtCmdWriteParam	: R_TRIG ; // Write parameter rising edge trigger 
 	// Simulation
 	fbTimerSimOpen 	: TON 	; 
 	fbTimerSimClose	: TON 	; 
-	
-	// Time Cylinder valid 
-	bTriggerTimeClose	: BOOL ;
-	bTriggerTimeOpen	: BOOL ;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -73,6 +70,12 @@ END_VAR
 // ====== Calculate timers =======
 	CalcTimers();
 
+// Reduce fault level when in manual mode
+IF bManual THEN
+	stFault.FaultType		:= E_FaultTypes.OW;
+ELSE
+	stFault.FaultType		:= E_FaultTypes.CF;
+END_IF
 ]]></ST>
     </Implementation>
     <Folder Name="Private" Id="{a3827919-0a79-428f-9a70-8c1e3fcbad7b}" />
@@ -192,12 +195,10 @@ END_VAR
  	IF q_Close AND fbSensorOpen.bReStatus AND NOT q_Open THEN
 		stFault.Active			:= TRUE ;
 		stFault.Description		:= 'Cylinder opening instead of closing';
-		stFault.FaultType		:= E_FaultTypes.CF 					;
 		bErrorActive			:= TRUE 								;
 	ELSIF q_Open AND fbSensorClosed.bReStatus AND NOT q_close THEN
 		stFault.Active			:= TRUE ;
 		stFault.Description		:= 'Cylinder closing instead of opening';
-		stFault.FaultType		:= E_FaultTypes.CF 					;
 		bErrorActive			:= TRUE 								;
 	END_IF
 
@@ -211,7 +212,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[{warning disable C0371}
-// ====== Call sensor Open function =======
+// ====== Call sensor close function =======
 	IF bIcfFbkClosedPresent THEN 
 		fbSensorClosed();
 		bFco_Closed := fbSensorClosed.bFcoInputActive ;
@@ -222,7 +223,7 @@ END_VAR
 		bFco_Closed := fbTOnClose.Q ;
 	END_IF
 
-// ====== Call sensor Close function =======
+// ====== Call sensor open function =======
 	IF bIcfFbkOpenPresent THEN 
 		fbSensorOpen() 	;
 		bFco_open 	:= fbSensorOpen.bFcoInputActive ;
@@ -239,90 +240,64 @@ END_VAR
       </Implementation>
     </Method>
     <Method Name="ExecTimeout" Id="{4c13fd3f-2cd5-4918-a271-53ad554a49b6}" FolderPath="Private\">
-      <Declaration><![CDATA[METHOD PRIVATE ExecTimeout : BOOL
-VAR_INPUT
-END_VAR
+      <Declaration><![CDATA[METHOD PRIVATE ExecTimeout
 VAR
-	nTimePassedMs : LREAL ;
+	bEnableCheck : BOOL;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF bFcoCalcDone AND bIcfTimeChecked AND bEnable THEN 
-// ====== Set triggers ======
-	IF q_Close  AND bFco_Open THEN 
-		bTriggerTimeClose := TRUE ;
-	ELSIF q_Open OR bFco_Closed  THEN 
-		bTriggerTimeClose := FALSE ;
-	END_IF
-
-	IF q_Open  AND bFco_Closed THEN 
-		bTriggerTimeOpen := TRUE ;
-	ELSIF q_Close OR bFco_Open THEN
-		bTriggerTimeOpen := FALSE ;
-	END_IF
-ELSE
-	bTriggerTimeClose 	:= FALSE ;
-	bTriggerTimeOpen	:= FALSE ;
-END_IF
-
-
-//======= run timers =======
-	IF bIcfFbkClosedPresent THEN 
-		fbTimerClose(IN := q_Close AND bEnable, PT := LREAL_TO_TIME(stTimesClose.Maximum + 10));
-	END_IF	
-	
-	IF bIcfFbkOpenPresent THEN 
-		fbTimerOpen	(IN := q_Open AND bEnable , PT := LREAL_TO_TIME(stTimesClose.Maximum + 10));
-	END_IF
+        <ST><![CDATA[bEnableCheck := (bManual OR bEnable) AND bFcoCalcDone;
 
 //====== Run timeout checks for cylinder close =======
-	nTimePassedMs:= TIME_TO_LREAL(fbTimerClose.ET);
-	
-	IF bIcfFbkClosedPresent THEN 
-		IF bTriggerTimeClose THEN 
-			IF fbSensorClosed.bReStatus THEN 
-				IF nTimePassedMs < stTimesClose.Minimal THEN 
-					// send message to HMI 
-					stFault.Active			:= TRUE 							;
-					stFault.Description		:= 'Cylinder closing too fast';
-					stFault.FaultType		:= E_FaultTypes.CF 					;
-					bErrorActive			:= TRUE 							;
-					bReCloseFast			:= TRUE                             ;
-				END_IF
-			ELSIF	nTimePassedMs > stTimesClose.Maximum  THEN
-				// send message to HMI 
-				stFault.Active			:= TRUE ;
-				stFault.Description		:= 'Cylinder closing too slow';
-				stFault.FaultType		:= E_FaultTypes.CF 						;
-				bErrorActive			:= TRUE 								;
-				bReCloseSlow			:= TRUE                             	;
-			END_IF
+IF bEnableCheck AND bIcfFbkClosedPresent THEN 
+	IF fbSensorClosed.bReStatus THEN 
+		IF bIcfCheckTooFast AND (TIME_TO_LREAL(fbTimerClose.ET) < stTimesClose.Minimal) THEN 
+			// send message to HMI 
+			stFault.Active			:= TRUE 							;
+			stFault.Description		:= 'Cylinder closing too fast';
+			bErrorActive			:= TRUE 							;
+			bReCloseFast			:= TRUE                             ;
 		END_IF
-	END_IF	
+	ELSIF bIcfCheckTooSlow AND fbTimerClose.Q THEN
+		// send message to HMI 
+		stFault.Active			:= TRUE ;
+		stFault.Description		:= 'Cylinder closing too slow';
+		bErrorActive			:= TRUE 								;
+		bReCloseSlow			:= TRUE                             	;
+	END_IF
+END_IF	
 
 //====== Run timeout checks for cylinder Open =======
-	nTimePassedMs:= TIME_TO_REAL(fbTimerOpen.ET);
-
-	IF bIcfFbkOpenPresent THEN 
-		IF bTriggerTimeOpen THEN 
-			IF fbSensorOpen.bReStatus THEN 
-				IF nTimePassedMs < stTimesOpen.Minimal THEN 
-					// send message to HMI 
-					stFault.Active			:= TRUE ;
-					stFault.Description		:= 'Cylinder opening too fast';
-					stFault.FaultType		:= E_FaultTypes.CF 					;
-					bErrorActive			:= TRUE 							;
-					bReOpenFast 			:= TRUE 							;
-				END_IF
-			ELSIF	nTimePassedMs > stTimesOpen.Maximum  THEN
-				// send message to HMI 
-				stFault.Active			:= TRUE ;
-				stFault.Description		:= 'Cylinder opening to slow';
-				stFault.FaultType		:= E_FaultTypes.CF 					;
-				bErrorActive			:= TRUE 							;
-				bReOpenSlow 			:= TRUE 							;
-			END_IF
+IF bEnableCheck AND bIcfFbkOpenPresent THEN 
+	IF fbSensorOpen.bReStatus THEN
+		IF bIcfCheckTooFast AND (TIME_TO_REAL(fbTimerOpen.ET) < stTimesOpen.Minimal) THEN 
+			// send message to HMI 
+			stFault.Active			:= TRUE ;
+			stFault.Description		:= 'Cylinder opening too fast';
+			bErrorActive			:= TRUE 							;
+			bReOpenFast 			:= TRUE 							;
 		END_IF
-	END_IF	
+	ELSIF bIcfCheckTooSlow AND fbTimerOpen.Q THEN
+		// send message to HMI 
+		stFault.Active			:= TRUE ;
+		stFault.Description		:= 'Cylinder opening to slow';
+		bErrorActive			:= TRUE 							;
+		bReOpenSlow 			:= TRUE 							;
+	END_IF
+END_IF	
+
+//======= run timers =======
+fbTimerClose(
+	IN := bEnableCheck 
+		AND q_Close
+		AND	(NOT fbSensorClosed.bFcoInputActive),
+	PT := LREAL_TO_TIME(stTimesClose.Maximum)
+);
+fbTimerOpen(
+	IN := bEnableCheck
+		AND q_Open
+		AND (NOT fbSensorOpen.bFcoInputActive),
+	PT := LREAL_TO_TIME(stTimesOpen.Maximum)
+);
 ]]></ST>
       </Implementation>
     </Method>

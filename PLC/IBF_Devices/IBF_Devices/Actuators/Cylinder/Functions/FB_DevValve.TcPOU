@@ -54,7 +54,7 @@ END_IF
 
 // ===== collect feedback ======
 	ExecSetFeedback();
-	
+
 ]]></ST>
     </Implementation>
     <Folder Name="Private" Id="{2dd80cd9-fe6b-4d89-aae3-48132b1585a9}" />
@@ -99,7 +99,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// Enable manual commands
-bCmdManual S= TRUE ;
+SUPER^.CmdManual();
 
 // execute manual command 
 	IF stManualCtrl.bCmdOpen THEN 
@@ -110,9 +110,6 @@ bCmdManual S= TRUE ;
 		bCmdOpen 	:= FALSE;
 	ELSIF stManualCtrl.bCmdTeach THEN
 		CmdTeach ();
-	ELSE
-		bCmdClose 	:= FALSE;		
-		bCmdOpen 	:= FALSE;
 	END_IF
 ]]></ST>
       </Implementation>
