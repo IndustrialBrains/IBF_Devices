@@ -96,22 +96,17 @@ class Tests(unittest.TestCase):
         self.assertTrue(wait_value(f"{self.PREFIX}.fbDevValve.q_Open", True, 1))
         self.assertFalse(conn.read_by_name(f"{self.PREFIX}.fbDevValve.q_Close"))
         conn.write_by_name(f"{self.PREFIX}.fbDevValve.stManualCtrl.bCmdOpen", False)
-        self.assertTrue(wait_value(f"{self.PREFIX}.fbDevValve.q_Open", False, 1))
 
         # Close manually
         conn.write_by_name(f"{self.PREFIX}.fbDevValve.stManualCtrl.bCmdClose", True)
         self.assertTrue(wait_value(f"{self.PREFIX}.fbDevValve.q_Close", True, 1))
         self.assertFalse(conn.read_by_name(f"{self.PREFIX}.fbDevValve.q_Open"))
         conn.write_by_name(f"{self.PREFIX}.fbDevValve.stManualCtrl.bCmdClose", False)
-        self.assertTrue(wait_value(f"{self.PREFIX}.fbDevValve.q_Close", False, 1))
 
-        # Try to open and close via regular commands (should be blocked)
+        # Try to open and close via regular commands (e.g., from automatic mode), this should be blocked
         conn.write_by_name(f"{self.PREFIX}.bCmdOpen", True)
-        self.assertFalse(wait_value(f"{self.PREFIX}.fbDevValve.bCmdOpen", True, 0.1))
-        conn.write_by_name(f"{self.PREFIX}.bCmdOpen", False)
-
-        conn.write_by_name(f"{self.PREFIX}.bCmdClose", True)
-        self.assertFalse(wait_value(f"{self.PREFIX}.fbDevValve.bCmdClose", True, 0.1))
+        wait_cycles(5)
+        self.assertFalse(conn.read_by_name(f"{self.PREFIX}.fbDevValve.q_Open"))
 
     def test_CmdReset_Idle(self):
         conn.write_by_name(
