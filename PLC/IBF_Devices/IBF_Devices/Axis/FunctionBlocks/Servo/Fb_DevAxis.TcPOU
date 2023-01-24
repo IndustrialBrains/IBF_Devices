@@ -118,7 +118,6 @@ VAR	// =============== Motion status functions ================
 
 	// ===== Move ristrictions ======
 		bCmdLimitVelocity 	: BOOL := FALSE			; // velocity limiting is active 
-		bCmdManualAccDec	: BOOL := FALSE			; // Activate manual acceleration and deceleration settings
 		fCmdVelocityLimit	: LREAL:= 100			; // Maximum velocity limit when velocity limiting is active  
 		fSafeOverride		: LREAL:= 10 			; // [%] Safe velocity override  
 		
@@ -140,8 +139,6 @@ VAR
 	// ===== Par write timer ===== 
 END_VAR
 VAR // Parameters 
-	ParAccManualScaling	: Udt_Parameter := (fValue := 50, fFactory := 50, bTeachable := FALSE)  ; // Acceleration scaling factor for manual functions 
-	ParDecManualScaling	: Udt_Parameter := (fValue := 50, fFactory := 50, bTeachable := FALSE)	; // Deceleration scaling factor for manual functions 
 	ParHomeOffset		: Udt_Parameter := (fValue := 0, fFactory := 0, bTeachable := FALSE)	; // Home position offset
 END_VAR
 ]]></Declaration>
@@ -195,14 +192,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ===== Set acceleratio and deceleration values =======
-	IF bCmdManualAccDec THEN 
-		fAcceleration 		:= fCmdAcc * (ParAccManualScaling.fvalue / 100);
-		fDeceleration		:= fCmdDec* (ParDecManualScaling.fValue / 100);
-		bCmdManualAccDec 	:= FALSE;
-	END_IF
-
-// ===== block all other commands if axis is coupled =====
+        <ST><![CDATA[// ===== block all other commands if axis is coupled =====
 	IF NOT AxisRef.Status.Coupled THEN 
 	// ===== Homing functions =====
 		ExecHome		(); 
@@ -505,17 +495,6 @@ ELSE
 				mcBuffermode := MC_BufferMode.MC_Aborting) ; 
 END_IF
 ]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="CmdManualAccDec" Id="{f1ec39c9-6e7f-0d08-2c32-3eb4d63235b8}" FolderPath="Command Methods\">
-      <Declaration><![CDATA[METHOD PUBLIC CmdManualAccDec : BOOL
-VAR_INPUT
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[bCmdManualAccDec := TRUE;
-
-CmdManualAccDec := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdMoveAbs" Id="{897ddefe-6fd9-4aa0-8e52-b781b66bb019}" FolderPath="Command Methods\">
@@ -1509,31 +1488,12 @@ END_VAR]]></Declaration>
 		THIS^.tDisableDelay 	:= tDisabledelay ;		
 		
 // ===== configure parameters =====
-	ParAccManualScaling.fMinimum 		:= 1 	;
-	ParAccManualScaling.fMaximum		:= 100 	;
-	ParAccManualScaling.nNumber 		:= stIdentity.nLocationId + 1;
-	ParAccManualScaling.sDiscription  	:= CONCAT( STR1 := stIdentity.sName, STR2 := ' percentage of acceleration used for jogging');
-	ParAccManualScaling.sName			:= CONCAT( STR1 := stIdentity.sName, STR2 := ' Manual acc scaling');
-	ParAccManualScaling.sType			:= 'Mpar';
-	ParAccManualScaling.sUnit			:= '%';
-	refFbParHandler.CmdAddParameter( refParameter := ParAccManualScaling );
-
-	
-	ParDecManualScaling.fMinimum 		:= 1 	;
-	ParDecManualScaling.fMaximum		:= 100 	;
-	ParDecManualScaling.nNumber 		:= stIdentity.nLocationId + 2;
-	ParDecManualScaling.sDiscription  	:= CONCAT( STR1 := stIdentity.sName, STR2 := ' percentage of deceleration used for jogging');
-	ParDecManualScaling.sName			:= CONCAT( STR1 := stIdentity.sName, STR2 := ' Manual dec scaling');
-	ParDecManualScaling.sType			:= 'Mpar';
-	ParDecManualScaling.sUnit			:= '%';
-	refFbParHandler.CmdAddParameter( refParameter := ParAccManualScaling );
-
 	ParHomeOffset.fMinimum 		:= -1E7;
 	ParHomeOffset.fMaximum		:= 1E7;
-	ParHomeOffset.nNumber 		:= stIdentity.nLocationId + 3;
+	ParHomeOffset.nNumber 		:= stIdentity.nLocationId + 1;
 	ParHomeOffset.sDiscription  := CONCAT( STR1 := stIdentity.sName, STR2 := ' home position offset');
 	ParHomeOffset.sName			:= CONCAT( STR1 := stIdentity.sName, STR2 := ' Home position offset');
-	ParHomeOffset.sType			:= 'Mpar';
+	ParHomeOffset.sType			:= 'Cpar';
 	ParHomeOffset.sUnit			:= 'unit';
 	refFbParHandler.CmdAddParameter( refParameter := ParHomeOffset );
 

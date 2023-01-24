@@ -3,12 +3,6 @@
   <POU Name="Fb_DevAxisDelta" Id="{63a8c96e-3fc0-001c-2116-24486a7558ba}" SpecialFunc="None">
     <Declaration><![CDATA[// Delta ASDA-A2 servo
 FUNCTION_BLOCK Fb_DevAxisDelta EXTENDS Fb_DevAxis
-VAR
-	// Parameters 
-		stMParMaxAcc : Udt_Parameter := (fMaximum := 999999, fMinimum := 0, fValue := 0)	; // Parameter for maximum acceleration
-		stMParMaxDec : Udt_Parameter := (fMaximum := 999999, fMinimum := 0, fValue := 0)	; // Parameter for maximum Deceleration
-		stMparMaxVelo: Udt_Parameter := (fMaximum := 999999, fMinimum := 0, fValue := 0)	; // Parameter for maximum velocity
-END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[SUPER^();
@@ -85,14 +79,6 @@ END_VAR
 // ====== Set manual device type ======
 	eDevType := E_Devices.Axis ;	
 	
-// ===== set axis configuration =====	
-	fMaxAcc	:= stMParMaxAcc.fValue;
-	fMaxDec	:= stMParMaxDec.fValue;	
-	fMaxVelo:= stMparMaxVelo.fValue;
-
-	fCmdAcc 		:= fMaxAcc;
-	fCmdDecc		:= fMaxDec;
-
 // ===== Configure Axis =====
 	// ***** Config Bits *****
 		THIS^.bIcfCmdVelocityRpm	:= bIcfCmdVelocityRpm	; // Enable speed inputs in Rpm
@@ -113,57 +99,12 @@ END_VAR
 		THIS^.tDisableDelay 	:= tDisabledelay ;		
 		
 // ===== configure parameters =====
-
-	stMParMaxAcc.fMinimum 		:= 0 	;
-	stMParMaxAcc.nNumber		:= stIdentity.nLocationId + 1;
-	stMParMaxAcc.sDiscription 	:= CONCAT(STR1 := stIdentity.sName, STR2:= ' hardware maximum acceleration (0 = HWMaximum)'); 
-	stMParMaxAcc.sName			:= CONCAT(STR1 := stIdentity.sName, STR2:= ' Hard max acceleration');
-	stMParMaxAcc.sType			:= 'MPar';
-	stMParMaxAcc.sUnit			:= 'unit/s^2';
-	refFbParHandler.CmdAddParameter(refParameter := stMParMaxAcc);
-	
-	stMParMaxDec.fMinimum 		:= 0 	;
-	stMParMaxDec.nNumber		:= stIdentity.nLocationId + 2;
-	stMParMaxDec.sDiscription 	:= CONCAT(STR1 := stIdentity.sName, STR2:= ' hardware maximum deceleration (0 = HWMaximum)'); 
-	stMParMaxDec.sName			:= CONCAT(STR1 := stIdentity.sName, STR2:= ' Hard max deceleration');
-	stMParMaxDec.sType			:= 'MPar';
-	stMParMaxDec.sUnit			:= 'unit/s^2';
-	refFbParHandler.CmdAddParameter(refParameter := stMParMaxDec);
-	
-	stMparMaxVelo.fMinimum 		:= 0 	;
-	stMparMaxVelo.nNumber		:= stIdentity.nLocationId + 3;
-	stMparMaxVelo.sDiscription 	:= CONCAT(STR1 := stIdentity.sName, STR2:= ' hardware maximum velocity'); 
-	stMparMaxVelo.sName			:= CONCAT(STR1 := stIdentity.sName, STR2:= ' Hard max velocity');
-	stMparMaxVelo.sType			:= 'MPar';
-	stMparMaxVelo.sUnit			:= 'Units/s';
-	refFbParHandler.CmdAddParameter(refParameter := stMparMaxVelo);
-
-
-	ParAccManualScaling.fMinimum 		:= 1 	;
-	ParAccManualScaling.fMaximum		:= 100 	;
-	ParAccManualScaling.nNumber 		:= stIdentity.nLocationId + 4;
-	ParAccManualScaling.sDiscription  	:= CONCAT( STR1 := stIdentity.sName, STR2 := ' percentage of acceleration used for jogging');
-	ParAccManualScaling.sName			:= CONCAT( STR1 := stIdentity.sName, STR2 := ' Manual acc scaling');
-	ParAccManualScaling.sType			:= 'Mpar';
-	ParAccManualScaling.sUnit			:= '%';
-	refFbParHandler.CmdAddParameter( refParameter := ParAccManualScaling );
-
-	
-	ParDecManualScaling.fMinimum 		:= 1 	;
-	ParDecManualScaling.fMaximum		:= 100 	;
-	ParDecManualScaling.nNumber 		:= stIdentity.nLocationId + 5;
-	ParDecManualScaling.sDiscription  	:= CONCAT( STR1 := stIdentity.sName, STR2 := ' percentage of deceleration used for jogging');
-	ParDecManualScaling.sName			:= CONCAT( STR1 := stIdentity.sName, STR2 := ' Manual dec scaling');
-	ParDecManualScaling.sType			:= 'Mpar';
-	ParDecManualScaling.sUnit			:= '%';
-	refFbParHandler.CmdAddParameter( refParameter := ParAccManualScaling );
-
 	ParHomeOffset.fMinimum 		:= -1E7;
 	ParHomeOffset.fMaximum		:= 1E7;
-	ParHomeOffset.nNumber 		:= stIdentity.nLocationId + 6;
+	ParHomeOffset.nNumber 		:= stIdentity.nLocationId + 1;
 	ParHomeOffset.sDiscription  := CONCAT( STR1 := stIdentity.sName, STR2 := ' home position offset');
 	ParHomeOffset.sName			:= CONCAT( STR1 := stIdentity.sName, STR2 := ' Home position offset');
-	ParHomeOffset.sType			:= 'Mpar';
+	ParHomeOffset.sType			:= 'Cpar';
 	ParHomeOffset.sUnit			:= 'unit';
 	refFbParHandler.CmdAddParameter( refParameter := ParHomeOffset );
 
