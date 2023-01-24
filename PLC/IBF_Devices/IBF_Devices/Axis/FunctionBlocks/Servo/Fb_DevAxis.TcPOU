@@ -6,7 +6,7 @@ FUNCTION_BLOCK PUBLIC Fb_DevAxis EXTENDS FB_DevBase
 VAR_INPUT
 	// ===== General Function input =====
 		fCmdAcc			: LREAL := 15000;
-		fCmdDecc		: LREAL := 15000; 
+		fCmdDec			: LREAL := 15000; 
 	// ===== Master Axis =====
 		refMasterAxis	: REFERENCE TO AXIS_REF ; // Master axis reference (if applicable)
 		bReverseSlave	: BOOL 	:= FALSE; // Reverse slave axis relative to master
@@ -169,7 +169,11 @@ fbHomeResetCalibrationFlag(
 );
 bResetCalibrationFlag R= fbHomeResetCalibrationFlag.Done;
 
-IF bHomed AND (NOT AxisRef.NcToPlc.StateDWord.1) THEN
+
+IF bHomed 
+	AND (AxisRef.DriveAddress.NetID <> '') // Check if drive is still homed
+	AND (NOT AxisRef.NcToPlc.StateDWord.1) // Skip this if the drive is not connected (e.g., during automated tests of an axis with disabled hardware) 
+THEN 
 	bHomed := FALSE;
 	IF NOT bManual THEN // Ignore homing error when in manual mode
 		bError					:= TRUE							;
@@ -194,7 +198,7 @@ END_VAR
         <ST><![CDATA[// ===== Set acceleratio and deceleration values =======
 	IF bCmdManualAccDec THEN 
 		fAcceleration 		:= fCmdAcc * (ParAccManualScaling.fvalue / 100);
-		fDeceleration		:= fCmdDecc* (ParDecManualScaling.fValue / 100);
+		fDeceleration		:= fCmdDec* (ParDecManualScaling.fValue / 100);
 		bCmdManualAccDec 	:= FALSE;
 	END_IF
 
@@ -227,7 +231,7 @@ END_VAR
 
 // ====== Reset acceleration deceleration values ======
 	fAcceleration	:= fCmdAcc;
-	fDeceleration	:= fCmdDecc;
+	fDeceleration	:= fCmdDec;
 	
 // ====== Check for command changes =====
 // Can be used to re-trigger movement
@@ -721,7 +725,7 @@ bBlockedCommand := fbMcHalt.Active ;
 		xbNewCmdVelocity := fbMcMoveVelocity.Velocity <> fVelocity OR NOT fbMcMoveVelocity.Active ;
 	ELSE
 		bExec_Halt := TRUE;
-		fbMcHalt.Deceleration	:= fCmdDecc;
+		fbMcHalt.Deceleration	:= fCmdDec;
 		fbMcHalt.BufferMode		:= mcBuffermode	;
 	END_IF
 	
@@ -1476,7 +1480,7 @@ END_VAR]]></Declaration>
 	AND fMaxDec >0 THEN 
 		bActParamValid	:= TRUE ; 
 		fCmdAcc 		:= fMaxAcc * 0.9;
-		fCmdDecc		:= fMaxDec * 0.9;
+		fCmdDec		:= fMaxDec * 0.9;
 	END_IF
 
 	IF NOT Cmd_EnDriveParRead AND NOT bActParamValid THEN  

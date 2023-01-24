@@ -316,12 +316,12 @@ END_VAR
         <ST><![CDATA[bFcoCalcDone := FALSE;
 
 // Enable sensor feedback
-fbSensorClosed.bEmbeded := TRUE ;
+fbSensorClosed.bEmbedded := TRUE ;
 fbSensorClosed.bEnable	:= TRUE ;
 fbSensorClosed.Init	(	nId 		:= 0,
 						nParentId 	:= stIdentity.nLocationId) ;
 
-fbSensorOpen.bEmbeded := TRUE ;
+fbSensorOpen.bEmbedded := TRUE ;
 fbSensorOpen.bEnable	:= TRUE ;
 fbSensorOpen.Init	(	nId 		:= 1,
 						nParentId 	:= stIdentity.nLocationId) ;

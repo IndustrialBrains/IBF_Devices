@@ -163,7 +163,7 @@ END_VAR]]></Declaration>
 	fMaxVelo:= stMparMaxVelo.fValue;
 
 	fCmdAcc 		:= fMaxAcc;
-	fCmdDecc		:= fMaxDec;
+	fCmdDec		:= fMaxDec;
 // ===== Configure Axis =====
 	// ***** Config Bits *****
 		THIS^.bIcfCmdVelocityRpm	:= bIcfCmdVelocityRpm	; // Enable speed inputs in Rpm
