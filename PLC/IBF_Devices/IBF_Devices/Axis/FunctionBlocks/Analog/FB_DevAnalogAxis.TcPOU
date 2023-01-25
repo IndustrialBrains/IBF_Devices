@@ -29,7 +29,7 @@ END_VAR]]></Declaration>
       <ST><![CDATA[SUPER^();
 
 // ===== Check inputs =====
-	fbiEnabled( bEmbeded	:= TRUE);
+	fbiEnabled( bEmbedded	:= TRUE);
 
 IF bInitOk THEN 
 	ExecSetOutputs() ;
@@ -131,19 +131,19 @@ ELSE
 END_IF 
 
 // ====== Set outputs =======
-	fbVelocity	(	bEmbeded 	:= TRUE,
+	fbVelocity	(	bEmbedded 	:= TRUE,
 					bEnable		:= bInternalEnable,
 					fCmdValue	:= fCmdVelocity);
 				
-	fbqRun		(	bEmbeded 	:= TRUE,
+	fbqRun		(	bEmbedded 	:= TRUE,
 					bEnable		:= bInternalEnable,
 					bCmdOn		:= bCmdRunCW OR bCmdRunCCW);
 				
-	fbqReverse	(	bEmbeded 	:= TRUE,
+	fbqReverse	(	bEmbedded 	:= TRUE,
 					bEnable		:= bInternalEnable,
 					bCmdOn		:= bCmdRunCCW);
 
-	fbqReset	(	bEmbeded 	:= TRUE,
+	fbqReset	(	bEmbedded 	:= TRUE,
 					bEnable		:= bInternalEnable,
 					bCmdOn		:= bCmdReset);
 

@@ -1493,7 +1493,7 @@ END_VAR]]></Declaration>
 	ParHomeOffset.nNumber 		:= stIdentity.nLocationId + 1;
 	ParHomeOffset.sDiscription  := CONCAT( STR1 := stIdentity.sName, STR2 := ' home position offset');
 	ParHomeOffset.sName			:= CONCAT( STR1 := stIdentity.sName, STR2 := ' Home position offset');
-	ParHomeOffset.sType			:= 'Cpar';
+	ParHomeOffset.sType			:= 'MPar';
 	ParHomeOffset.sUnit			:= 'unit';
 	refFbParHandler.CmdAddParameter( refParameter := ParHomeOffset );
 
