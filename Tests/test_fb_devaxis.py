@@ -13,7 +13,7 @@ COLD_RESET = True
 class Tests(unittest.TestCase):
 
     PREFIX = "PRG_TEST_FB_DEVAXIS"
-    MOVING = f"{PREFIX}.fbDevAxis.AxisRef.Status.Moving"
+    AXIS_STATUS = f"{PREFIX}.fbDevAxis.AxisRef.Status"
     VALID_POS_SETPOINT = 500
     INVALID_POS_SETPOINT = 10000  # outside software limit switch
 
@@ -33,7 +33,10 @@ class Tests(unittest.TestCase):
         return super().setUp()
 
     def _assert_moving(self, status):
-        self.assertTrue(wait_value(self.MOVING, status, 2))
+        if status:
+            self.assertTrue(wait_value(f"{self.AXIS_STATUS}.Moving", True, 2))
+        else:
+            self.assertTrue(wait_value(f"{self.AXIS_STATUS}.NotMoving", True, 2))
 
     def _assert_error(self, status):
         self.assertTrue(conn.read_by_name(f"{self.PREFIX}.fbDevAxis.bError") == status)
@@ -99,6 +102,26 @@ class Tests(unittest.TestCase):
         conn.write_by_name(f"{self.PREFIX}.fPosition", self.INVALID_POS_SETPOINT)
         conn.write_by_name(f"{self.PREFIX}.bCmdMoveAbs", True)
         self.assertTrue(wait_value(f"{self.PREFIX}.fbDevAxis.bError", True, 1))
+
+    def test_CmdReset(self):
+        # trigger an error by calling CmdMoveAbs with an invalid setpoint
+
+        # TODO: remove
+        conn.write_by_name(f"{self.PREFIX}.fVelocity", 0.01)
+
+        self._home()
+        conn.write_by_name(f"{self.PREFIX}.fPosition", self.INVALID_POS_SETPOINT)
+        conn.write_by_name(f"{self.PREFIX}.bCmdMoveAbs", True)
+        self.assertTrue(wait_value(f"{self.PREFIX}.fbDevAxis.bError", True, 1))
+
+        # axis should not continue moving until reset is triggered
+        conn.write_by_name(f"{self.PREFIX}.fPosition", self.VALID_POS_SETPOINT)
+        self._assert_moving(False)
+
+        # now reset; motion will resume immediately (MoveAbs command is still in the buffer))
+        conn.write_by_name(f"{self.PREFIX}.bCmdReset", True)
+        self.assertTrue(wait_value(f"{self.PREFIX}.bCmdReset", False, 1))
+        self._assert_moving(True)
 
 
 if __name__ == "__main__":

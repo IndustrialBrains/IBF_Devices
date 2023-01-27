@@ -257,6 +257,13 @@ END_VAR
 		stFault.FaultType		:= E_FaultTypes.FF				;
 	END_IF
 
+// check if error is active
+	IF bError THEN
+		stFault.Active 			:= TRUE 						;
+		stFault.Description		:= 'Call to CmdGearDynamic while axis has an error';
+		stFault.FaultType		:= E_FaultTypes.OW				;	
+		RETURN;
+	END_IF
 
 // set blocked command if halt is active 
 	bBlockedCommand 		:= fbMcHalt.Active ;
@@ -293,6 +300,14 @@ END_VAR
 		stFault.FaultType		:= E_FaultTypes.FF				;
 	END_IF
 
+// check if error is active
+	IF bError THEN
+		stFault.Active 			:= TRUE 						;
+		stFault.Description		:= 'Call to CmdGearIn while axis has an error';
+		stFault.FaultType		:= E_FaultTypes.OW				;	
+		RETURN;
+	END_IF
+
 // set blocked command if halt is active 
 	bBlockedCommand := fbMcHalt.Active ;
 
@@ -324,6 +339,14 @@ END_VAR
 		stFault.Active 			:= TRUE 						;
 		stFault.Description		:= CONCAT('Axis master not found ', UDINT_TO_STRING(fbMcHalt.ErrorID));
 		stFault.FaultType		:= E_FaultTypes.FF				;
+	END_IF
+
+// check if error is active
+	IF bError THEN
+		stFault.Active 			:= TRUE 						;
+		stFault.Description		:= 'Call to CmdGearOut while axis has an error';
+		stFault.FaultType		:= E_FaultTypes.OW				;	
+		RETURN;
 	END_IF
 
 // set blocked command if halt is active 
@@ -383,6 +406,14 @@ CmdHold := fbMchalt.Active OR fbMcHalt.Done ;]]></ST>
         <ST><![CDATA[// set blocked command if halt is active 
 bBlockedCommand := fbMcHalt.Active ;
 
+// check if error is active
+	IF bError THEN
+		stFault.Active 			:= TRUE 						;
+		stFault.Description		:= 'Call to CmdHome while axis has an error';
+		stFault.FaultType		:= E_FaultTypes.OW				;	
+		RETURN;
+	END_IF
+
 // Enable drive 
 bExec_Home 		:= NOT bResetCalibrationFlag; 
 bInternalEnable	:= TRUE ;
@@ -407,6 +438,14 @@ END_VAR
       <Implementation>
         <ST><![CDATA[// set blocked command if halt is active 
 bBlockedCommand := fbMcHalt.Active ;
+
+// check if error is active
+	IF bError THEN
+		stFault.Active 			:= TRUE 						;
+		stFault.Description		:= 'Call to CmdJog while axis has an error';
+		stFault.FaultType		:= E_FaultTypes.OW				;	
+		RETURN;
+	END_IF
 
 // Velocity conversion from RPM to deg/sec
 	IF bIcfCmdVelocityRpm THEN 
@@ -515,6 +554,14 @@ END_VAR]]></Declaration>
 	RETURN;
 END_IF
 
+// check if error is active
+	IF bError THEN
+		stFault.Active 			:= TRUE 						;
+		stFault.Description		:= 'Call to CmdMoveAbs while axis has an error';
+		stFault.FaultType		:= E_FaultTypes.OW				;	
+		RETURN;
+	END_IF
+
 // set blocked command if halt is active 
 bBlockedCommand := fbMcHalt.Active ;
 
@@ -571,6 +618,14 @@ END_VAR
 bBlockedCommand := fbMcHalt.Active ;
 
 
+// check if error is active
+	IF bError THEN
+		stFault.Active 			:= TRUE 						;
+		stFault.Description		:= 'Call to CmdMoveModulo while axis has an error';
+		stFault.FaultType		:= E_FaultTypes.OW				;	
+		RETURN;
+	END_IF
+
 // Velocity conversion from RPM to deg/sec
 	IF bIcfCmdVelocityRpm THEN 
 		fVelocity := Rpm_To_DegS(fVelocity);
@@ -616,6 +671,14 @@ END_VAR
         <ST><![CDATA[// set blocked command if halt is active 
 bBlockedCommand := fbMcHalt.Active ;
 
+// check if error is active
+	IF bError THEN
+		stFault.Active 			:= TRUE 						;
+		stFault.Description		:= 'Call to CmdMoveRelative while axis has an error';
+		stFault.FaultType		:= E_FaultTypes.OW				;	
+		RETURN;
+	END_IF
+
 // Velocity conversion from RPM to deg/sec
 	IF bIcfCmdVelocityRpm THEN 
 		fVelocity := Rpm_To_DegS(fVelocity);
@@ -658,6 +721,14 @@ END_VAR
         <ST><![CDATA[// set blocked command if halt is active 
 bBlockedCommand := fbMcHalt.Active ;
 
+// check if error is active
+	IF bError THEN
+		stFault.Active 			:= TRUE 						;
+		stFault.Description		:= 'Call to CmdMoveVelocity while axis has an error';
+		stFault.FaultType		:= E_FaultTypes.OW				;	
+		RETURN;
+	END_IF
+
 // Velocity conversion from RPM to deg/sec
 	IF bIcfCmdVelocityRpm THEN 
 		fVelocity := Rpm_To_DegS(fVelocity);
@@ -692,6 +763,14 @@ END_VAR
       <Implementation>
         <ST><![CDATA[// set blocked command if halt is active 
 bBlockedCommand := fbMcHalt.Active ;
+
+// check if error is active
+	IF bError THEN
+		stFault.Active 			:= TRUE 						;
+		stFault.Description		:= 'Call to CmdMoveVelocityDynamic while axis has an error';
+		stFault.FaultType		:= E_FaultTypes.OW				;	
+		RETURN;
+	END_IF
 
 // Velocity conversion from RPM to deg/sec
 	IF bIcfCmdVelocityRpm THEN 
@@ -787,6 +866,7 @@ END_VAR
 	CmdSafeStop := AxisRef.Status.NotMoving ;
 	RETURN;
 END_IF
+
 // Set safestop command
 bCmdSafeStop := TRUE ; 
 
@@ -802,7 +882,15 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[bExec_SetPosition 			:= NOT fbMcSetPosition.Busy AND NOT fbMcSetPosition.Done ; 
+        <ST><![CDATA[// check if error is active
+	IF bError THEN
+		stFault.Active 			:= TRUE 						;
+		stFault.Description		:= 'Call to CmdSetPosition while axis has an error';
+		stFault.FaultType		:= E_FaultTypes.OW				;	
+		RETURN;
+	END_IF
+
+bExec_SetPosition 			:= NOT fbMcSetPosition.Busy AND NOT fbMcSetPosition.Done ; 
 fbMcSetPosition.Position	:= fPosition ;
 fbMcSetPosition.Mode		:= bSetRelative ;
 
@@ -1090,7 +1178,7 @@ FOR i := 0 TO 1 DO
 	IF fbMcMoveAbsolute[i].Error THEN 
 		bError					:= TRUE							;
 		stFault.Active 			:= TRUE 						;
-		stFault.Description		:= CONCAT('Move absolute Fault ', UDINT_TO_STRING(fbMcMoveAbsolute[i].ErrorID));
+		stFault.Description		:= CONCAT('Move absolute fault ', UDINT_TO_STRING(fbMcMoveAbsolute[i].ErrorID));
 		stFault.FaultType		:= E_FaultTypes.FF				;
 	END_IF
 END_FOR 
