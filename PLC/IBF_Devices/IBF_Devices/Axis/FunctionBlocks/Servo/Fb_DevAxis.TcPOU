@@ -756,8 +756,12 @@ END_VAR
 	bExec_Reset 	:= TRUE ; 
 	bInternalEnable	:= TRUE ;
 	
+// Check error state of axis
+	bError 		:= AxisRef.Status.Error ; 
+
 // Set feedback output 
-	CmdReset := tonResetDone.Q OR (AxisRef.Status.Coupled AND bResetDone) ; ]]></ST>
+	CmdReset := (NOT bError); 
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdSafeSpeed" Id="{ddc13036-fa7e-46f4-be16-22a24c1d346b}" FolderPath="Command Methods\">
@@ -1255,7 +1259,6 @@ IF AxisRef.Status.Coupled THEN
 END_IF
 
 // ===== reset command =====
-	bError 		:= AxisRef.Status.Error ; 
 	bExec_Reset	R= fbMcReset.Done  ;
 
 // ==== execute reset functions =====
