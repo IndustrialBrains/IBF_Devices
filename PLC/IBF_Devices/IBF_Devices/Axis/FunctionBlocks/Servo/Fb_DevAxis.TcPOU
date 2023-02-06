@@ -169,7 +169,7 @@ bResetCalibrationFlag R= fbHomeResetCalibrationFlag.Done;
 
 IF bHomed AND (NOT AxisRef.NcToPlc.StateDWord.1) // Check if drive is still homed
 THEN 
-	{warning 'TODO: / Skip homing check if the drive is not connected (e.g., during automated tests of an axis with disabled hardware)'}
+	{warning 'TODO: Skip homing check if the drive is not connected (e.g., during automated tests of an axis with disabled hardware)'}
 	bHomed := FALSE;
 	IF NOT bManual THEN // Ignore homing error when in manual mode
 		bError					:= TRUE							;

@@ -245,7 +245,7 @@ VAR
 	bEnableCheck : BOOL;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[bEnableCheck := (bManual OR bEnable) AND bFcoCalcDone;
+        <ST><![CDATA[bEnableCheck := (bManual OR bEnable OR (bInitOk AND NOT bIsSafe)) AND bFcoCalcDone;
 
 //====== Run timeout checks for cylinder close =======
 IF bEnableCheck AND bIcfFbkClosedPresent THEN 
@@ -279,7 +279,7 @@ IF bEnableCheck AND bIcfFbkOpenPresent THEN
 	ELSIF bIcfCheckTooSlow AND fbTimerOpen.Q THEN
 		// send message to HMI 
 		stFault.Active			:= TRUE ;
-		stFault.Description		:= 'Cylinder opening to slow';
+		stFault.Description		:= 'Cylinder opening too slow';
 		bErrorActive			:= TRUE 							;
 		bReOpenSlow 			:= TRUE 							;
 	END_IF
