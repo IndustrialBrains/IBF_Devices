@@ -3,9 +3,47 @@
   <POU Name="Fb_DevAxisDelta" Id="{63a8c96e-3fc0-001c-2116-24486a7558ba}" SpecialFunc="None">
     <Declaration><![CDATA[// Delta ASDA-A2 servo
 FUNCTION_BLOCK Fb_DevAxisDelta EXTENDS Fb_DevAxis
-]]></Declaration>
+VAR
+	fbFormatString : FB_FormatString;
+    fbCoERead	: FB_CoERead;
+	dwErrorCode	: DWORD; // See ASDA A2-E EtherCAT Interface Servo Drive User Manual, chapter 9.2 Error Code Table
+END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[SUPER^();
+
+// Continously check drive error code
+fbCoERead(
+    NetId          := '', 
+    Index          := 16#603F, // ASDA2 Error Code
+    SubIndex       := 0, 
+    pDstBuf        := ADR(dwErrorCode), 
+    BufLen         := SIZEOF(dwErrorCode), 
+    Execute        := NOT fbCoERead.Busy,
+    Timeout        := T#5S, 
+    CompleteAccess := FALSE, 
+    Axis           := AxisRef
+);
+
+IF (dwErrorCode <> 0)
+	AND (dwErrorCode <> 16#9000) // Ignore STO errors (already handled by fbDevAxis)
+THEN
+	stFault.Active := TRUE;
+	stFault.FaultType := E_FaultTypes.CF;
+	
+	// Custom fault descriptions for some common errors
+	IF (dwErrorCode = 16#2310) THEN // AL001
+		stFault.Description := 'Motor overcurrent';
+	ELSIF (dwErrorCode = 16#7305) THEN // AL011
+		stFault.Description := 'Encoder error';
+	ELSIF (dwErrorCode = 16#7121) THEN // AL030
+		stFault.Description := 'Motor protection error (possible overload)';
+	ELSIF (dwErrorCode = 16#3300) THEN // AL031
+		stFault.Description := 'U,V,W wiring error';
+	ELSE // Not so common error
+		fbFormatString(sFormat := 'Delta ASDA-A2 servo error: 0x%X', arg1 := F_DWORD(dwErrorCode), sOut => stFault.Description);
+	END_IF
+END_IF
+
 ]]></ST>
     </Implementation>
     <Folder Name="Command Methods" Id="{6ff04a08-145f-0075-3081-8a253c264400}" />
