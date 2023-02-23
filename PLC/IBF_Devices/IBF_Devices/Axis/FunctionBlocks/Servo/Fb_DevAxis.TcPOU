@@ -127,8 +127,9 @@ VAR	// =============== Motion status functions ================
 		fLastCommandPosition: LREAL := 0 ; // Last given position command
 		fLastCommandVelocity: LREAL := 0 ; // Last given Velocity command
 
-	// Check command changes
-	feHaltDone : F_TRIG; 
+	// Register command changes to make sure CmdMoveAbs is triggered
+	{warning 'TODO: this is a workaround for a generic software design issue of DevAxis (needs state machine)'}
+	bResetCmdMoveAbs : BOOL := TRUE;
 		
 END_VAR
 VAR
@@ -221,10 +222,6 @@ END_VAR
 // ====== Reset acceleration deceleration values ======
 	fAcceleration	:= fCmdAcc;
 	fDeceleration	:= fCmdDec;
-	
-// ====== Check for command changes =====
-// Can be used to re-trigger movement
-feHaltDone(CLK := THIS^.fbMchalt.Done);
 ]]></ST>
       </Implementation>
     </Method>
@@ -281,8 +278,12 @@ END_VAR
 // copy parameters
 	fCmdGearRatio 		:= fGearRatio ;
 
+// Reset CmdMoveAbs
+bResetCmdMoveAbs := TRUE;
+
 // Set feedback output 
-	CmdGearDynamic 		:= bGearedAsSlave ;]]></ST>
+	CmdGearDynamic 		:= bGearedAsSlave ;
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdGearIn" Id="{d39d912d-cd60-47f9-9c58-f4c673b83377}" FolderPath="Command Methods\">
@@ -323,8 +324,12 @@ END_VAR
 // copy parameters
 	fCmdGearRatio 				:= fGearRatio ;
 
+// Reset CmdMoveAbs
+bResetCmdMoveAbs := TRUE;
+
 // Set feedback output 
-	CmdGearIn := bGearedAsSlave ;]]></ST>
+	CmdGearIn := bGearedAsSlave ;
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdGearOut" Id="{0eba1dc5-045c-4e71-9b15-315cb2debe34}" FolderPath="Command Methods\">
@@ -357,8 +362,12 @@ bExec_GearOutSlave 	:= TRUE ;
 bExec_GearAsSlave	:= FALSE;
 bExec_GearSlaveDyn 	:= FALSE;
 
+// Reset CmdMoveAbs
+bResetCmdMoveAbs := TRUE;
+
 // Set feedback Output
-CmdGearOut := fbMcGearOutSlave.Done;]]></ST>
+CmdGearOut := fbMcGearOutSlave.Done;
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdHalt" Id="{76ed2c19-987b-01bf-2d8e-dfce06b9fc82}" FolderPath="Command Methods\">
@@ -377,8 +386,12 @@ bInternalEnable	:= TRUE ;
 fbMcHalt.Deceleration	:= fDeceleration;
 fbMcHalt.BufferMode		:= mcBuffermode	;
 
+// Reset CmdMoveAbs
+bResetCmdMoveAbs := TRUE;
+
 // Set feedback output 
-CmdHalt := fbMchalt.Active OR fbMcHalt.Done ;]]></ST>
+CmdHalt := fbMchalt.Active OR fbMcHalt.Done ;
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="CmdHold" Id="{addb655d-652c-0e59-2bae-c9b2b7cd0849}" FolderPath="Command Methods\">
@@ -394,6 +407,9 @@ bInternalEnable	:= TRUE ;
 // copy parameters
 fbMcHalt.Deceleration	:= 0;
 fbMcHalt.BufferMode		:= 0;
+	
+// Reset CmdMoveAbs
+bResetCmdMoveAbs := TRUE;
 
 // Set feedback output 
 CmdHold := fbMchalt.Active OR fbMcHalt.Done ;]]></ST>
@@ -420,6 +436,9 @@ bInternalEnable	:= TRUE ;
 
 // copy parameters
 fbMcHome.Position 	:= ParHomeOffset.fValue;
+
+// Reset CmdMoveAbs
+bResetCmdMoveAbs := TRUE;
 
 // Set feedback output
 CmdHome := fbMcHome.Done ;
@@ -463,6 +482,9 @@ bBlockedCommand := fbMcHalt.Active ;
 	fbMcJog.Velocity	:= fVelocity 	;
 	fbmcjog.Mode		:= eJogmode		;
 	fbMcJog.Position	:= fPos			;
+
+// Reset CmdMoveAbs
+bResetCmdMoveAbs := TRUE;
 
 // Set feedback output 
 	CmdJog := fbMcJog.Active ;]]></ST>
@@ -532,6 +554,7 @@ ELSE
 	CmdHalt( 	fDeceleration := fMaxDec * 0.9, 
 				mcBuffermode := MC_BufferMode.MC_Aborting) ; 
 END_IF
+
 ]]></ST>
       </Implementation>
     </Method>
@@ -571,10 +594,12 @@ bBlockedCommand := fbMcHalt.Active ;
 	END_IF
 
 // Determine if a new command is geven or previous command is repeated
-bNewCommandReceived := feHaltDone.Q 
+bNewCommandReceived := bResetCmdMoveAbs
 			OR (fPosition <> fLastCommandPosition) 
 			OR (fVelocity <> fLastCommandVelocity)
-;	
+;
+bResetCmdMoveAbs := FALSE;
+
 	
 // Determine function for command stacking
 IF mcBuffermode = MC_Aborting OR NOT AxisRef.Status.CmdBuffered THEN 
@@ -650,6 +675,9 @@ END_IF
 	
 bInternalEnable	:= TRUE ;
 
+// Reset CmdMoveAbs
+bResetCmdMoveAbs := TRUE;
+
 // set feedback
 IF arExec_MoveModulo[1] OR fbMcMoveModulo[1].Busy THEN 
 	CmdMoveModulo :=	fbMcMoveModulo[1].Active OR fbMcMoveModulo[1].Done;
@@ -700,6 +728,9 @@ IF NOT AxisRef.Status.CmdBuffered OR mcBuffermode <> MC_Aborting THEN
 END_IF
 bInternalEnable	:= TRUE ;
 
+// Reset CmdMoveAbs
+bResetCmdMoveAbs := TRUE;
+
 // set feedback
 IF arExec_MoveRelative[1] OR fbMCMoveRelative[1].Busy THEN 
 	CmdMoveRelative :=	fbMCMoveRelative[1].Active ;
@@ -744,6 +775,9 @@ bBlockedCommand := fbMcHalt.Active ;
 	fbMcMoveVelocity.Velocity	:= fVelocity 	;
 	fbMcMoveVelocity.Direction 	:= mcDirection	;
 	fbMcMoveVelocity.BufferMode	:= mcBuffermode	;
+
+// Reset CmdMoveAbs
+bResetCmdMoveAbs := TRUE;
 
 // Set feedback output 
 	CmdMoveVelocity := fbMcMoveVelocity.Active ;]]></ST>
@@ -797,6 +831,10 @@ bBlockedCommand := fbMcHalt.Active ;
 	fbMcMoveVelocity.Direction 	:= mcDirection	;
 	fbMcMoveVelocity.BufferMode	:= mcBuffermode	;
 
+// Reset CmdMoveAbs
+bResetCmdMoveAbs := TRUE;
+	
+
 // Set feedback output
 	CmdMoveVelocityDynamic := fbMcMoveVelocity.Active ;]]></ST>
       </Implementation>
@@ -837,6 +875,9 @@ END_VAR
 	
 // Check error state of axis
 	bError 		:= AxisRef.Status.Error ; 
+
+// Reset CmdMoveAbs
+bResetCmdMoveAbs := TRUE;
 
 // Set feedback output 
 	CmdReset := (NOT bError); 
@@ -893,6 +934,9 @@ END_VAR
 bExec_SetPosition 			:= NOT fbMcSetPosition.Busy AND NOT fbMcSetPosition.Done ; 
 fbMcSetPosition.Position	:= fPosition ;
 fbMcSetPosition.Mode		:= bSetRelative ;
+
+// Reset CmdMoveAbs
+bResetCmdMoveAbs := TRUE;
 
 CmdSetPosition := fbMcSetPosition.Done;]]></ST>
       </Implementation>
